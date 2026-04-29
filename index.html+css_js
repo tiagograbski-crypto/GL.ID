@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GLID | Preload de Elite</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            /* 1. Base Metálica (Obrigatória) */
+            --gold-light: #E8D5C4; 
+            --gold-base: #B8A38E;  
+            --gold-deep: #8D7A65;  
+            
+            /* 2. Contraste */
+            --color-gunmetal: #2C2C2C;
+            --color-cashmere: #F5F5F3;
+        }
+
+        /* Foundation: Champagne Gold Gradient - A chapa de metal sólida */
+        #preloader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, 
+                var(--gold-light) 0%, 
+                var(--gold-base) 50%, 
+                var(--gold-deep) 100%
+            );
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        /* Container da Logo */
+        .logo-container {
+            position: relative;
+            width: 220px; /* Aumentado levemente para impacto */
+            margin-bottom: 3.5rem;
+        }
+
+        /* A Logo Base (Sólida) */
+        .logo-base {
+            width: 100%;
+            height: auto;
+            display: block;
+            opacity: 0.9;
+        }
+
+        /* Efeito de Brilho Técnico (Metallic Sweep) */
+        /* Este elemento usa a logo como MÁSCARA para que o brilho só apareça no metal */
+        .logo-shimmer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                110deg,
+                transparent 20%,
+                rgba(255, 255, 255, 0) 35%,
+                rgba(255, 255, 255, 0.8) 50%,
+                rgba(255, 255, 255, 0) 65%,
+                transparent 80%
+            );
+            background-size: 200% 100%;
+            /* A MÁGICA: A logo define onde a luz aparece */
+            -webkit-mask-image: url('https://glid.carrd.co/assets/images/image03.png?v=951bca55');
+            mask-image: url('https://glid.carrd.co/assets/images/image03.png?v=951bca55');
+            -webkit-mask-size: contain;
+            mask-size: contain;
+            -webkit-mask-repeat: no-repeat;
+            mask-repeat: no-repeat;
+            
+            animation: metallicSweep 3s infinite ease-in-out;
+            z-index: 2;
+        }
+
+        @keyframes metallicSweep {
+            0% { background-position: 200% 0; opacity: 0; }
+            10% { opacity: 1; }
+            40% { background-position: -200% 0; opacity: 1; }
+            50%, 100% { background-position: -200% 0; opacity: 0; }
+        }
+
+        /* A Costura Digital - Agora integrada como um sulco no metal */
+        .stitch-container {
+            position: relative;
+            width: 160px;
+            height: 1px;
+            background-color: rgba(44, 44, 44, 0.15); 
+            overflow: hidden;
+            box-shadow: inset 0 1px 1px rgba(0,0,0,0.05);
+        }
+
+        .stitch-line {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: var(--color-cashmere);
+            box-shadow: 0 0 15px var(--color-cashmere);
+            animation: stitchFlow 2s infinite cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes stitchFlow {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        /* Label de Performance */
+        .technical-label {
+            color: var(--color-gunmetal);
+            opacity: 0.6;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.7em;
+            margin-top: 2rem;
+            font-weight: 600;
+        }
+
+        /* Modo de Edição: Mantém visível */
+        .preloader-hidden {
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.1s linear;
+        }
+    </style>
+</head>
+<body style="margin: 0; overflow: hidden;">
+
+    <div id="preloader">
+        <div class="flex flex-col items-center">
+            
+            <!-- Logo Container -->
+            <div class="logo-container">
+                <!-- Camada 1: Logo Estática -->
+                <img 
+                    src="https://glid.carrd.co/assets/images/image03.png?v=951bca55" 
+                    alt="GLID" 
+                    class="logo-base"
+                >
+                <!-- Camada 2: Reflexo Dinâmico (Mascarado) -->
+                <div class="logo-shimmer"></div>
+            </div>
+            
+            <!-- A Costura (Luz de progresso) -->
+            <div class="stitch-container">
+                <div class="stitch-line"></div>
+            </div>
+            
+            <span class="technical-label">
+                Performance Radical
+            </span>
+        </div>
+    </div>
+
+    <main id="main-content" style="display: none;">
+        <!-- Conteúdo final entra aqui -->
+    </main>
+
+    <script>
+        /**
+         * MODO DE EDIÇÃO ATIVO
+         * O preloader não sumirá para você trabalhar no efeito de máscara.
+         */
+    </script>
+</body>
+</html>
