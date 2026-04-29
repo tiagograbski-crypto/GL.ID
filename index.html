@@ -27,6 +27,7 @@
             --btn-hover-bg: rgba(44, 44, 44, 0.08);
             --cursor-focus: rgba(44, 44, 44, 0.04);
             --gold-accent: #B8A38E; 
+            --grid-line: rgba(184, 163, 142, 0.08);
             
             --mouse-x: 50%; --mouse-y: 50%;
             --parallax-x: 0px; --parallax-y: 0px;
@@ -50,6 +51,7 @@
             --btn-hover-bg: rgba(255, 255, 255, 0.08);
             --cursor-focus: rgba(255, 255, 255, 0.05);
             --gold-accent: #E8D5C4; 
+            --grid-line: rgba(232, 213, 196, 0.03);
         }
 
         * { transition: background-color 0.5s ease, color 0.5s ease, border-color 0.5s ease; -webkit-tap-highlight-color: transparent; }
@@ -176,6 +178,12 @@
             position: relative; z-index: 10;
         }
 
+        /* Fundo com "Marcas de Contraste" - Architectural Grid */
+        .arch-grid {
+            background-image: linear-gradient(to right, var(--grid-line) 1px, transparent 1px);
+            background-size: 25vw 100%;
+        }
+
         /* Gradiente Champagne Gold Otimizado */
         .gold-gradient-text {
             background: linear-gradient(135deg, #E8D5C4 0%, #B8A38E 50%, #8D7A65 100%);
@@ -198,13 +206,44 @@
         }
         .reveal-on-scroll.is-visible { opacity: 1; transform: translateY(0); filter: blur(0); }
 
-        /* Parallax Acervo */
-        .parallax-img { transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
-        .group:hover .parallax-img { transform: scale(1.05); }
+        /* Parallax Acervo & Imagens de Grife */
+        .card-img-container { overflow: hidden; position: absolute; inset: 0; }
+        .card-img { 
+            width: 100%; height: 100%; object-fit: cover; 
+            filter: grayscale(100%) contrast(1.1) brightness(0.8); 
+            transition: transform 1.2s cubic-bezier(0.16, 1, 0.3, 1), filter 1.2s ease; 
+        }
+        .group:hover .card-img { 
+            transform: scale(1.08); 
+            filter: grayscale(0%) contrast(1) brightness(1); 
+        }
 
-        /* Before/After Slider */
+        /* Before/After Slider - "Seda Sensorial" vs "Ruído Visual" */
         .slider-container { cursor: ew-resize; touch-action: pan-y; }
         .slider-handle { transform: translateX(-50%); }
+
+        /* Efeito de Ruído Sujo (Before) */
+        .noise-bg {
+            background-color: #111;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.15'/%3E%3C/svg%3E");
+        }
+
+        /* Efeito Seda Sensorial / Silk Flow (After) */
+        .silk-effect {
+            background: linear-gradient(120deg, #F5F5F3, #E8D5C4, #F5F5F3, #B8A38E);
+            background-size: 300% 300%;
+            animation: silkFlow 8s ease-in-out infinite;
+            box-shadow: inset 0 0 100px rgba(255,255,255,0.4);
+        }
+        [data-theme="obsidian"] .silk-effect {
+            background: linear-gradient(120deg, #111111, #1a1a1a, #0a0a0a, #2C2C2C);
+            box-shadow: inset 0 0 100px rgba(0,0,0,0.8);
+        }
+        @keyframes silkFlow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
 
     </style>
 </head>
@@ -238,7 +277,7 @@
     </div>
 
     <!-- FUNIL PRINCIPAL SEO 4.0 -->
-    <main id="main-content" class="opacity-0 pointer-events-none absolute top-0 left-0 w-full min-h-screen pb-0">
+    <main id="main-content" class="opacity-0 pointer-events-none absolute top-0 left-0 w-full min-h-screen pb-0 arch-grid">
         
         <!-- 1. HEADER MINIMALISTA -->
         <header class="fixed top-0 left-0 w-full z-50 px-6 py-5 flex justify-between items-center backdrop-blur-[10px] border-b border-[var(--border-color)] bg-[var(--bg-color)]/70 transition-opacity duration-1000 opacity-0" id="main-header" aria-label="Cabeçalho Principal">
@@ -247,77 +286,97 @@
         </header>
 
         <!-- 2. HERO SECTION -->
-        <section class="min-h-screen flex flex-col justify-center items-center px-6 text-center pt-24 pb-16 reveal-on-scroll" aria-labelledby="hero-title">
-            <h1 id="hero-title" class="text-3xl md:text-5xl lg:text-6xl text-[var(--text-color)] leading-[1.2] mb-8 max-w-5xl tracking-tight uppercase">
+        <section class="min-h-screen flex flex-col justify-center items-center px-6 text-center pt-24 pb-16 reveal-on-scroll relative" aria-labelledby="hero-title">
+            <h1 id="hero-title" class="text-3xl md:text-5xl lg:text-6xl text-[var(--text-color)] leading-[1.2] mb-8 max-w-5xl tracking-tight uppercase relative z-10">
                 Sua autoridade digital merece a precisão de um Atelier, não o ruído de uma agência.
             </h1>
-            <p class="text-sm md:text-base text-[var(--text-color)] opacity-70 max-w-3xl mb-14 font-light leading-relaxed">
+            <p class="text-sm md:text-base text-[var(--text-color)] opacity-70 max-w-3xl mb-14 font-light leading-relaxed relative z-10">
                 Nós não entregamos sites genéricos. Esculpimos infraestruturas de conversão ultra-luxo, hand-coded, que justificam o seu preço high-ticket antes mesmo do cliente ler a oferta. Sinta a textura da exclusividade.
             </p>
-            <button class="bg-[#2C2C2C] text-[#E8D5C4] px-10 py-5 uppercase tracking-[0.3em] text-xs font-semibold haptic-press haptic-target" data-vibrate="20">
+            <button class="bg-[#2C2C2C] text-[#E8D5C4] px-10 py-5 uppercase tracking-[0.3em] text-xs font-semibold haptic-press haptic-target relative z-10" data-vibrate="20">
                 Solicitar Acesso ao Atelier
             </button>
         </section>
 
-        <!-- 3. GALERIA DE CURADORIA -->
-        <section class="py-32 px-6 md:px-12 w-full max-w-7xl mx-auto border-t border-[var(--border-color)] reveal-on-scroll" aria-labelledby="gallery-title">
+        <!-- 3. GALERIA DE CURADORIA COM IMAGENS REAIS -->
+        <section class="py-32 px-6 md:px-12 w-full max-w-7xl mx-auto border-t border-[var(--border-color)] reveal-on-scroll relative z-10 bg-[var(--bg-color)]" aria-labelledby="gallery-title">
             <h2 id="gallery-title" class="text-2xl md:text-3xl lg:text-4xl text-[var(--text-color)] text-center mb-20 uppercase tracking-[0.2em]">Arquitetura de Intenção. Nosso Acervo Private.</h2>
             
             <div class="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-8 lg:gap-16">
                 <!-- Ativo 1 -->
-                <article class="group haptic-target" data-vibrate="5">
-                    <div class="aspect-[16/9] bg-[#1A1A1A] mb-6 overflow-hidden relative shadow-[inset_0_0_20px_rgba(0,0,0,0.5)]">
-                         <div class="absolute inset-0 bg-cover bg-center parallax-img" style="background-image: url('https://glid.carrd.co/assets/images/image03.png?v=951bca55'); opacity: 0.15; filter: grayscale(100%);"></div>
-                         <div class="absolute inset-0 flex items-center justify-center opacity-30 group-hover:opacity-100 transition-opacity"><span class="gold-gradient-text text-sm tracking-widest uppercase">+ Inspecionar</span></div>
+                <article class="group haptic-target cursor-pointer" data-vibrate="5">
+                    <div class="aspect-[4/5] md:aspect-[16/9] mb-6 relative shadow-[inset_0_0_20px_rgba(0,0,0,0.5)] card-img-container">
+                         <!-- Placeholder de Luxo (Alta Costura/Cosméticos) -->
+                         <img src="https://images.unsplash.com/photo-1615397323214-7798369cb84e?q=80&w=800&auto=format&fit=crop" alt="GL PRO Cosméticos de Luxo" class="card-img">
+                         <div class="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-700">
+                             <span class="gold-gradient-text text-sm tracking-widest uppercase border border-[#B8A38E] px-6 py-2 backdrop-blur-sm">+ Inspecionar</span>
+                         </div>
                     </div>
-                    <h3 class="text-lg text-[var(--text-color)] uppercase tracking-[0.2em] mb-2">GL PRO</h3>
-                    <span class="text-[10px] text-[#B8A38E] tracking-[0.3em] uppercase block mb-4">High-End Cosmetics</span>
+                    <h3 class="text-lg text-[var(--text-color)] uppercase tracking-[0.2em] mb-2 font-bold">GL PRO</h3>
+                    <span class="text-[10px] text-[#B8A38E] tracking-[0.3em] uppercase block mb-4 border-b border-[var(--border-color)] pb-2 inline-block">High-End Cosmetics</span>
                     <p class="text-sm text-[var(--text-color)] opacity-60 font-light leading-relaxed">Engenharia visual para protocolos 8K e reestruturação capilar de elite.</p>
                 </article>
                 
                 <!-- Ativo 2 -->
-                <article class="group haptic-target" data-vibrate="5">
-                    <div class="aspect-[16/9] bg-[#1A1A1A] mb-6 overflow-hidden relative shadow-[inset_0_0_20px_rgba(0,0,0,0.5)]">
-                         <div class="absolute inset-0 bg-cover bg-center parallax-img" style="background-image: url('https://glid.carrd.co/assets/images/image03.png?v=951bca55'); opacity: 0.15; filter: grayscale(100%); transform: scale(1.02);"></div>
-                         <div class="absolute inset-0 flex items-center justify-center opacity-30 group-hover:opacity-100 transition-opacity"><span class="gold-gradient-text text-sm tracking-widest uppercase">+ Inspecionar</span></div>
+                <article class="group haptic-target cursor-pointer" data-vibrate="5">
+                    <div class="aspect-[4/5] md:aspect-[16/9] mb-6 relative shadow-[inset_0_0_20px_rgba(0,0,0,0.5)] card-img-container">
+                         <!-- Placeholder de Luxo (Bebidas Premium/Minimalismo) -->
+                         <img src="https://images.unsplash.com/photo-1575037614876-c38e4d44f5b8?q=80&w=800&auto=format&fit=crop" alt="LX Élixir Noir Garrafa" class="card-img">
+                         <div class="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-700">
+                             <span class="gold-gradient-text text-sm tracking-widest uppercase border border-[#B8A38E] px-6 py-2 backdrop-blur-sm">+ Inspecionar</span>
+                         </div>
                     </div>
-                    <h3 class="text-lg text-[var(--text-color)] uppercase tracking-[0.2em] mb-2">LX ÉLIXIR NOIR</h3>
-                    <span class="text-[10px] text-[#B8A38E] tracking-[0.3em] uppercase block mb-4">Functional Luxury</span>
+                    <h3 class="text-lg text-[var(--text-color)] uppercase tracking-[0.2em] mb-2 font-bold">LX ÉLIXIR NOIR</h3>
+                    <span class="text-[10px] text-[#B8A38E] tracking-[0.3em] uppercase block mb-4 border-b border-[var(--border-color)] pb-2 inline-block">Functional Luxury</span>
                     <p class="text-sm text-[var(--text-color)] opacity-60 font-light leading-relaxed">Materialização digital para bebidas funcionais voltadas à beleza e saúde premium.</p>
                 </article>
 
                 <!-- Ativo 3 -->
-                <article class="group haptic-target" data-vibrate="5">
-                    <div class="aspect-[16/9] bg-[#1A1A1A] mb-6 overflow-hidden relative shadow-[inset_0_0_20px_rgba(0,0,0,0.5)]">
-                         <div class="absolute inset-0 bg-cover bg-center parallax-img" style="background-image: url('https://glid.carrd.co/assets/images/image03.png?v=951bca55'); opacity: 0.15; filter: grayscale(100%); transform: scale(1.05);"></div>
-                         <div class="absolute inset-0 flex items-center justify-center opacity-30 group-hover:opacity-100 transition-opacity"><span class="gold-gradient-text text-sm tracking-widest uppercase">+ Inspecionar</span></div>
+                <article class="group haptic-target cursor-pointer" data-vibrate="5">
+                    <div class="aspect-[4/5] md:aspect-[16/9] mb-6 relative shadow-[inset_0_0_20px_rgba(0,0,0,0.5)] card-img-container">
+                         <!-- Placeholder de Luxo (Gastronomia/Arquitetura Sensorial) -->
+                         <img src="https://images.unsplash.com/photo-1600565193348-f74bd3c7ccdf?q=80&w=800&auto=format&fit=crop" alt="Doré Gastronomia Sensorial" class="card-img">
+                         <div class="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-700">
+                             <span class="gold-gradient-text text-sm tracking-widest uppercase border border-[#B8A38E] px-6 py-2 backdrop-blur-sm">+ Inspecionar</span>
+                         </div>
                     </div>
-                    <h3 class="text-lg text-[var(--text-color)] uppercase tracking-[0.2em] mb-2">DORÉ</h3>
-                    <span class="text-[10px] text-[#B8A38E] tracking-[0.3em] uppercase block mb-4">Sensorial Gastronomy</span>
+                    <h3 class="text-lg text-[var(--text-color)] uppercase tracking-[0.2em] mb-2 font-bold">DORÉ</h3>
+                    <span class="text-[10px] text-[#B8A38E] tracking-[0.3em] uppercase block mb-4 border-b border-[var(--border-color)] pb-2 inline-block">Sensorial Gastronomy</span>
                     <p class="text-sm text-[var(--text-color)] opacity-60 font-light leading-relaxed">Experiência tátil e visual para alta gastronomia e acompanhamentos gourmet.</p>
                 </article>
             </div>
         </section>
 
-        <!-- 4. A TRANSFORMAÇÃO (CHOQUE DE REALIDADE) -->
-        <section class="py-32 px-6 w-full max-w-6xl mx-auto border-t border-[var(--border-color)] reveal-on-scroll" aria-labelledby="transformation-title">
+        <!-- 4. A TRANSFORMAÇÃO (Seda Sensorial vs Ruído Visual) -->
+        <section class="py-32 px-6 w-full max-w-6xl mx-auto border-t border-[var(--border-color)] reveal-on-scroll relative z-10 bg-[var(--bg-color)]" aria-labelledby="transformation-title">
             <h2 id="transformation-title" class="text-2xl md:text-3xl lg:text-4xl text-[var(--text-color)] text-center mb-16 uppercase tracking-[0.2em]">O Custo do Ruído.</h2>
             
-            <div class="relative w-full aspect-square md:aspect-[21/9] overflow-hidden slider-container bg-[var(--bg-color)] shadow-2xl haptic-target" id="ba-container" data-vibrate="2">
-                <!-- AFTER LAYER (Direita / Elite) -->
-                <div class="absolute inset-0 bg-[var(--bg-color)] flex items-center justify-end p-8 md:p-16 border border-[var(--border-color)]">
-                    <div class="text-right w-1/2 max-w-sm">
-                        <h4 class="text-xl md:text-3xl text-[var(--text-color)] mb-4 uppercase tracking-widest">Arquitetura de Elite</h4>
-                        <p class="text-[var(--text-color)] opacity-70 text-sm md:text-base font-light italic">Hand-coded, Alta Performance, R$ 30k+</p>
+            <div class="relative w-full aspect-square md:aspect-[21/9] overflow-hidden slider-container shadow-2xl haptic-target border border-[var(--border-color)]" id="ba-container" data-vibrate="2">
+                
+                <!-- AFTER LAYER (Direita / Elite / SEDA SENSORIAL) -->
+                <div class="absolute inset-0 flex items-center justify-end p-8 md:p-16 silk-effect text-[var(--text-color)]">
+                    <div class="text-right w-full md:w-1/2 max-w-md ml-auto">
+                        <h4 class="text-xl md:text-3xl mb-4 uppercase tracking-widest font-bold">Arquitetura de Elite</h4>
+                        <ul class="text-sm md:text-base font-light italic opacity-80 flex flex-col gap-2 mb-6 items-end">
+                            <li>✦ Código Limpo (Hand-coded) puro.</li>
+                            <li>✦ Performance radical (Sub 0.8s).</li>
+                            <li>✦ Arquitetura semântica imaculada.</li>
+                        </ul>
+                        <p class="text-xs uppercase tracking-widest text-[#8D7A65] border-t border-[#8D7A65]/30 pt-4">O DNA da sua marca esculpido na raiz da internet.</p>
                     </div>
                 </div>
                 
-                <!-- BEFORE LAYER (Esquerda / Ruído) -->
-                <div class="absolute inset-y-0 left-0 w-1/2 overflow-hidden border-r border-[#B8A38E] z-10 bg-[#1A1A1A] text-[#F5F5F3] shadow-[5px_0_20px_rgba(0,0,0,0.5)]" id="ba-before">
+                <!-- BEFORE LAYER (Esquerda / Ruído / NOISE GLITCH) -->
+                <div class="absolute inset-y-0 left-0 w-1/2 overflow-hidden border-r border-[#B8A38E] z-10 noise-bg text-[#F5F5F3] shadow-[5px_0_20px_rgba(0,0,0,0.8)]" id="ba-before">
                     <div class="absolute inset-0 w-[200vw] md:w-[600px] lg:w-[1152px] flex items-center justify-start p-8 md:p-16">
-                        <div class="w-full md:w-1/2 max-w-sm">
-                            <h4 class="text-xl md:text-3xl mb-4 uppercase tracking-widest">Infraestrutura de Ruído</h4>
-                            <p class="opacity-70 text-sm md:text-base font-light italic">Templates, Lentidão, R$ 3k</p>
+                        <div class="w-full md:w-1/2 max-w-md">
+                            <h4 class="text-xl md:text-3xl mb-4 uppercase tracking-widest text-red-50/80">Infraestrutura de Ruído</h4>
+                            <ul class="text-sm md:text-base font-light italic opacity-60 flex flex-col gap-2 mb-6">
+                                <li>✕ Templates pesados e engessados.</li>
+                                <li>✕ Plugins inchados, lentidão crônica.</li>
+                                <li>✕ Dependência estrutural de terceiros.</li>
+                            </ul>
+                            <p class="text-xs uppercase tracking-widest text-gray-500 border-t border-gray-700 pt-4">A sua marca diluída num mar de código genérico.</p>
                         </div>
                     </div>
                 </div>
@@ -325,7 +384,6 @@
                 <!-- ALÇA DO SLIDER (Champagne Gold) -->
                 <div class="absolute inset-y-0 -ml-[2px] flex items-center justify-center z-20 pointer-events-none slider-handle" style="left: 50%; width: 4px;" id="ba-handle">
                     <div class="w-[3px] h-full bg-gradient-to-b from-[#E8D5C4] via-[#B8A38E] to-[#8D7A65] shadow-[0_0_15px_rgba(184,163,142,0.8)]"></div>
-                    <!-- Ícone de arraste -->
                     <div class="absolute w-8 h-12 bg-[#2C2C2C] border border-[#B8A38E] rounded-sm flex items-center justify-center gap-1 shadow-lg">
                         <div class="w-px h-4 bg-[#B8A38E]"></div>
                         <div class="w-px h-4 bg-[#B8A38E]"></div>
@@ -334,33 +392,89 @@
             </div>
         </section>
 
-        <!-- 5. O FILTRO DE ELITE -->
-        <section class="py-32 px-6 w-full bg-[var(--bg-color)] border-t border-[var(--border-color)] reveal-on-scroll" aria-labelledby="filter-title">
-            <div class="max-w-4xl mx-auto text-center">
-                <h2 id="filter-title" class="text-2xl md:text-3xl text-[var(--text-color)] mb-10 uppercase tracking-[0.2em]">Seleção de Clientes Tier 1</h2>
-                <p class="text-[var(--text-color)] opacity-70 mb-16 font-light leading-relaxed text-sm md:text-base max-w-2xl mx-auto">
-                    A Alfaiataria Digital da GLID não é para todos. Exigimos marcas que já dominam seus nichos e precisam que a sua vitrine digital alcance o nível do seu faturamento real.
-                </p>
-                
-                <!-- Ancoragem de Preço com Estilo Pesponto -->
-                <div class="border border-dashed border-[#B8A38E] p-12 relative bg-[var(--bg-color)] mx-auto max-w-xl shadow-[inset_0_0_50px_rgba(0,0,0,0.03)] haptic-target" data-vibrate="10">
-                    <div class="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-[var(--bg-color)] px-4">
-                        <img src="https://glid.carrd.co/assets/images/image03.png?v=951bca55" alt="GLID Símbolo" class="w-6 opacity-30 filter brightness-0 dark:invert" style="filter: invert(var(--invert-logo));">
+        <!-- 5. ARQUITETURA DE INVESTIMENTO PRIVATE (FILTRO DE ELITE) -->
+        <section class="py-32 px-6 w-full bg-[var(--bg-color)] border-t border-[var(--border-color)] reveal-on-scroll relative z-10" aria-labelledby="pricing-title">
+            <div class="max-w-7xl mx-auto">
+                <div class="text-center mb-24 max-w-4xl mx-auto">
+                    <h2 id="pricing-title" class="text-2xl md:text-3xl lg:text-4xl text-[var(--text-color)] mb-8 uppercase tracking-[0.2em] font-serif">Arquitetura de Investimento Private</h2>
+                    <p class="text-[var(--text-color)] opacity-70 mb-10 font-light leading-relaxed text-sm md:text-base">
+                        A Alfaiataria Digital da GL.ID não constrói e-commerces pesados e sistemas de gestão de estoque obsoletos. Nós construímos vitrines de desejo absoluto e funis de altíssima performance. Toda a transação e inteligência de vendas é roteada diretamente para o seu WhatsApp ou Checkout Oficial. Escolha o seu nível de exclusividade:
+                    </p>
+                    <div class="inline-flex items-center justify-center gap-3 border border-[var(--border-color)] px-5 py-2.5 bg-[var(--text-color)] text-[var(--bg-color)] uppercase tracking-widest text-[9px] haptic-target" data-vibrate="5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-[#B8A38E] animate-pulse"></span>
+                        Zero WordPress. 100% Hand-Coded Puro.
                     </div>
-                    <p class="text-lg md:text-2xl text-[var(--text-color)] uppercase tracking-widest mb-6 leading-relaxed">
-                        Padrão de Investimento Private:<br>
-                        <span class="gold-gradient-text font-bold">A partir de R$ 12.000</span>
-                    </p>
-                    <p class="text-[10px] text-[var(--text-color)] opacity-50 uppercase tracking-[0.2em] border-t border-[var(--border-color)] pt-6 mt-6">
-                        Limitado a um número restrito de projetos por semestre no Brasil para garantir qualidade artesanal.
-                    </p>
+                </div>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-0 items-center">
+                    
+                    <!-- TIER 1 -->
+                    <div class="border border-[var(--border-color)] p-10 lg:p-12 relative bg-[var(--bg-color)] hover:bg-[var(--cursor-focus)] transition-colors haptic-target backdrop-blur-sm" data-vibrate="10">
+                        <h3 class="text-lg uppercase tracking-widest text-[var(--text-color)] mb-2 font-serif">Cápsula</h3>
+                        <p class="text-[10px] uppercase tracking-[0.3em] text-[#B8A38E] mb-8">A Porta de Entrada</p>
+                        <div class="mb-10">
+                            <span class="text-3xl font-serif text-[var(--text-color)] tracking-tight">R$ 8.500</span>
+                        </div>
+                        <ul class="flex flex-col gap-5 text-xs font-light tracking-wide text-[var(--text-color)] opacity-80 mb-12 min-h-[220px]">
+                            <li class="flex items-start gap-3"><span class="text-[#B8A38E]">✦</span> Single-Page Editorial</li>
+                            <li class="flex items-start gap-3"><span class="text-[#B8A38E]">✦</span> Design Quiet Luxury</li>
+                            <li class="flex items-start gap-3"><span class="text-[#B8A38E]">✦</span> Copywriting Base</li>
+                            <li class="flex items-start gap-3"><span class="text-[#B8A38E]">✦</span> Botão flutuante minimalista (WhatsApp)</li>
+                            <li class="flex items-start gap-3 opacity-40"><span class="text-[var(--text-color)]">✕</span> Haptic UX (Vibração Tátil)</li>
+                            <li class="flex items-start gap-3 opacity-40"><span class="text-[var(--text-color)]">✕</span> SEO 4.0 Semântico</li>
+                            <li class="flex items-start gap-3 opacity-40"><span class="text-[var(--text-color)]">✕</span> Páginas Múltiplas</li>
+                        </ul>
+                        <button class="w-full border border-[var(--text-color)] text-[var(--text-color)] py-4 text-[10px] uppercase tracking-widest hover:bg-[var(--text-color)] hover:text-[var(--bg-color)] transition-colors haptic-target" data-vibrate="15">Aplicar Agora</button>
+                    </div>
+
+                    <!-- TIER 2 -->
+                    <div class="border border-[#B8A38E] p-12 lg:p-16 relative bg-[var(--bg-color)] z-10 shadow-[0_0_40px_rgba(184,163,142,0.15)] lg:scale-105 haptic-press haptic-target" data-vibrate="20">
+                        <div class="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-[#B8A38E] text-[#F5F5F3] px-6 py-2 text-[9px] uppercase tracking-[0.4em] whitespace-nowrap shadow-lg">
+                            A Escolha da Elite
+                        </div>
+                        <h3 class="text-xl uppercase tracking-widest text-[var(--text-color)] mb-2 font-serif mt-2">Alfaiataria de Funil</h3>
+                        <p class="text-[10px] uppercase tracking-[0.3em] text-[#B8A38E] mb-8">A Experiência Private</p>
+                        <div class="mb-10">
+                            <span class="text-4xl font-serif gold-gradient-text tracking-tight font-bold">R$ 14.500</span>
+                        </div>
+                        <ul class="flex flex-col gap-5 text-xs font-light tracking-wide text-[var(--text-color)] opacity-90 mb-12 min-h-[220px]">
+                            <li class="flex items-start gap-3"><span class="text-[#B8A38E]">✦</span> Funil Completo (até 3 páginas)</li>
+                            <li class="flex items-start gap-3"><span class="text-[#B8A38E]">✦</span> Haptic UX (Textura e Vibração)</li>
+                            <li class="flex items-start gap-3"><span class="text-[#B8A38E]">✦</span> SEO 4.0 Semântico</li>
+                            <li class="flex items-start gap-3"><span class="text-[#B8A38E]">✦</span> Rastreamento Nativo (Pixels/GA4)</li>
+                            <li class="flex items-start gap-3"><span class="text-[#B8A38E]">✦</span> Redirecionamentos para Checkouts</li>
+                            <li class="flex items-start gap-3 opacity-40"><span class="text-[var(--text-color)]">✕</span> Assessoria técnica contínua</li>
+                        </ul>
+                        <button class="w-full bg-[#2C2C2C] text-[#E8D5C4] py-5 text-[10px] uppercase tracking-[0.3em] font-semibold hover:bg-[#B8A38E] hover:text-white transition-colors shadow-[0_10px_30px_rgba(44,44,44,0.2)] haptic-target" data-vibrate="30">
+                            Reservar Vaga no Atelier
+                        </button>
+                    </div>
+
+                    <!-- TIER 3 -->
+                    <div class="border border-[var(--border-color)] p-10 lg:p-12 relative bg-[var(--bg-color)] hover:bg-[var(--cursor-focus)] transition-colors haptic-target backdrop-blur-sm" data-vibrate="10">
+                        <h3 class="text-lg uppercase tracking-widest text-[var(--text-color)] mb-2 font-serif">Haute Couture</h3>
+                        <p class="text-[10px] uppercase tracking-[0.3em] text-[#B8A38E] mb-8">Domínio Total</p>
+                        <div class="mb-10 flex flex-col justify-center">
+                            <span class="text-[10px] uppercase tracking-widest opacity-50 text-[var(--text-color)] mb-1">A partir de</span>
+                            <span class="text-3xl font-serif text-[var(--text-color)] tracking-tight">R$ 28.000</span>
+                        </div>
+                        <ul class="flex flex-col gap-5 text-xs font-light tracking-wide text-[var(--text-color)] opacity-80 mb-12 min-h-[220px]">
+                            <li class="flex items-start gap-3"><span class="text-[#B8A38E]">✦</span> Ecossistema Digital Completo</li>
+                            <li class="flex items-start gap-3"><span class="text-[#B8A38E]">✦</span> Multi-funis Ilimitados</li>
+                            <li class="flex items-start gap-3"><span class="text-[#B8A38E]">✦</span> Animações Cinemáticas WebGL</li>
+                            <li class="flex items-start gap-3"><span class="text-[#B8A38E]">✦</span> Integrações de API Avançadas</li>
+                            <li class="flex items-start gap-3"><span class="text-[#B8A38E]">✦</span> Consultoria Semestral Exclusiva</li>
+                        </ul>
+                        <button class="w-full border border-[var(--text-color)] text-[var(--text-color)] py-4 text-[10px] uppercase tracking-widest hover:bg-[var(--text-color)] hover:text-[var(--bg-color)] transition-colors haptic-target" data-vibrate="15">Aplicar para Seleção</button>
+                    </div>
+
                 </div>
             </div>
         </section>
 
         <!-- 6. CTA DE ALTA FRICÇÃO -->
-        <section class="py-40 px-6 w-full bg-[#111111] text-[#F5F5F3] text-center reveal-on-scroll">
-            <h2 class="text-2xl md:text-4xl lg:text-5xl mb-16 uppercase tracking-[0.2em] max-w-4xl mx-auto leading-tight">
+        <section class="py-40 px-6 w-full bg-[#111111] text-[#F5F5F3] text-center reveal-on-scroll relative z-10">
+            <h2 class="text-2xl md:text-4xl lg:text-5xl mb-16 uppercase tracking-[0.2em] max-w-4xl mx-auto leading-tight font-serif">
                 Vamos elevar o seu posicionamento digital?
             </h2>
             <a href="https://wa.me/5549999999999" target="_blank" rel="noopener noreferrer" class="inline-block gold-gradient-bg text-[#2C2C2C] px-8 md:px-12 py-5 md:py-6 uppercase tracking-[0.3em] text-xs font-bold haptic-press shadow-[0_0_30px_rgba(184,163,142,0.2)] haptic-target" data-vibrate="40">
@@ -369,21 +483,18 @@
         </section>
 
         <!-- 7. RODAPÉ INSTITUCIONAL (SEO & LGPD) -->
-        <footer class="bg-[#0A0A0A] text-[#F5F5F3] py-20 px-6 md:px-12 w-full text-xs font-light tracking-wide border-t border-[#222]">
+        <footer class="bg-[#0A0A0A] text-[#F5F5F3] py-20 px-6 md:px-12 w-full text-xs font-light tracking-wide border-t border-[#222] relative z-10">
             <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-16 mb-16">
-                <!-- Branding -->
                 <div>
                     <div class="font-serif text-2xl tracking-[0.3em] uppercase font-bold mb-6 gold-gradient-text">GLID</div>
                     <p class="opacity-50 leading-loose">Hand-coded.<br>Performance Radical.<br>Luxo Silencioso.</p>
                 </div>
-                <!-- Links -->
                 <div class="flex flex-col gap-4 opacity-50 uppercase tracking-widest">
                     <span class="text-[#B8A38E] mb-2 text-[10px]">Legal</span>
                     <a href="#" class="hover:text-[#E8D5C4] transition-colors">Política de Privacidade</a>
                     <a href="#" class="hover:text-[#E8D5C4] transition-colors">Termos de Uso</a>
                     <a href="#" class="hover:text-[#E8D5C4] transition-colors">Compliance LGPD</a>
                 </div>
-                <!-- Dados Brasil -->
                 <div class="opacity-50 uppercase tracking-widest leading-loose">
                     <span class="text-[#B8A38E] mb-2 text-[10px] block">Sede</span>
                     <p>GL.ID PRIVATE DIGITAL ATELIER</p>
@@ -391,7 +502,6 @@
                     <p>CNPJ: 00.000.000/0000-00</p>
                 </div>
             </div>
-            <!-- Copyright -->
             <div class="max-w-7xl mx-auto border-t border-[#B8A38E]/20 pt-8 text-center text-[10px] opacity-30 uppercase tracking-[0.4em]">
                 &copy; 2026 GLID. Todos os direitos reservados.
             </div>
@@ -401,7 +511,6 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // --- VARIÁVEIS GLOBAIS ---
             const preloader = document.getElementById('preloader');
             const logoBox = document.getElementById('logo-box');
             const cursor = document.getElementById('cursor');
@@ -524,18 +633,14 @@
                 mainContent.classList.remove('absolute');
                 visionToggle.style.opacity = '0';
 
-                // Evolui o Cursor Global para Dedal
                 if (window.innerWidth > 768 && cursor) cursor.classList.add('thimble-mode');
 
                 setTimeout(() => {
                     preloader.style.display = 'none';
                     document.body.style.overflowY = 'auto'; 
                     paperTexture.classList.add('active');
-                    // Mostra o Header fixo com fade
                     mainHeader.classList.remove('opacity-0');
                     mainHeader.classList.add('opacity-100');
-                    
-                    // Inicia Observer para revelar secções
                     initScrollReveal();
                 }, 850);
             });
@@ -580,23 +685,21 @@
                 const updateSlider = (clientX) => {
                     const rect = sliderContainer.getBoundingClientRect();
                     let x = clientX - rect.left;
-                    x = Math.max(0, Math.min(x, rect.width)); // Limites
+                    x = Math.max(0, Math.min(x, rect.width));
                     const percentage = (x / rect.width) * 100;
                     
                     beforePanel.style.width = `${percentage}%`;
                     handle.style.left = `${percentage}%`;
                 };
 
-                // Desktop
                 sliderContainer.addEventListener('mousedown', () => isDraggingSlider = true);
                 window.addEventListener('mouseup', () => isDraggingSlider = false);
                 window.addEventListener('mousemove', (e) => {
                     if (!isDraggingSlider) return;
                     updateSlider(e.clientX);
-                    try { if (navigator.vibrate && Math.random() > 0.8) navigator.vibrate(5); } catch(e){} // Micro vibração ao arrastar
+                    try { if (navigator.vibrate && Math.random() > 0.8) navigator.vibrate(5); } catch(e){}
                 });
 
-                // Mobile
                 sliderContainer.addEventListener('touchstart', () => isDraggingSlider = true, {passive: true});
                 window.addEventListener('touchend', () => isDraggingSlider = false);
                 window.addEventListener('touchmove', (e) => {
