@@ -1,26 +1,66 @@
 <!DOCTYPE html>
-<html lang="pt-PT">
+<html lang="pt-PT" data-theme="cashmere">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GLID | Architecture of Elite</title>
+    
+    <link rel="icon" type="image/png" href="https://glid.carrd.co/assets/images/image03.png?v=951bca55">
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
+        /* --- CORE VARIABLES --- */
         :root {
-            /* Paleta Vencedora: Cashmere & Bone */
-            --gold-light: #E8D5C4; 
-            --gold-base: #B8A38E;  
-            --gold-deep: #8D7A65;  
-            --color-gunmetal: #2C2C2C;
-            --color-cashmere: #F5F5F3;
+            /* Visão: Cashmere (Light/Gold) */
+            --bg-color: #F5F5F3;
+            --text-color: #2C2C2C;
+            --radial-1: #E8D5C4; 
+            --radial-2: #B8A38E;  
+            --radial-3: #8D7A65;
+            --lantern-glow: rgba(232, 213, 196, 0.4);
+            --logo-shimmer: linear-gradient(110deg, transparent 20%, rgba(255, 255, 255, 0.6) 50%, transparent 80%);
+            --shadow-rgb: 0, 0, 0;
+            --stitch-glow: #F5F5F3;
+            --btn-glass: rgba(245, 245, 243, 0.05);
+            --btn-hover-bg: rgba(44, 44, 44, 0.08);
+            --cursor-focus: rgba(44, 44, 44, 0.04);
             
+            /* Identidade Dinâmica */
             --mouse-x: 50%;
             --mouse-y: 50%;
             --parallax-x: 0px;
             --parallax-y: 0px;
+            --shadow-x: 0px;
+            --shadow-y: 0px;
+            --tilt-x: 0deg;
+            --tilt-y: 0deg;
         }
 
-        /* Foundation: Metal Polido Dinâmico */
+        [data-theme="obsidian"] {
+            /* Visão: Obsidian (Dark/Chrome) */
+            --bg-color: #050505;
+            --text-color: #F8F9FA;
+            --radial-1: #1a1a1a; 
+            --radial-2: #0a0a0a;  
+            --radial-3: #000000;
+            --lantern-glow: rgba(255, 255, 255, 0.05);
+            --logo-shimmer: linear-gradient(110deg, transparent 20%, rgba(255, 255, 255, 0.8) 50%, transparent 80%);
+            --shadow-rgb: 255, 255, 255;
+            --stitch-glow: #F8F9FA;
+            --btn-glass: rgba(255, 255, 255, 0.02);
+            --btn-hover-bg: rgba(255, 255, 255, 0.08);
+            --cursor-focus: rgba(255, 255, 255, 0.05);
+        }
+
+        /* --- GLOBAL & PRELOADER --- */
+        * { transition: background-color 0.5s ease, color 0.5s ease; }
+
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: var(--bg-color);
+        }
+
         #preloader {
             position: fixed;
             top: 0;
@@ -29,9 +69,9 @@
             height: 100%;
             background: radial-gradient(
                 circle at var(--mouse-x) var(--mouse-y),
-                var(--gold-light) 0%,
-                var(--gold-base) 35%,
-                var(--gold-deep) 100%
+                var(--radial-1) 0%,
+                var(--radial-2) 35%,
+                var(--radial-3) 100%
             );
             display: flex;
             justify-content: center;
@@ -39,38 +79,92 @@
             z-index: 9999;
             overflow: hidden;
             cursor: none;
-            transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.85, 0, 0.15, 1);
+            transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.85, 0, 0.15, 1), background 0.5s ease;
             will-change: transform, opacity;
         }
 
-        /* Monograma 45º com Paralaxe */
-        .monogram-container {
+        /* --- UI ELEMENTS --- */
+        .theme-toggle {
             position: absolute;
-            width: 220%;
-            height: 220%;
-            top: -60%;
-            left: -60%;
+            top: clamp(1.5rem, 4vh, 3rem);
+            right: clamp(1.5rem, 4vw, 3rem);
+            z-index: 100;
+            color: var(--text-color);
+            font-size: clamp(8px, 1.5vw, 9px);
+            text-transform: uppercase;
+            letter-spacing: 0.3em;
+            cursor: pointer;
+            opacity: 0.4;
+            transition: opacity 0.3s, letter-spacing 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .theme-toggle:hover {
+            opacity: 1;
+            letter-spacing: 0.4em;
+        }
+
+        .theme-indicator {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background-color: var(--text-color);
+            transition: transform 0.3s;
+        }
+
+        .identity-text {
+            position: absolute;
+            top: clamp(1.5rem, 4vh, 3rem);
+            left: 0;
+            width: 100%;
+            text-align: center;
+            color: var(--text-color);
+            opacity: 0.4;
+            font-size: clamp(8px, 2.2vw, 9px);
+            text-transform: uppercase;
+            letter-spacing: 1em;
+            font-weight: 400;
+            font-family: 'Georgia', serif; 
+            z-index: 10;
+        }
+
+        /* --- BACKGROUND MONOGRAMS --- */
+        .monogram-wrapper {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .monogram-pattern {
+            position: absolute;
+            width: 300%;
+            height: 300%;
+            top: -100%;
+            left: -100%;
             background-image: url('https://glid.carrd.co/assets/images/image03.png?v=951bca55');
             background-size: 90px;
             background-repeat: repeat;
             transform: rotate(-45deg) translate(var(--parallax-x), var(--parallax-y));
-            pointer-events: none;
             transition: transform 0.2s ease-out;
             will-change: transform;
         }
 
-        /* Camada Base: Garantindo textura global */
-        .base-mono {
-            opacity: 0.05; /* Aumentado para garantir visibilidade nos cantos escuros */
-        }
+        [data-theme="cashmere"] .monogram-pattern { mix-blend-mode: multiply; }
+        [data-theme="obsidian"] .monogram-pattern { mix-blend-mode: screen; filter: grayscale(100%) invert(1); }
 
-        /* Camada Inteligente: Lanterna Ultra-Wide */
+        .base-mono { opacity: 0.04; }
+
         .reveal-mono {
-            opacity: 0.18; 
-            /* Raio expandido de 400px para 800px para cobrir os cantos com perfeição */
-            -webkit-mask-image: radial-gradient(800px circle at calc(var(--mouse-x) + var(--parallax-x)) calc(var(--mouse-y) + var(--parallax-y)), black 15%, transparent 75%);
-            mask-image: radial-gradient(800px circle at calc(var(--mouse-x) + var(--parallax-x)) calc(var(--mouse-y) + var(--parallax-y)), black 15%, transparent 75%);
+            opacity: 0.20; 
             z-index: 2;
+            -webkit-mask-image: radial-gradient(1200px circle at var(--mouse-x) var(--mouse-y), black 10%, transparent 65%);
+            mask-image: radial-gradient(1200px circle at var(--mouse-x) var(--mouse-y), black 10%, transparent 65%);
         }
 
         .lantern-glow {
@@ -80,27 +174,29 @@
             width: 100%;
             height: 100%;
             background: radial-gradient(
-                800px circle at var(--mouse-x) var(--mouse-y),
-                rgba(232, 213, 196, 0.4),
-                transparent 60% /* Dissipação mais suave */
+                1000px circle at var(--mouse-x) var(--mouse-y),
+                var(--lantern-glow),
+                transparent 60%
             );
             pointer-events: none;
             z-index: 1;
             will-change: background;
         }
 
-        /* Logo com Sombra Dinâmica - Centro Absoluto */
+        /* --- LOGO 3D & SHADOWS --- */
         .logo-container {
             position: relative;
-            /* Responsivo: Cresce com a tela, não perde proporção */
             width: clamp(200px, 45vw, 280px);
             margin-bottom: 2.5rem;
             z-index: 10;
+            filter: drop-shadow(var(--shadow-x) var(--shadow-y) 25px rgba(var(--shadow-rgb), 0.12));
+            transform: perspective(1000px) rotateX(var(--tilt-y)) rotateY(var(--tilt-x));
             transition: filter 0.1s ease-out, transform 0.1s ease-out;
             will-change: filter, transform;
             transform-style: preserve-3d;
         }
 
+        /* Removido o filtro invert: a logo manterá a SUA COR ORIGINAL sempre */
         .logo-base {
             width: 100%;
             height: auto;
@@ -113,12 +209,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(
-                110deg,
-                transparent 20%,
-                rgba(255, 255, 255, 0.6) 50%,
-                transparent 80%
-            );
+            background: var(--logo-shimmer);
             background-size: 200% 100%;
             -webkit-mask-image: url('https://glid.carrd.co/assets/images/image03.png?v=951bca55');
             mask-image: url('https://glid.carrd.co/assets/images/image03.png?v=951bca55');
@@ -135,16 +226,16 @@
             50%, 100% { background-position: -200% 0; opacity: 0; }
         }
 
-        /* Botão Magnético de Elite - Centro Inferior */
+        /* --- BUTTON & DETAILS --- */
         .mag-wrap {
             padding: 30px;
             z-index: 20;
         }
 
         .elite-btn {
-            background: transparent;
-            border: 1px solid rgba(44, 44, 44, 0.15);
-            color: var(--color-gunmetal);
+            background: var(--btn-glass);
+            border: 1px solid rgba(var(--shadow-rgb), 0.15);
+            color: var(--text-color);
             padding: clamp(0.8rem, 2vh, 1.1rem) clamp(1.8rem, 5vw, 3rem);
             font-size: clamp(9px, 2.5vw, 11px);
             text-transform: uppercase;
@@ -153,43 +244,23 @@
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
             overflow: hidden;
-            background-color: rgba(245, 245, 243, 0.05);
             backdrop-filter: blur(2px);
             cursor: pointer;
         }
 
         .elite-btn:hover {
-            border-color: rgba(44, 44, 44, 0.4);
+            border-color: rgba(var(--shadow-rgb), 0.4);
             letter-spacing: 0.8em;
             transform: scale(1.02);
-            background-color: rgba(44, 44, 44, 0.08);
+            background-color: var(--btn-hover-bg);
             backdrop-filter: blur(8px);
-            color: var(--color-gunmetal);
-        }
-
-        /* Tipografia de Topo - Absolutamente Fixa e Centralizada */
-        .identity-text {
-            position: absolute;
-            /* Espaçamento fluido: adapta-se a telemóveis e monitores grandes */
-            top: clamp(1.5rem, 4vh, 3rem);
-            left: 0;
-            width: 100%;
-            text-align: center;
-            color: var(--color-gunmetal);
-            opacity: 0.5;
-            font-size: clamp(8px, 2.2vw, 9px);
-            text-transform: uppercase;
-            letter-spacing: 1em;
-            font-weight: 400;
-            font-family: 'Georgia', serif; 
-            z-index: 10;
         }
 
         .stitch-container {
             position: relative;
             width: 120px;
             height: 1px;
-            background-color: rgba(44, 44, 44, 0.08); 
+            background-color: rgba(var(--shadow-rgb), 0.1); 
             overflow: hidden;
             margin-bottom: 3.5rem;
             z-index: 10;
@@ -199,8 +270,8 @@
             position: absolute;
             width: 100%;
             height: 100%;
-            background: var(--color-cashmere);
-            box-shadow: 0 0 12px var(--color-cashmere);
+            background: var(--stitch-glow);
+            box-shadow: 0 0 12px var(--stitch-glow);
             animation: stitchFlow 4s infinite ease-in-out;
         }
 
@@ -209,33 +280,34 @@
             100% { transform: translateX(100%); }
         }
 
-        /* Cursor de Inspeção */
         .custom-cursor {
             width: 25px;
             height: 25px;
-            border: 1px solid var(--color-gunmetal);
+            border: 1px solid var(--text-color);
             border-radius: 50%;
             position: fixed;
             pointer-events: none;
             z-index: 10000;
             transform: translate(-50%, -50%);
-            transition: width 0.3s, height 0.3s, background 0.3s, opacity 0.5s ease;
+            transition: width 0.3s, height 0.3s, background 0.3s, opacity 0.5s ease, border-color 0.5s;
             opacity: 0; 
         }
 
-        /* Regras de Adaptação Mobile (Telemóveis) */
+        /* --- MOBILE ADJUSTMENTS --- */
         @media (max-width: 768px) {
             .custom-cursor { display: none !important; }
             #preloader { cursor: auto; }
             .mag-wrap { padding: 15px; }
             
-            /* Aumenta nitidez do fundo no telemóvel */
-            .monogram-container { background-size: 75px !important; }
-            .base-mono { opacity: 0.07 !important; }
-            .reveal-mono { opacity: 0.25 !important; }
+            .monogram-pattern { background-size: 70px !important; }
+            .base-mono { opacity: 0.08 !important; }
+            .reveal-mono { opacity: 0.28 !important; }
+            
+            /* Evita colisão entre logo de texto e botão de tema no mobile */
+            .theme-toggle { top: 1.5rem; right: 1.5rem; font-size: 7px; }
+            .identity-text { top: 4rem; } 
         }
 
-        /* Ritual de Saída */
         .exit-ritual {
             transform: scale(1.1) !important;
             opacity: 0 !important;
@@ -244,26 +316,33 @@
         }
     </style>
 </head>
-<body class="m-0 bg-[#F5F5F3] overflow-hidden">
+<body>
 
-    <!-- Cursor interativo -->
     <div class="custom-cursor" id="cursor"></div>
 
-    <!-- PRELOADER DE ELITE -->
     <div id="preloader">
-        <!-- Inteligência de Marca D'água Dinâmica -->
-        <div class="monogram-container base-mono" id="monogram-base"></div>
-        <div class="monogram-container reveal-mono" id="monogram-reveal"></div>
+        
+        <div class="theme-toggle" id="vision-toggle">
+            <div class="theme-indicator" id="theme-dot"></div>
+            <span id="theme-label">CASHMERE</span>
+        </div>
+
+        <div class="monogram-wrapper base-mono">
+            <div class="monogram-pattern"></div>
+        </div>
+        
+        <div class="monogram-wrapper reveal-mono">
+            <div class="monogram-pattern"></div>
+        </div>
         
         <div class="lantern-glow"></div>
 
-        <!-- Cabeçalho (Fixo no Topo com Clamp) -->
         <span class="identity-text italic">Elite Front-end Atelier</span>
 
-        <!-- Corpo Principal (Centro Absoluto) -->
         <div class="flex flex-col items-center justify-center">
             
             <div class="logo-container" id="logo-box">
+                <!-- A Logo original sem distorção de cores -->
                 <img src="https://glid.carrd.co/assets/images/image03.png?v=951bca55" alt="GLID Logo" class="logo-base">
                 <div class="logo-shimmer"></div>
             </div>
@@ -280,15 +359,14 @@
         </div>
     </div>
 
-    <!-- CONTEÚDO FINAL DO TEU SITE -->
-    <main id="main-content" class="min-h-screen flex flex-col items-center justify-center p-10 opacity-0 pointer-events-none transition-opacity duration-1000 ease-in-out">
+    <main id="main-content" class="min-h-screen flex flex-col items-center justify-center p-10 opacity-0 pointer-events-none transition-opacity duration-1000 ease-in-out" style="background-color: var(--bg-color);">
         <div class="text-center max-w-2xl">
-            <h1 style="font-family: 'Georgia', serif;" class="text-[clamp(12px,4vw,16px)] uppercase tracking-[1.5em] text-[#2C2C2C] mb-8">
+            <h1 style="font-family: 'Georgia', serif; color: var(--text-color);" class="text-[clamp(12px,4vw,16px)] uppercase tracking-[1.5em] mb-8 transition-colors duration-500">
                 Draft Protocol Active
             </h1>
-            <div class="w-16 h-[1px] bg-[#2C2C2C] mx-auto opacity-20 mb-8"></div>
-            <p class="text-[#2C2C2C] font-light leading-relaxed opacity-60 text-[clamp(12px,3vw,16px)]">
-                O front-end de elite foi revelado. Podes construir o resto do teu site a partir desta secção.
+            <div class="w-16 h-[1px] mx-auto opacity-20 mb-8 transition-colors duration-500" style="background-color: var(--text-color);"></div>
+            <p style="color: var(--text-color);" class="font-light leading-relaxed opacity-60 text-[clamp(12px,3vw,16px)] transition-colors duration-500">
+                O front-end de elite foi revelado e a visão tática sincronizada. A fundação está pronta.
             </p>
         </div>
     </main>
@@ -301,11 +379,31 @@
             const magArea = document.getElementById('mag-area');
             const btn = document.getElementById('protocol-btn');
             const mainContent = document.getElementById('main-content');
+            
+            const visionToggle = document.getElementById('vision-toggle');
+            const themeLabel = document.getElementById('theme-label');
+            const themeDot = document.getElementById('theme-dot');
 
-            // Estado da Automação
+            let isObsidian = false;
+            visionToggle.addEventListener('click', () => {
+                isObsidian = !isObsidian;
+                if (isObsidian) {
+                    document.documentElement.setAttribute('data-theme', 'obsidian');
+                    themeLabel.textContent = 'OBSIDIAN';
+                    themeDot.style.transform = 'scale(1.5)';
+                } else {
+                    document.documentElement.setAttribute('data-theme', 'cashmere');
+                    themeLabel.textContent = 'CASHMERE';
+                    themeDot.style.transform = 'scale(1)';
+                }
+                
+                try {
+                    if (navigator.vibrate) navigator.vibrate(10);
+                } catch (e) {} // Proteção silenciosa para browsers antigos
+            });
+
             let isAutonomous = true;
 
-            // Função de Animação Autônoma
             function autonomousLoop() {
                 if (!isAutonomous) return;
 
@@ -327,24 +425,19 @@
                 preloader.style.setProperty('--parallax-x', `${moveX}px`);
                 preloader.style.setProperty('--parallax-y', `${moveY}px`);
 
-                // 3D Tilt & Profundidade da Sombra (Autónomo)
                 const normX = (absX - winW / 2) / (winW / 2);
                 const normY = (absY - winH / 2) / (winH / 2);
                 
-                const shadowX = normX * 30; // Distância da sombra
-                const shadowY = normY * 30;
-                const tiltX = normX * 12; // Rotação máxima de 12 graus
-                const tiltY = -normY * 12;
-
-                logoBox.style.filter = `drop-shadow(${-shadowX}px ${-shadowY}px 25px rgba(0,0,0,0.15))`;
-                logoBox.style.transform = `perspective(1000px) rotateX(${tiltY}deg) rotateY(${tiltX}deg)`;
+                preloader.style.setProperty('--shadow-x', `${normX * 30}px`);
+                preloader.style.setProperty('--shadow-y', `${normY * 30}px`);
+                preloader.style.setProperty('--tilt-x', `${normX * 12}deg`);
+                preloader.style.setProperty('--tilt-y', `${-normY * 12}deg`);
 
                 requestAnimationFrame(autonomousLoop);
             }
 
             requestAnimationFrame(autonomousLoop);
 
-            // Função Modo Manual (Responsivo)
             const handleMove = (e) => {
                 const winW = window.innerWidth;
                 const winH = window.innerHeight;
@@ -355,7 +448,6 @@
                 }
 
                 let x, y;
-                
                 if (e.type.includes('touch')) {
                     if (!e.touches || e.touches.length === 0) return;
                     x = e.touches[0].clientX;
@@ -377,17 +469,13 @@
                     preloader.style.setProperty('--parallax-x', `${moveX}px`);
                     preloader.style.setProperty('--parallax-y', `${moveY}px`);
 
-                    // 3D Tilt & Profundidade da Sombra (Manual)
                     const normX = (x - winW / 2) / (winW / 2);
                     const normY = (y - winH / 2) / (winH / 2);
                     
-                    const shadowX = normX * 30;
-                    const shadowY = normY * 30;
-                    const tiltX = normX * 12;
-                    const tiltY = -normY * 12;
-
-                    logoBox.style.filter = `drop-shadow(${-shadowX}px ${-shadowY}px 25px rgba(0,0,0,0.15))`;
-                    logoBox.style.transform = `perspective(1000px) rotateX(${tiltY}deg) rotateY(${tiltX}deg)`;
+                    preloader.style.setProperty('--shadow-x', `${normX * 30}px`);
+                    preloader.style.setProperty('--shadow-y', `${normY * 30}px`);
+                    preloader.style.setProperty('--tilt-x', `${normX * 12}deg`);
+                    preloader.style.setProperty('--tilt-y', `${-normY * 12}deg`);
 
                     if (winW > 768) {
                         cursor.style.left = x + 'px';
@@ -404,12 +492,14 @@
                             btn.style.transform = `translate(${attractX}px, ${attractY}px)`;
                             cursor.style.width = '60px';
                             cursor.style.height = '60px';
-                            cursor.style.background = 'rgba(44, 44, 44, 0.03)';
+                            cursor.style.background = 'var(--cursor-focus)';
+                            cursor.style.borderColor = 'transparent';
                         } else {
                             btn.style.transform = `translate(0, 0)`;
                             cursor.style.width = '25px';
                             cursor.style.height = '25px';
                             cursor.style.background = 'transparent';
+                            cursor.style.borderColor = 'var(--text-color)';
                         }
                     } else {
                         btn.style.transform = `translate(0, 0)`;
@@ -422,9 +512,14 @@
             window.addEventListener('touchmove', handleMove, { passive: true });
 
             btn.addEventListener('click', () => {
+                try {
+                    if (navigator.vibrate) navigator.vibrate([20, 30, 20, 30, 60]);
+                } catch (e) {}
+
                 preloader.classList.add('exit-ritual');
                 mainContent.classList.remove('opacity-0', 'pointer-events-none');
                 mainContent.classList.add('opacity-100');
+                visionToggle.style.opacity = '0';
 
                 setTimeout(() => {
                     preloader.style.display = 'none';
