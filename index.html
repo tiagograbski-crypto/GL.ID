@@ -53,12 +53,25 @@
             background-image: url('https://glid.carrd.co/assets/images/image03.png?v=951bca55');
             background-size: 90px;
             background-repeat: repeat;
-            opacity: 0.04;
             transform: rotate(-45deg) translate(var(--parallax-x), var(--parallax-y));
             mix-blend-mode: multiply;
             pointer-events: none;
             transition: transform 0.2s ease-out;
             will-change: transform;
+        }
+
+        /* Camada Base: Extremamente subtil */
+        .base-mono {
+            opacity: 0.03;
+        }
+
+        /* Camada Inteligente: Acende apenas sob a lanterna */
+        .reveal-mono {
+            opacity: 0.15; /* Legibilidade alta */
+            /* A mágica acontece aqui: A máscara usa as coordenadas do rato/dedo */
+            -webkit-mask-image: radial-gradient(400px circle at calc(var(--mouse-x) + var(--parallax-x)) calc(var(--mouse-y) + var(--parallax-y)), black 10%, transparent 60%);
+            mask-image: radial-gradient(400px circle at var(--mouse-x) var(--mouse-y), black 10%, transparent 60%);
+            z-index: 2;
         }
 
         .lantern-glow {
@@ -202,7 +215,7 @@
             pointer-events: none;
             z-index: 10000;
             transform: translate(-50%, -50%);
-            transition: width 0.3s, height 0.3s, background 0.3s;
+            transition: width 0.3s, height 0.3s, background 0.3s, opacity 0.3s;
         }
 
         /* Ocultar cursor customizado em ecrãs touch/mobile para evitar bugs */
@@ -211,11 +224,12 @@
             #preloader { cursor: auto; }
             .mag-wrap { padding: 15px; }
             
-            /* Melhoria do Monograma no Mobile (mais presente e visível) */
+            /* Melhoria do Monograma no Mobile */
             .monogram-container { 
-                opacity: 0.08 !important; 
                 background-size: 70px !important; 
             }
+            .base-mono { opacity: 0.06 !important; }
+            .reveal-mono { opacity: 0.25 !important; }
         }
 
         /* Ritual de Saída */
@@ -234,7 +248,10 @@
 
     <!-- PRELOADER DE ELITE -->
     <div id="preloader">
-        <div class="monogram-container" id="monogram"></div>
+        <!-- Inteligência de Marca D'água Dinâmica -->
+        <div class="monogram-container base-mono" id="monogram-base"></div>
+        <div class="monogram-container reveal-mono" id="monogram-reveal"></div>
+        
         <div class="lantern-glow"></div>
 
         <div class="flex flex-col items-center">
@@ -258,7 +275,6 @@
     </div>
 
     <!-- CONTEÚDO FINAL DO TEU SITE -->
-    <!-- Começa invisível (opacity-0) e fica visível após o botão ser clicado -->
     <main id="main-content" class="min-h-screen flex flex-col items-center justify-center p-10 opacity-0 pointer-events-none transition-opacity duration-1000 ease-in-out">
         <div class="text-center max-w-2xl">
             <h1 style="font-family: 'Georgia', serif;" class="text-[clamp(12px,4vw,16px)] uppercase tracking-[1.5em] text-[#2C2C2C] mb-8">
@@ -274,15 +290,73 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const preloader = document.getElementById('preloader');
-            const monogram = document.getElementById('monogram');
             const logoBox = document.getElementById('logo-box');
             const cursor = document.getElementById('cursor');
             const magArea = document.getElementById('mag-area');
             const btn = document.getElementById('protocol-btn');
             const mainContent = document.getElementById('main-content');
 
-            // Função para gerir movimento (Rato e Toque)
+            // Estado da Automação
+            let isAutonomous = true;
+
+            // Função de Animação Autônoma (Movimento em Infinito / Lemniscata)
+            function autonomousLoop() {
+                if (!isAutonomous) return; // Para o loop se o utilizador interagir
+
+                const time = Date.now() * 0.001; // Tempo decorrido em segundos
+                const winW = window.innerWidth;
+                const winH = window.innerHeight;
+
+                // Fórmulas matemáticas para o símbolo do infinito (∞)
+                // O eixo Y move-se ao dobro da velocidade do eixo X para formar o "8" deitado
+                const percentX = 50 + 35 * Math.sin(time * 0.7); 
+                const percentY = 50 + 15 * Math.sin(time * 1.4);
+
+                // Aplica a Lanterna
+                preloader.style.setProperty('--mouse-x', `${percentX}%`);
+                preloader.style.setProperty('--mouse-y', `${percentY}%`);
+
+                // Calcula pixeis absolutos para Paralaxe e Sombra
+                const absX = (percentX / 100) * winW;
+                const absY = (percentY / 100) * winH;
+
+                // Paralaxe e Sombra Reativa
+                const moveX = (absX - winW / 2) * -0.05;
+                const moveY = (absY - winH / 2) * -0.05;
+                preloader.style.setProperty('--parallax-x', `${moveX}px`);
+                preloader.style.setProperty('--parallax-y', `${moveY}px`);
+
+                const shadowX = (absX - winW / 2) * 0.04;
+                const shadowY = (absY - winH / 2) * 0.04;
+                logoBox.style.filter = `drop-shadow(${-shadowX}px ${-shadowY}px 25px rgba(0,0,0,0.12))`;
+
+                // Move o cursor como um "fantasma" inspecionando a página
+                if (winW > 768 && cursor) {
+                    cursor.style.left = `${absX}px`;
+                    cursor.style.top = `${absY}px`;
+                    cursor.style.opacity = '0.4'; // Levemente transparente no modo autônomo
+                    
+                    // Pequeno pulsar no cursor autônomo
+                    const pulse = 25 + 5 * Math.sin(time * 3);
+                    cursor.style.width = `${pulse}px`;
+                    cursor.style.height = `${pulse}px`;
+                }
+
+                // Continua o loop
+                requestAnimationFrame(autonomousLoop);
+            }
+
+            // Inicia o piloto automático assim que a página carrega
+            requestAnimationFrame(autonomousLoop);
+
+            // Função para gerir o modo Manual (Rato e Toque)
             const handleMove = (e) => {
+                // Desativa o piloto automático instantaneamente ao primeiro toque/movimento
+                if (isAutonomous) {
+                    isAutonomous = false;
+                    if (cursor) cursor.style.opacity = '1'; // Restaura o cursor a 100% de solidez
+                }
+
                 let x, y;
                 
                 // Tratar eventos de rato vs touch
@@ -302,7 +376,7 @@
                     const percentX = (x / winW) * 100;
                     const percentY = (y / winH) * 100;
                     
-                    // 1. Lantern Effect
+                    // 1. Lantern Effect & Reveal Mask
                     preloader.style.setProperty('--mouse-x', `${percentX}%`);
                     preloader.style.setProperty('--mouse-y', `${percentY}%`);
                     
@@ -317,7 +391,7 @@
                     const shadowY = (y - winH / 2) * 0.04;
                     logoBox.style.filter = `drop-shadow(${-shadowX}px ${-shadowY}px 25px rgba(0,0,0,0.12))`;
 
-                    // 4. Cursor Follow (Apenas se o ecrã for maior que 768px)
+                    // 4. Cursor Follow
                     if (winW > 768) {
                         cursor.style.left = x + 'px';
                         cursor.style.top = y + 'px';
@@ -351,25 +425,21 @@
                 }
             };
 
-            // Adicionar Listeners
+            // Adicionar Listeners (Passa de Auto para Manual)
             window.addEventListener('mousemove', handleMove, { passive: true });
             window.addEventListener('touchstart', handleMove, { passive: true });
             window.addEventListener('touchmove', handleMove, { passive: true });
 
             // Ritual de Saída: Transição de Elite
             btn.addEventListener('click', () => {
-                // Animação de saída do preloader
                 preloader.classList.add('exit-ritual');
-                
-                // Revelação do conteúdo principal (Fade In suave)
                 mainContent.classList.remove('opacity-0', 'pointer-events-none');
                 mainContent.classList.add('opacity-100');
 
-                // Limpeza após animação terminar
                 setTimeout(() => {
                     preloader.style.display = 'none';
                     document.body.classList.remove('overflow-hidden');
-                    document.body.style.overflow = 'auto'; // Restaura o scroll para o site
+                    document.body.style.overflow = 'auto'; 
                 }, 850);
             });
         });
