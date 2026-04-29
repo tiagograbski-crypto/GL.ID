@@ -54,23 +54,22 @@
             background-size: 90px;
             background-repeat: repeat;
             transform: rotate(-45deg) translate(var(--parallax-x), var(--parallax-y));
-            mix-blend-mode: multiply;
             pointer-events: none;
             transition: transform 0.2s ease-out;
             will-change: transform;
         }
 
-        /* Camada Base: Extremamente subtil */
+        /* Camada Base: Garantindo textura global */
         .base-mono {
-            opacity: 0.03;
+            opacity: 0.05; /* Aumentado para garantir visibilidade nos cantos escuros */
         }
 
-        /* Camada Inteligente: Acende apenas sob a lanterna */
+        /* Camada Inteligente: Lanterna Ultra-Wide */
         .reveal-mono {
-            opacity: 0.15; /* Legibilidade alta */
-            /* A mágica acontece aqui: A máscara usa as coordenadas do rato/dedo */
-            -webkit-mask-image: radial-gradient(400px circle at calc(var(--mouse-x) + var(--parallax-x)) calc(var(--mouse-y) + var(--parallax-y)), black 10%, transparent 60%);
-            mask-image: radial-gradient(400px circle at var(--mouse-x) var(--mouse-y), black 10%, transparent 60%);
+            opacity: 0.18; 
+            /* Raio expandido de 400px para 800px para cobrir os cantos com perfeição */
+            -webkit-mask-image: radial-gradient(800px circle at calc(var(--mouse-x) + var(--parallax-x)) calc(var(--mouse-y) + var(--parallax-y)), black 15%, transparent 75%);
+            mask-image: radial-gradient(800px circle at calc(var(--mouse-x) + var(--parallax-x)) calc(var(--mouse-y) + var(--parallax-y)), black 15%, transparent 75%);
             z-index: 2;
         }
 
@@ -83,22 +82,23 @@
             background: radial-gradient(
                 800px circle at var(--mouse-x) var(--mouse-y),
                 rgba(232, 213, 196, 0.4),
-                transparent 50%
+                transparent 60% /* Dissipação mais suave */
             );
             pointer-events: none;
             z-index: 1;
             will-change: background;
         }
 
-        /* Logo com Sombra Dinâmica */
+        /* Logo com Sombra Dinâmica - Centro Absoluto */
         .logo-container {
             position: relative;
-            /* Largura fluida adaptável ao ecrã */
-            width: clamp(160px, 40vw, 230px);
+            /* Responsivo: Cresce com a tela, não perde proporção */
+            width: clamp(200px, 45vw, 280px);
             margin-bottom: 2.5rem;
             z-index: 10;
-            transition: filter 0.1s ease-out;
-            will-change: filter;
+            transition: filter 0.1s ease-out, transform 0.1s ease-out;
+            will-change: filter, transform;
+            transform-style: preserve-3d;
         }
 
         .logo-base {
@@ -135,7 +135,7 @@
             50%, 100% { background-position: -200% 0; opacity: 0; }
         }
 
-        /* Botão Magnético de Elite */
+        /* Botão Magnético de Elite - Centro Inferior */
         .mag-wrap {
             padding: 30px;
             z-index: 20;
@@ -145,7 +145,6 @@
             background: transparent;
             border: 1px solid rgba(44, 44, 44, 0.15);
             color: var(--color-gunmetal);
-            /* Padding e fonte fluidos para todos os ecrãs */
             padding: clamp(0.8rem, 2vh, 1.1rem) clamp(1.8rem, 5vw, 3rem);
             font-size: clamp(9px, 2.5vw, 11px);
             text-transform: uppercase;
@@ -160,24 +159,29 @@
         }
 
         .elite-btn:hover {
-            border-color: var(--color-gunmetal);
+            border-color: rgba(44, 44, 44, 0.4);
             letter-spacing: 0.8em;
             transform: scale(1.02);
-            background-color: var(--color-gunmetal);
-            color: var(--color-cashmere);
+            background-color: rgba(44, 44, 44, 0.08);
+            backdrop-filter: blur(8px);
+            color: var(--color-gunmetal);
         }
 
-        /* Tipografia Serifada de Atelier */
+        /* Tipografia de Topo - Absolutamente Fixa e Centralizada */
         .identity-text {
+            position: absolute;
+            /* Espaçamento fluido: adapta-se a telemóveis e monitores grandes */
+            top: clamp(1.5rem, 4vh, 3rem);
+            left: 0;
+            width: 100%;
+            text-align: center;
             color: var(--color-gunmetal);
-            opacity: 0.4;
-            /* Fonte adaptável */
+            opacity: 0.5;
             font-size: clamp(8px, 2.2vw, 9px);
             text-transform: uppercase;
             letter-spacing: 1em;
-            margin-bottom: 2.5rem;
             font-weight: 400;
-            font-family: 'Georgia', serif; /* Font safe serifada */
+            font-family: 'Georgia', serif; 
             z-index: 10;
         }
 
@@ -215,20 +219,19 @@
             pointer-events: none;
             z-index: 10000;
             transform: translate(-50%, -50%);
-            transition: width 0.3s, height 0.3s, background 0.3s, opacity 0.3s;
+            transition: width 0.3s, height 0.3s, background 0.3s, opacity 0.5s ease;
+            opacity: 0; 
         }
 
-        /* Ocultar cursor customizado em ecrãs touch/mobile para evitar bugs */
+        /* Regras de Adaptação Mobile (Telemóveis) */
         @media (max-width: 768px) {
             .custom-cursor { display: none !important; }
             #preloader { cursor: auto; }
             .mag-wrap { padding: 15px; }
             
-            /* Melhoria do Monograma no Mobile */
-            .monogram-container { 
-                background-size: 70px !important; 
-            }
-            .base-mono { opacity: 0.06 !important; }
+            /* Aumenta nitidez do fundo no telemóvel */
+            .monogram-container { background-size: 75px !important; }
+            .base-mono { opacity: 0.07 !important; }
             .reveal-mono { opacity: 0.25 !important; }
         }
 
@@ -254,9 +257,12 @@
         
         <div class="lantern-glow"></div>
 
-        <div class="flex flex-col items-center">
-            <span class="identity-text italic">Elite Front-end Atelier</span>
+        <!-- Cabeçalho (Fixo no Topo com Clamp) -->
+        <span class="identity-text italic">Elite Front-end Atelier</span>
 
+        <!-- Corpo Principal (Centro Absoluto) -->
+        <div class="flex flex-col items-center justify-center">
+            
             <div class="logo-container" id="logo-box">
                 <img src="https://glid.carrd.co/assets/images/image03.png?v=951bca55" alt="GLID Logo" class="logo-base">
                 <div class="logo-shimmer"></div>
@@ -268,7 +274,7 @@
             
             <div class="mag-wrap" id="mag-area">
                 <button type="button" class="elite-btn" id="protocol-btn">
-                    Acessar Alfaiataria Digital
+                    Iniciar Protocolo
                 </button>
             </div>
         </div>
@@ -299,67 +305,57 @@
             // Estado da Automação
             let isAutonomous = true;
 
-            // Função de Animação Autônoma (Movimento em Infinito / Lemniscata)
+            // Função de Animação Autônoma
             function autonomousLoop() {
-                if (!isAutonomous) return; // Para o loop se o utilizador interagir
+                if (!isAutonomous) return;
 
-                const time = Date.now() * 0.001; // Tempo decorrido em segundos
+                const time = Date.now() * 0.001; 
                 const winW = window.innerWidth;
                 const winH = window.innerHeight;
 
-                // Fórmulas matemáticas para o símbolo do infinito (∞)
-                // O eixo Y move-se ao dobro da velocidade do eixo X para formar o "8" deitado
                 const percentX = 50 + 35 * Math.sin(time * 0.7); 
                 const percentY = 50 + 15 * Math.sin(time * 1.4);
 
-                // Aplica a Lanterna
                 preloader.style.setProperty('--mouse-x', `${percentX}%`);
                 preloader.style.setProperty('--mouse-y', `${percentY}%`);
 
-                // Calcula pixeis absolutos para Paralaxe e Sombra
                 const absX = (percentX / 100) * winW;
                 const absY = (percentY / 100) * winH;
 
-                // Paralaxe e Sombra Reativa
                 const moveX = (absX - winW / 2) * -0.05;
                 const moveY = (absY - winH / 2) * -0.05;
                 preloader.style.setProperty('--parallax-x', `${moveX}px`);
                 preloader.style.setProperty('--parallax-y', `${moveY}px`);
 
-                const shadowX = (absX - winW / 2) * 0.04;
-                const shadowY = (absY - winH / 2) * 0.04;
-                logoBox.style.filter = `drop-shadow(${-shadowX}px ${-shadowY}px 25px rgba(0,0,0,0.12))`;
+                // 3D Tilt & Profundidade da Sombra (Autónomo)
+                const normX = (absX - winW / 2) / (winW / 2);
+                const normY = (absY - winH / 2) / (winH / 2);
+                
+                const shadowX = normX * 30; // Distância da sombra
+                const shadowY = normY * 30;
+                const tiltX = normX * 12; // Rotação máxima de 12 graus
+                const tiltY = -normY * 12;
 
-                // Move o cursor como um "fantasma" inspecionando a página
-                if (winW > 768 && cursor) {
-                    cursor.style.left = `${absX}px`;
-                    cursor.style.top = `${absY}px`;
-                    cursor.style.opacity = '0.4'; // Levemente transparente no modo autônomo
-                    
-                    // Pequeno pulsar no cursor autônomo
-                    const pulse = 25 + 5 * Math.sin(time * 3);
-                    cursor.style.width = `${pulse}px`;
-                    cursor.style.height = `${pulse}px`;
-                }
+                logoBox.style.filter = `drop-shadow(${-shadowX}px ${-shadowY}px 25px rgba(0,0,0,0.15))`;
+                logoBox.style.transform = `perspective(1000px) rotateX(${tiltY}deg) rotateY(${tiltX}deg)`;
 
-                // Continua o loop
                 requestAnimationFrame(autonomousLoop);
             }
 
-            // Inicia o piloto automático assim que a página carrega
             requestAnimationFrame(autonomousLoop);
 
-            // Função para gerir o modo Manual (Rato e Toque)
+            // Função Modo Manual (Responsivo)
             const handleMove = (e) => {
-                // Desativa o piloto automático instantaneamente ao primeiro toque/movimento
+                const winW = window.innerWidth;
+                const winH = window.innerHeight;
+
                 if (isAutonomous) {
                     isAutonomous = false;
-                    if (cursor) cursor.style.opacity = '1'; // Restaura o cursor a 100% de solidez
+                    if (winW > 768 && cursor) cursor.style.opacity = '1'; 
                 }
 
                 let x, y;
                 
-                // Tratar eventos de rato vs touch
                 if (e.type.includes('touch')) {
                     if (!e.touches || e.touches.length === 0) return;
                     x = e.touches[0].clientX;
@@ -370,67 +366,61 @@
                 }
                 
                 if (x !== undefined && y !== undefined) {
-                    const winW = window.innerWidth;
-                    const winH = window.innerHeight;
-
                     const percentX = (x / winW) * 100;
                     const percentY = (y / winH) * 100;
                     
-                    // 1. Lantern Effect & Reveal Mask
                     preloader.style.setProperty('--mouse-x', `${percentX}%`);
                     preloader.style.setProperty('--mouse-y', `${percentY}%`);
                     
-                    // 2. Parallax Background
                     const moveX = (x - winW / 2) * -0.05;
                     const moveY = (y - winH / 2) * -0.05;
                     preloader.style.setProperty('--parallax-x', `${moveX}px`);
                     preloader.style.setProperty('--parallax-y', `${moveY}px`);
 
-                    // 3. Dynamic Shadow on Logo
-                    const shadowX = (x - winW / 2) * 0.04;
-                    const shadowY = (y - winH / 2) * 0.04;
-                    logoBox.style.filter = `drop-shadow(${-shadowX}px ${-shadowY}px 25px rgba(0,0,0,0.12))`;
+                    // 3D Tilt & Profundidade da Sombra (Manual)
+                    const normX = (x - winW / 2) / (winW / 2);
+                    const normY = (y - winH / 2) / (winH / 2);
+                    
+                    const shadowX = normX * 30;
+                    const shadowY = normY * 30;
+                    const tiltX = normX * 12;
+                    const tiltY = -normY * 12;
 
-                    // 4. Cursor Follow
+                    logoBox.style.filter = `drop-shadow(${-shadowX}px ${-shadowY}px 25px rgba(0,0,0,0.15))`;
+                    logoBox.style.transform = `perspective(1000px) rotateX(${tiltY}deg) rotateY(${tiltX}deg)`;
+
                     if (winW > 768) {
                         cursor.style.left = x + 'px';
                         cursor.style.top = y + 'px';
-                    }
 
-                    // 5. Magnet Logic
-                    const rect = magArea.getBoundingClientRect();
-                    const centerX = rect.left + rect.width / 2;
-                    const centerY = rect.top + rect.height / 2;
-                    const dist = Math.sqrt(Math.pow(x - centerX, 2) + Math.pow(y - centerY, 2));
+                        const rect = magArea.getBoundingClientRect();
+                        const centerX = rect.left + rect.width / 2;
+                        const centerY = rect.top + rect.height / 2;
+                        const dist = Math.sqrt(Math.pow(x - centerX, 2) + Math.pow(y - centerY, 2));
 
-                    if (dist < 150) {
-                        const attractX = (x - centerX) * 0.4;
-                        const attractY = (y - centerY) * 0.4;
-                        btn.style.transform = `translate(${attractX}px, ${attractY}px)`;
-                        
-                        if (winW > 768) {
+                        if (dist < 150) {
+                            const attractX = (x - centerX) * 0.4;
+                            const attractY = (y - centerY) * 0.4;
+                            btn.style.transform = `translate(${attractX}px, ${attractY}px)`;
                             cursor.style.width = '60px';
                             cursor.style.height = '60px';
                             cursor.style.background = 'rgba(44, 44, 44, 0.03)';
-                        }
-                    } else {
-                        btn.style.transform = `translate(0, 0)`;
-                        
-                        if (winW > 768) {
+                        } else {
+                            btn.style.transform = `translate(0, 0)`;
                             cursor.style.width = '25px';
                             cursor.style.height = '25px';
                             cursor.style.background = 'transparent';
                         }
+                    } else {
+                        btn.style.transform = `translate(0, 0)`;
                     }
                 }
             };
 
-            // Adicionar Listeners (Passa de Auto para Manual)
             window.addEventListener('mousemove', handleMove, { passive: true });
             window.addEventListener('touchstart', handleMove, { passive: true });
             window.addEventListener('touchmove', handleMove, { passive: true });
 
-            // Ritual de Saída: Transição de Elite
             btn.addEventListener('click', () => {
                 preloader.classList.add('exit-ritual');
                 mainContent.classList.remove('opacity-0', 'pointer-events-none');
