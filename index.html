@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GLID | Architecture of Elite</title>
+    <meta name="description" content="Alfaiataria Digital Hand-coded para marcas High-Ticket. Onde a performance radical encontra o luxo silencioso.">
     
     <link rel="icon" type="image/png" href="https://glid.carrd.co/assets/images/image03.png?v=951bca55">
     <meta name="theme-color" content="#F5F5F3" id="theme-color-meta">
@@ -14,6 +15,7 @@
             /* Visão: Cashmere (Light/Gold) */
             --bg-color: #F5F5F3;
             --text-color: #2C2C2C;
+            --border-color: rgba(44, 44, 44, 0.15);
             --radial-1: #E8D5C4; 
             --radial-2: #B8A38E;  
             --radial-3: #8D7A65;
@@ -24,21 +26,19 @@
             --btn-glass: rgba(245, 245, 243, 0.05);
             --btn-hover-bg: rgba(44, 44, 44, 0.08);
             --cursor-focus: rgba(44, 44, 44, 0.04);
+            --gold-accent: #B8A38E; 
             
-            --mouse-x: 50%;
-            --mouse-y: 50%;
-            --parallax-x: 0px;
-            --parallax-y: 0px;
-            --shadow-x: 0px;
-            --shadow-y: 0px;
-            --tilt-x: 0deg;
-            --tilt-y: 0deg;
+            --mouse-x: 50%; --mouse-y: 50%;
+            --parallax-x: 0px; --parallax-y: 0px;
+            --shadow-x: 0px; --shadow-y: 0px;
+            --tilt-x: 0deg; --tilt-y: 0deg;
         }
 
         [data-theme="obsidian"] {
             /* Visão: Obsidian (Dark/Chrome) */
             --bg-color: #050505;
             --text-color: #F8F9FA;
+            --border-color: rgba(248, 249, 250, 0.15);
             --radial-1: #1a1a1a; 
             --radial-2: #0a0a0a;  
             --radial-3: #000000;
@@ -49,400 +49,380 @@
             --btn-glass: rgba(255, 255, 255, 0.02);
             --btn-hover-bg: rgba(255, 255, 255, 0.08);
             --cursor-focus: rgba(255, 255, 255, 0.05);
+            --gold-accent: #E8D5C4; 
         }
 
-        * { transition: background-color 0.5s ease, color 0.5s ease; }
+        * { transition: background-color 0.5s ease, color 0.5s ease, border-color 0.5s ease; -webkit-tap-highlight-color: transparent; }
 
         body {
-            margin: 0;
-            overflow: hidden;
-            background-color: var(--bg-color);
+            margin: 0; overflow: hidden; background-color: var(--bg-color);
+            font-family: 'Didot', 'Bodoni MT', 'Cinzel', 'Playfair Display', serif;
         }
 
+        /* --- TEXTURA DE PAPEL ALGODÃO 300G (HAPTIC UX) --- */
+        .paper-grain {
+            position: fixed; inset: 0; pointer-events: none; z-index: 0; opacity: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            transition: opacity 2s ease-in-out;
+        }
+        .paper-grain.active { opacity: 0.03; }
+        [data-theme="obsidian"] .paper-grain.active { opacity: 0.02; filter: invert(1); }
+
+        /* =========================================
+           1. PRELOADER / FRONTIER (BLINDADO)
+           ========================================= */
         #preloader {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(
-                circle at var(--mouse-x) var(--mouse-y),
-                var(--radial-1) 0%,
-                var(--radial-2) 35%,
-                var(--radial-3) 100%
-            );
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-            overflow: hidden;
-            cursor: none;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at var(--mouse-x) var(--mouse-y), var(--radial-1) 0%, var(--radial-2) 35%, var(--radial-3) 100%);
+            display: flex; justify-content: center; align-items: center; z-index: 9999;
+            overflow: hidden; cursor: none;
             transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.85, 0, 0.15, 1), background 0.5s ease;
             will-change: transform, opacity;
         }
 
-        /* Alternador de Tema */
         .theme-toggle {
-            position: absolute;
-            top: clamp(1.5rem, 4vh, 3rem);
-            right: clamp(1.5rem, 4vw, 3rem);
-            z-index: 100;
-            color: var(--text-color);
-            font-size: clamp(8px, 1.5vw, 9px);
-            text-transform: uppercase;
-            letter-spacing: 0.3em;
-            cursor: pointer;
-            opacity: 0.4;
-            transition: opacity 0.3s, letter-spacing 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            position: absolute; top: clamp(1.5rem, 4vh, 3rem); right: clamp(1.5rem, 4vw, 3rem); z-index: 100;
+            color: var(--text-color); font-size: clamp(8px, 1.5vw, 9px); text-transform: uppercase; letter-spacing: 0.3em;
+            cursor: pointer; opacity: 0.4; transition: opacity 0.3s, letter-spacing 0.3s; display: flex; align-items: center; gap: 8px;
         }
-        
-        .theme-toggle:hover {
-            opacity: 1;
-            letter-spacing: 0.4em;
-        }
+        .theme-toggle:hover { opacity: 1; letter-spacing: 0.4em; }
 
-        /* Bolinha do Alternador com Animação de Pulso */
-        .theme-indicator {
-            position: relative;
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            background-color: var(--text-color);
-            transition: transform 0.3s;
-        }
+        .theme-indicator { position: relative; width: 6px; height: 6px; border-radius: 50%; background-color: var(--text-color); transition: transform 0.3s; }
+        .theme-indicator::after { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; border-radius: 50%; border: 1px solid var(--text-color); opacity: 0; }
+        .pulse-active .theme-indicator::after { animation: ringPulse 2s infinite ease-out; }
+        @keyframes ringPulse { 0% { transform: scale(1); opacity: 0.8; } 100% { transform: scale(3.5); opacity: 0; } }
 
-        /* Anel Fantasma para o efeito de sonar */
-        .theme-indicator::after {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            border-radius: 50%;
-            border: 1px solid var(--text-color);
-            opacity: 0;
-        }
-
-        /* Classe que ativa o pulso (inserida via JS) */
-        .pulse-active .theme-indicator::after {
-            animation: ringPulse 2s infinite ease-out;
-        }
-
-        @keyframes ringPulse {
-            0% { transform: scale(1); opacity: 0.8; }
-            100% { transform: scale(3.5); opacity: 0; }
-        }
-
-        .monogram-wrapper {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 1;
-        }
-
+        .monogram-wrapper { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; }
         .monogram-pattern {
-            position: absolute;
-            width: 300%;
-            height: 300%;
-            top: -100%;
-            left: -100%;
+            position: absolute; width: 300%; height: 300%; top: -100%; left: -100%;
             background-image: url('https://glid.carrd.co/assets/images/image03.png?v=951bca55');
-            background-size: 90px;
-            background-repeat: repeat;
-            transform: rotate(-45deg) translate(var(--parallax-x), var(--parallax-y));
-            transition: transform 0.2s ease-out;
-            will-change: transform;
+            background-size: 90px; background-repeat: repeat; transform: rotate(-45deg) translate(var(--parallax-x), var(--parallax-y));
+            transition: transform 0.2s ease-out; will-change: transform;
         }
-
-        [data-theme="obsidian"] .monogram-pattern {
-            mix-blend-mode: screen;
-            filter: grayscale(100%) invert(1);
-        }
+        [data-theme="obsidian"] .monogram-pattern { mix-blend-mode: screen; filter: grayscale(100%) invert(1); }
 
         .base-mono { opacity: 0.04; }
-
-        .reveal-mono {
-            opacity: 0.20; 
-            z-index: 2;
-            -webkit-mask-image: radial-gradient(1200px circle at var(--mouse-x) var(--mouse-y), black 10%, transparent 65%);
-            mask-image: radial-gradient(1200px circle at var(--mouse-x) var(--mouse-y), black 10%, transparent 65%);
-        }
+        .reveal-mono { opacity: 0.20; z-index: 2; -webkit-mask-image: radial-gradient(1200px circle at var(--mouse-x) var(--mouse-y), black 10%, transparent 65%); mask-image: radial-gradient(1200px circle at var(--mouse-x) var(--mouse-y), black 10%, transparent 65%); }
 
         .lantern-glow {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(
-                1000px circle at var(--mouse-x) var(--mouse-y),
-                var(--lantern-glow),
-                transparent 60%
-            );
-            pointer-events: none;
-            z-index: 1;
-            will-change: background;
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(1000px circle at var(--mouse-x) var(--mouse-y), var(--lantern-glow), transparent 60%);
+            pointer-events: none; z-index: 1; will-change: background;
         }
 
         .logo-container {
-            position: relative;
-            width: clamp(200px, 45vw, 280px);
-            margin-bottom: 2.5rem;
-            z-index: 10;
+            position: relative; width: clamp(200px, 45vw, 280px); margin-bottom: 2.5rem; z-index: 10;
             filter: drop-shadow(var(--shadow-x) var(--shadow-y) 25px rgba(var(--shadow-rgb), 0.12));
             transform: perspective(1000px) rotateX(var(--tilt-y)) rotateY(var(--tilt-x));
-            transition: filter 0.1s ease-out, transform 0.1s ease-out;
-            will-change: filter, transform;
-            transform-style: preserve-3d;
+            transition: filter 0.1s ease-out, transform 0.1s ease-out; will-change: filter, transform; transform-style: preserve-3d;
         }
 
-        .logo-base {
-            width: 100%;
-            height: auto;
-            display: block;
-        }
-
+        .logo-base { width: 100%; height: auto; display: block; }
         .logo-shimmer {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: var(--logo-shimmer);
-            background-size: 200% 100%;
-            -webkit-mask-image: url('https://glid.carrd.co/assets/images/image03.png?v=951bca55');
-            mask-image: url('https://glid.carrd.co/assets/images/image03.png?v=951bca55');
-            -webkit-mask-size: contain;
-            mask-size: contain;
-            -webkit-mask-repeat: no-repeat;
-            animation: metallicSweep 6s infinite ease-in-out;
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: var(--logo-shimmer); background-size: 200% 100%;
+            -webkit-mask-image: url('https://glid.carrd.co/assets/images/image03.png?v=951bca55'); mask-image: url('https://glid.carrd.co/assets/images/image03.png?v=951bca55');
+            -webkit-mask-size: contain; mask-size: contain; -webkit-mask-repeat: no-repeat; animation: metallicSweep 6s infinite ease-in-out;
         }
+        @keyframes metallicSweep { 0% { background-position: 200% 0; opacity: 0; } 10% { opacity: 1; } 35% { background-position: -200% 0; opacity: 1; } 50%, 100% { background-position: -200% 0; opacity: 0; } }
 
-        @keyframes metallicSweep {
-            0% { background-position: 200% 0; opacity: 0; }
-            10% { opacity: 1; }
-            35% { background-position: -200% 0; opacity: 1; }
-            50%, 100% { background-position: -200% 0; opacity: 0; }
-        }
-
-        .mag-wrap {
-            padding: 30px;
-            z-index: 20;
-        }
-
+        .mag-wrap { padding: 30px; z-index: 20; }
         .elite-btn {
-            background: var(--btn-glass);
-            border: 1px solid rgba(var(--shadow-rgb), 0.15);
-            color: var(--text-color);
-            padding: clamp(0.8rem, 2vh, 1.1rem) clamp(1.8rem, 5vw, 3rem);
-            font-size: clamp(9px, 2.5vw, 11px);
-            text-transform: uppercase;
-            letter-spacing: 0.6em;
-            font-weight: 600;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
-            backdrop-filter: blur(2px);
-            cursor: pointer;
+            background: var(--btn-glass); border: 1px solid rgba(var(--shadow-rgb), 0.15); color: var(--text-color);
+            padding: clamp(0.8rem, 2vh, 1.1rem) clamp(1.8rem, 5vw, 3rem); font-size: clamp(9px, 2.5vw, 11px);
+            text-transform: uppercase; letter-spacing: 0.6em; font-weight: 600;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); position: relative; overflow: hidden; backdrop-filter: blur(2px); cursor: pointer;
         }
+        .elite-btn:hover { border-color: rgba(var(--shadow-rgb), 0.4); letter-spacing: 0.8em; transform: scale(1.02); background-color: var(--btn-hover-bg); backdrop-filter: blur(8px); }
 
-        .elite-btn:hover {
-            border-color: rgba(var(--shadow-rgb), 0.4);
-            letter-spacing: 0.8em;
-            transform: scale(1.02);
-            background-color: var(--btn-hover-bg);
-            backdrop-filter: blur(8px);
-        }
-
-        /* Tipografia Haute Couture (Ultra Luxo - Abaixo da Logo) */
         .identity-text {
-            color: var(--text-color);
-            opacity: 0.75;
-            font-size: clamp(9px, 2vw, 11px);
-            text-transform: uppercase;
-            letter-spacing: 0.35em;
-            font-weight: 300;
-            font-family: 'Didot', 'Bodoni MT', 'Cinzel', 'Playfair Display', 'Times New Roman', serif;
-            text-align: center;
-            margin-top: 1.5rem;
-            margin-bottom: 3rem;
-            padding: 0 1.5rem;
-            z-index: 10;
-            line-height: 1.6;
+            color: var(--text-color); opacity: 0.75; font-size: clamp(9px, 2vw, 11px); text-transform: uppercase; letter-spacing: 0.35em;
+            font-weight: 300; font-family: 'Didot', 'Bodoni MT', 'Cinzel', 'Playfair Display', 'Times New Roman', serif;
+            text-align: center; margin-top: 1.5rem; margin-bottom: 3rem; padding: 0 1.5rem; z-index: 10; line-height: 1.6;
         }
+        .dna-highlight { font-weight: 700; opacity: 1; letter-spacing: 0.45em; font-style: italic; }
 
-        /* Destaque de Luxo para a Palavra-Chave */
-        .dna-highlight {
-            font-weight: 700;
-            opacity: 1; /* Brilho/solidez total */
-            letter-spacing: 0.45em; /* Ligeiramente mais espaçado para impor respeito */
-            font-style: italic;
-        }
+        .stitch-container { position: relative; width: 120px; height: 1px; background-color: rgba(var(--shadow-rgb), 0.1); overflow: hidden; margin-bottom: 3.5rem; z-index: 10; }
+        .stitch-line { position: absolute; width: 100%; height: 100%; background: var(--stitch-glow); box-shadow: 0 0 12px var(--stitch-glow); animation: stitchFlow 4s infinite ease-in-out; }
+        @keyframes stitchFlow { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
 
-        .stitch-container {
-            position: relative;
-            width: 120px;
-        .lantern-glow {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(
-                1000px circle at var(--mouse-x) var(--mouse-y),
-                var(--lantern-glow),
-                transparent 60%
-            );
-            pointer-events: none;
-            z-index: 1;
-            will-change: background;
-        }
-
-        /* Logo Dinâmica e 3D */
-        .logo-container {
-            position: relative;
-            width: clamp(200px, 45vw, 280px);
-            z-index: 10;
-            filter: drop-shadow(var(--shadow-x) var(--shadow-y) 25px rgba(var(--shadow-rgb), 0.12));
-            transform: perspective(1000px) rotateX(var(--tilt-y)) rotateY(var(--tilt-x));
-            transition: filter 0.1s ease-out, transform 0.1s ease-out;
-            will-change: filter, transform;
-            transform-style: preserve-3d;
-        }
-
-        .logo-base {
-            width: 100%;
-            height: 100%;
-            background: var(--stitch-glow);
-            box-shadow: 0 0 12px var(--stitch-glow);
-            animation: stitchFlow 4s infinite ease-in-out;
-        }
-
-        @keyframes stitchFlow {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
-        }
-
+        /* THE THIMBLE (CURSOR) */
         .custom-cursor {
-            width: 25px;
-            height: 25px;
-            border: 1px solid var(--text-color);
-            border-radius: 50%;
-            position: fixed;
-            pointer-events: none;
-            z-index: 10000;
-            transform: translate(-50%, -50%);
-            transition: width 0.3s, height 0.3s, background 0.3s, opacity 0.5s ease, border-color 0.5s;
-            opacity: 0; 
+            width: 25px; height: 25px; border: 1px solid var(--text-color); border-radius: 50%;
+            position: fixed; pointer-events: none; z-index: 10000; transform: translate(-50%, -50%);
+            transition: width 0.3s, height 0.3s, background 0.3s, opacity 0.5s ease, border-color 0.5s, box-shadow 0.5s; opacity: 0; 
+        }
+        .custom-cursor.thimble-mode {
+            width: 6px !important; height: 6px !important; background-color: var(--gold-accent) !important;
+            border-color: transparent !important; box-shadow: 0 0 10px var(--gold-accent), 0 0 20px var(--gold-accent) !important; opacity: 1 !important;
         }
 
         @media (max-width: 768px) {
             .custom-cursor { display: none !important; }
             #preloader { cursor: auto; }
             .mag-wrap { padding: 15px; }
-            
             .monogram-pattern { background-size: 70px !important; }
             .base-mono { opacity: 0.08 !important; }
             .reveal-mono { opacity: 0.28 !important; }
-            
             .theme-toggle { top: 1.5rem; right: 1.5rem; font-size: 7px; }
-            .identity-text { top: 4rem; } 
         }
 
-        .exit-ritual {
-            transform: scale(1.1) !important;
-            opacity: 0 !important;
-            filter: blur(10px);
-            pointer-events: none;
+        .exit-ritual { transform: scale(1.1) !important; opacity: 0 !important; filter: blur(10px); pointer-events: none; }
+
+        /* =========================================
+           2. FUNIL MAIN CONTENT (SEO 4.0 & ANIMATIONS)
+           ========================================= */
+        #main-content {
+            background-color: var(--bg-color); color: var(--text-color);
+            position: relative; z-index: 10;
         }
+
+        /* Gradiente Champagne Gold Otimizado */
+        .gold-gradient-text {
+            background: linear-gradient(135deg, #E8D5C4 0%, #B8A38E 50%, #8D7A65 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .gold-gradient-bg { background: linear-gradient(135deg, #E8D5C4 0%, #B8A38E 50%, #8D7A65 100%); }
+
+        /* Botões de Baixo Relevo / Haptic Press */
+        .haptic-press {
+            box-shadow: inset 2px 2px 5px rgba(0,0,0,0.4), inset -1px -1px 3px rgba(255,255,255,0.1);
+            transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s;
+        }
+        .haptic-press:hover { transform: scale(0.98); box-shadow: inset 4px 4px 8px rgba(0,0,0,0.6), inset -2px -2px 6px rgba(255,255,255,0.1); }
+        .haptic-press:active { transform: scale(0.95); }
+
+        /* Reveal on Scroll (Slide Up) */
+        .reveal-on-scroll {
+            opacity: 0; transform: translateY(20px); filter: blur(3px);
+            transition: opacity 800ms cubic-bezier(0.16, 1, 0.3, 1), transform 800ms cubic-bezier(0.16, 1, 0.3, 1), filter 800ms ease;
+        }
+        .reveal-on-scroll.is-visible { opacity: 1; transform: translateY(0); filter: blur(0); }
+
+        /* Parallax Acervo */
+        .parallax-img { transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
+        .group:hover .parallax-img { transform: scale(1.05); }
+
+        /* Before/After Slider */
+        .slider-container { cursor: ew-resize; touch-action: pan-y; }
+        .slider-handle { transform: translateX(-50%); }
+
     </style>
 </head>
 <body>
 
     <div class="custom-cursor" id="cursor"></div>
+    <div class="paper-grain" id="paper-texture"></div>
 
+    <!-- PRELOADER FRONTIER -->
     <div id="preloader">
-        
         <div class="theme-toggle" id="vision-toggle">
             <div class="theme-indicator" id="theme-dot"></div>
-            <!-- translate="no" e class="notranslate" bloqueiam o Google Translate e outros -->
             <span id="theme-label" translate="no" class="notranslate">CASHMERE</span>
         </div>
-
-        <div class="monogram-wrapper base-mono">
-            <div class="monogram-pattern"></div>
-        </div>
-        
-        <div class="monogram-wrapper reveal-mono">
-            <div class="monogram-pattern"></div>
-        </div>
-        
+        <div class="monogram-wrapper base-mono"><div class="monogram-pattern"></div></div>
+        <div class="monogram-wrapper reveal-mono"><div class="monogram-pattern"></div></div>
         <div class="lantern-glow"></div>
-
         <div class="flex flex-col items-center justify-center relative w-full z-10 px-4">
-            
             <div class="logo-container" id="logo-box">
                 <img src="https://glid.carrd.co/assets/images/image03.png?v=951bca55" alt="GLID Logo" class="logo-base">
                 <div class="logo-shimmer"></div>
             </div>
-            
-            <!-- Frase ÚNICA com o destaque estratégico aplicado -->
             <span class="identity-text">Front-end exclusivo moldado ao <br class="md:hidden"> <span class="dna-highlight">DNA da sua marca</span></span>
-            
-            <div class="stitch-container">
-                <div class="stitch-line"></div>
-            </div>
-            
+            <div class="stitch-container"><div class="stitch-line"></div></div>
             <div class="mag-wrap" id="mag-area">
-                <button type="button" class="elite-btn" id="protocol-btn">
+                <button type="button" class="elite-btn haptic-target" data-vibrate="30" id="protocol-btn">
                     Iniciar Experiência
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- CONTEÚDO FINAL DO SITE -->
-    <main id="main-content" class="min-h-screen flex flex-col items-center justify-center p-10 opacity-0 pointer-events-none transition-opacity duration-1000 ease-in-out" style="background-color: var(--bg-color);">
-        <div class="text-center max-w-2xl">
-            <h1 style="font-family: 'Georgia', serif; color: var(--text-color);" class="text-[clamp(12px,4vw,16px)] uppercase tracking-[1.5em] mb-8 transition-colors duration-500">
-                Draft Protocol Active
+    <!-- FUNIL PRINCIPAL SEO 4.0 -->
+    <main id="main-content" class="opacity-0 pointer-events-none absolute top-0 left-0 w-full min-h-screen pb-0">
+        
+        <!-- 1. HEADER MINIMALISTA -->
+        <header class="fixed top-0 left-0 w-full z-50 px-6 py-5 flex justify-between items-center backdrop-blur-[10px] border-b border-[var(--border-color)] bg-[var(--bg-color)]/70 transition-opacity duration-1000 opacity-0" id="main-header" aria-label="Cabeçalho Principal">
+            <div class="font-serif text-xl tracking-[0.3em] font-bold gold-gradient-text uppercase">GLID</div>
+            <button class="border border-[#B8A38E] text-[var(--text-color)] px-6 py-2 text-[10px] uppercase tracking-[0.2em] hover:bg-[#B8A38E] hover:text-[#F5F5F3] transition-colors haptic-target" data-vibrate="10">Análise Private</button>
+        </header>
+
+        <!-- 2. HERO SECTION -->
+        <section class="min-h-screen flex flex-col justify-center items-center px-6 text-center pt-24 pb-16 reveal-on-scroll" aria-labelledby="hero-title">
+            <h1 id="hero-title" class="text-3xl md:text-5xl lg:text-6xl text-[var(--text-color)] leading-[1.2] mb-8 max-w-5xl tracking-tight uppercase">
+                Sua autoridade digital merece a precisão de um Atelier, não o ruído de uma agência.
             </h1>
-            <div class="w-16 h-[1px] mx-auto opacity-20 mb-8 transition-colors duration-500" style="background-color: var(--text-color);"></div>
-            <p style="color: var(--text-color);" class="font-light leading-relaxed opacity-60 text-[clamp(12px,3vw,16px)] transition-colors duration-500">
-                O front-end de elite foi revelado e a visão tática sincronizada. A fundação está pronta.
+            <p class="text-sm md:text-base text-[var(--text-color)] opacity-70 max-w-3xl mb-14 font-light leading-relaxed">
+                Nós não entregamos sites genéricos. Esculpimos infraestruturas de conversão ultra-luxo, hand-coded, que justificam o seu preço high-ticket antes mesmo do cliente ler a oferta. Sinta a textura da exclusividade.
             </p>
-        </div>
+            <button class="bg-[#2C2C2C] text-[#E8D5C4] px-10 py-5 uppercase tracking-[0.3em] text-xs font-semibold haptic-press haptic-target" data-vibrate="20">
+                Solicitar Acesso ao Atelier
+            </button>
+        </section>
+
+        <!-- 3. GALERIA DE CURADORIA -->
+        <section class="py-32 px-6 md:px-12 w-full max-w-7xl mx-auto border-t border-[var(--border-color)] reveal-on-scroll" aria-labelledby="gallery-title">
+            <h2 id="gallery-title" class="text-2xl md:text-3xl lg:text-4xl text-[var(--text-color)] text-center mb-20 uppercase tracking-[0.2em]">Arquitetura de Intenção. Nosso Acervo Private.</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-8 lg:gap-16">
+                <!-- Ativo 1 -->
+                <article class="group haptic-target" data-vibrate="5">
+                    <div class="aspect-[16/9] bg-[#1A1A1A] mb-6 overflow-hidden relative shadow-[inset_0_0_20px_rgba(0,0,0,0.5)]">
+                         <div class="absolute inset-0 bg-cover bg-center parallax-img" style="background-image: url('https://glid.carrd.co/assets/images/image03.png?v=951bca55'); opacity: 0.15; filter: grayscale(100%);"></div>
+                         <div class="absolute inset-0 flex items-center justify-center opacity-30 group-hover:opacity-100 transition-opacity"><span class="gold-gradient-text text-sm tracking-widest uppercase">+ Inspecionar</span></div>
+                    </div>
+                    <h3 class="text-lg text-[var(--text-color)] uppercase tracking-[0.2em] mb-2">GL PRO</h3>
+                    <span class="text-[10px] text-[#B8A38E] tracking-[0.3em] uppercase block mb-4">High-End Cosmetics</span>
+                    <p class="text-sm text-[var(--text-color)] opacity-60 font-light leading-relaxed">Engenharia visual para protocolos 8K e reestruturação capilar de elite.</p>
+                </article>
+                
+                <!-- Ativo 2 -->
+                <article class="group haptic-target" data-vibrate="5">
+                    <div class="aspect-[16/9] bg-[#1A1A1A] mb-6 overflow-hidden relative shadow-[inset_0_0_20px_rgba(0,0,0,0.5)]">
+                         <div class="absolute inset-0 bg-cover bg-center parallax-img" style="background-image: url('https://glid.carrd.co/assets/images/image03.png?v=951bca55'); opacity: 0.15; filter: grayscale(100%); transform: scale(1.02);"></div>
+                         <div class="absolute inset-0 flex items-center justify-center opacity-30 group-hover:opacity-100 transition-opacity"><span class="gold-gradient-text text-sm tracking-widest uppercase">+ Inspecionar</span></div>
+                    </div>
+                    <h3 class="text-lg text-[var(--text-color)] uppercase tracking-[0.2em] mb-2">LX ÉLIXIR NOIR</h3>
+                    <span class="text-[10px] text-[#B8A38E] tracking-[0.3em] uppercase block mb-4">Functional Luxury</span>
+                    <p class="text-sm text-[var(--text-color)] opacity-60 font-light leading-relaxed">Materialização digital para bebidas funcionais voltadas à beleza e saúde premium.</p>
+                </article>
+
+                <!-- Ativo 3 -->
+                <article class="group haptic-target" data-vibrate="5">
+                    <div class="aspect-[16/9] bg-[#1A1A1A] mb-6 overflow-hidden relative shadow-[inset_0_0_20px_rgba(0,0,0,0.5)]">
+                         <div class="absolute inset-0 bg-cover bg-center parallax-img" style="background-image: url('https://glid.carrd.co/assets/images/image03.png?v=951bca55'); opacity: 0.15; filter: grayscale(100%); transform: scale(1.05);"></div>
+                         <div class="absolute inset-0 flex items-center justify-center opacity-30 group-hover:opacity-100 transition-opacity"><span class="gold-gradient-text text-sm tracking-widest uppercase">+ Inspecionar</span></div>
+                    </div>
+                    <h3 class="text-lg text-[var(--text-color)] uppercase tracking-[0.2em] mb-2">DORÉ</h3>
+                    <span class="text-[10px] text-[#B8A38E] tracking-[0.3em] uppercase block mb-4">Sensorial Gastronomy</span>
+                    <p class="text-sm text-[var(--text-color)] opacity-60 font-light leading-relaxed">Experiência tátil e visual para alta gastronomia e acompanhamentos gourmet.</p>
+                </article>
+            </div>
+        </section>
+
+        <!-- 4. A TRANSFORMAÇÃO (CHOQUE DE REALIDADE) -->
+        <section class="py-32 px-6 w-full max-w-6xl mx-auto border-t border-[var(--border-color)] reveal-on-scroll" aria-labelledby="transformation-title">
+            <h2 id="transformation-title" class="text-2xl md:text-3xl lg:text-4xl text-[var(--text-color)] text-center mb-16 uppercase tracking-[0.2em]">O Custo do Ruído.</h2>
+            
+            <div class="relative w-full aspect-square md:aspect-[21/9] overflow-hidden slider-container bg-[var(--bg-color)] shadow-2xl haptic-target" id="ba-container" data-vibrate="2">
+                <!-- AFTER LAYER (Direita / Elite) -->
+                <div class="absolute inset-0 bg-[var(--bg-color)] flex items-center justify-end p-8 md:p-16 border border-[var(--border-color)]">
+                    <div class="text-right w-1/2 max-w-sm">
+                        <h4 class="text-xl md:text-3xl text-[var(--text-color)] mb-4 uppercase tracking-widest">Arquitetura de Elite</h4>
+                        <p class="text-[var(--text-color)] opacity-70 text-sm md:text-base font-light italic">Hand-coded, Alta Performance, R$ 30k+</p>
+                    </div>
+                </div>
+                
+                <!-- BEFORE LAYER (Esquerda / Ruído) -->
+                <div class="absolute inset-y-0 left-0 w-1/2 overflow-hidden border-r border-[#B8A38E] z-10 bg-[#1A1A1A] text-[#F5F5F3] shadow-[5px_0_20px_rgba(0,0,0,0.5)]" id="ba-before">
+                    <div class="absolute inset-0 w-[200vw] md:w-[600px] lg:w-[1152px] flex items-center justify-start p-8 md:p-16">
+                        <div class="w-full md:w-1/2 max-w-sm">
+                            <h4 class="text-xl md:text-3xl mb-4 uppercase tracking-widest">Infraestrutura de Ruído</h4>
+                            <p class="opacity-70 text-sm md:text-base font-light italic">Templates, Lentidão, R$ 3k</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- ALÇA DO SLIDER (Champagne Gold) -->
+                <div class="absolute inset-y-0 -ml-[2px] flex items-center justify-center z-20 pointer-events-none slider-handle" style="left: 50%; width: 4px;" id="ba-handle">
+                    <div class="w-[3px] h-full bg-gradient-to-b from-[#E8D5C4] via-[#B8A38E] to-[#8D7A65] shadow-[0_0_15px_rgba(184,163,142,0.8)]"></div>
+                    <!-- Ícone de arraste -->
+                    <div class="absolute w-8 h-12 bg-[#2C2C2C] border border-[#B8A38E] rounded-sm flex items-center justify-center gap-1 shadow-lg">
+                        <div class="w-px h-4 bg-[#B8A38E]"></div>
+                        <div class="w-px h-4 bg-[#B8A38E]"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. O FILTRO DE ELITE -->
+        <section class="py-32 px-6 w-full bg-[var(--bg-color)] border-t border-[var(--border-color)] reveal-on-scroll" aria-labelledby="filter-title">
+            <div class="max-w-4xl mx-auto text-center">
+                <h2 id="filter-title" class="text-2xl md:text-3xl text-[var(--text-color)] mb-10 uppercase tracking-[0.2em]">Seleção de Clientes Tier 1</h2>
+                <p class="text-[var(--text-color)] opacity-70 mb-16 font-light leading-relaxed text-sm md:text-base max-w-2xl mx-auto">
+                    A Alfaiataria Digital da GLID não é para todos. Exigimos marcas que já dominam seus nichos e precisam que a sua vitrine digital alcance o nível do seu faturamento real.
+                </p>
+                
+                <!-- Ancoragem de Preço com Estilo Pesponto -->
+                <div class="border border-dashed border-[#B8A38E] p-12 relative bg-[var(--bg-color)] mx-auto max-w-xl shadow-[inset_0_0_50px_rgba(0,0,0,0.03)] haptic-target" data-vibrate="10">
+                    <div class="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-[var(--bg-color)] px-4">
+                        <img src="https://glid.carrd.co/assets/images/image03.png?v=951bca55" alt="GLID Símbolo" class="w-6 opacity-30 filter brightness-0 dark:invert" style="filter: invert(var(--invert-logo));">
+                    </div>
+                    <p class="text-lg md:text-2xl text-[var(--text-color)] uppercase tracking-widest mb-6 leading-relaxed">
+                        Padrão de Investimento Private:<br>
+                        <span class="gold-gradient-text font-bold">A partir de R$ 12.000</span>
+                    </p>
+                    <p class="text-[10px] text-[var(--text-color)] opacity-50 uppercase tracking-[0.2em] border-t border-[var(--border-color)] pt-6 mt-6">
+                        Limitado a um número restrito de projetos por semestre no Brasil para garantir qualidade artesanal.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 6. CTA DE ALTA FRICÇÃO -->
+        <section class="py-40 px-6 w-full bg-[#111111] text-[#F5F5F3] text-center reveal-on-scroll">
+            <h2 class="text-2xl md:text-4xl lg:text-5xl mb-16 uppercase tracking-[0.2em] max-w-4xl mx-auto leading-tight">
+                Vamos elevar o seu posicionamento digital?
+            </h2>
+            <a href="https://wa.me/5549999999999" target="_blank" rel="noopener noreferrer" class="inline-block gold-gradient-bg text-[#2C2C2C] px-8 md:px-12 py-5 md:py-6 uppercase tracking-[0.3em] text-xs font-bold haptic-press shadow-[0_0_30px_rgba(184,163,142,0.2)] haptic-target" data-vibrate="40">
+                Agendar Análise Private com Thiago Grabski
+            </a>
+        </section>
+
+        <!-- 7. RODAPÉ INSTITUCIONAL (SEO & LGPD) -->
+        <footer class="bg-[#0A0A0A] text-[#F5F5F3] py-20 px-6 md:px-12 w-full text-xs font-light tracking-wide border-t border-[#222]">
+            <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-16 mb-16">
+                <!-- Branding -->
+                <div>
+                    <div class="font-serif text-2xl tracking-[0.3em] uppercase font-bold mb-6 gold-gradient-text">GLID</div>
+                    <p class="opacity-50 leading-loose">Hand-coded.<br>Performance Radical.<br>Luxo Silencioso.</p>
+                </div>
+                <!-- Links -->
+                <div class="flex flex-col gap-4 opacity-50 uppercase tracking-widest">
+                    <span class="text-[#B8A38E] mb-2 text-[10px]">Legal</span>
+                    <a href="#" class="hover:text-[#E8D5C4] transition-colors">Política de Privacidade</a>
+                    <a href="#" class="hover:text-[#E8D5C4] transition-colors">Termos de Uso</a>
+                    <a href="#" class="hover:text-[#E8D5C4] transition-colors">Compliance LGPD</a>
+                </div>
+                <!-- Dados Brasil -->
+                <div class="opacity-50 uppercase tracking-widest leading-loose">
+                    <span class="text-[#B8A38E] mb-2 text-[10px] block">Sede</span>
+                    <p>GL.ID PRIVATE DIGITAL ATELIER</p>
+                    <p>Chapecó, SC, Brasil</p>
+                    <p>CNPJ: 00.000.000/0000-00</p>
+                </div>
+            </div>
+            <!-- Copyright -->
+            <div class="max-w-7xl mx-auto border-t border-[#B8A38E]/20 pt-8 text-center text-[10px] opacity-30 uppercase tracking-[0.4em]">
+                &copy; 2026 GLID. Todos os direitos reservados.
+            </div>
+        </footer>
+
     </main>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            // --- VARIÁVEIS GLOBAIS ---
             const preloader = document.getElementById('preloader');
             const logoBox = document.getElementById('logo-box');
             const cursor = document.getElementById('cursor');
             const magArea = document.getElementById('mag-area');
             const btn = document.getElementById('protocol-btn');
             const mainContent = document.getElementById('main-content');
+            const mainHeader = document.getElementById('main-header');
             
             const visionToggle = document.getElementById('vision-toggle');
             const themeLabel = document.getElementById('theme-label');
             const themeDot = document.getElementById('theme-dot');
             const themeMeta = document.getElementById('theme-color-meta');
+            const paperTexture = document.getElementById('paper-texture');
 
-            // Timer para chamar atenção para o botão de tema
-            let attentionTimer = setTimeout(() => {
-                visionToggle.classList.add('pulse-active');
-            }, 4000); // Começa a pulsar passados 4 segundos
+            // --- LÓGICA DO PRELOADER (INTACTA) ---
+            let attentionTimer = setTimeout(() => { visionToggle.classList.add('pulse-active'); }, 4000);
 
             let isObsidian = false;
             visionToggle.addEventListener('click', () => {
-                // Ao clicar, o utilizador já reparou no botão, o pulso é desativado para sempre
                 visionToggle.classList.remove('pulse-active');
                 clearTimeout(attentionTimer);
-
                 isObsidian = !isObsidian;
                 if (isObsidian) {
                     document.documentElement.setAttribute('data-theme', 'obsidian');
@@ -455,137 +435,176 @@
                     themeDot.style.transform = 'scale(1)';
                     if (themeMeta) themeMeta.setAttribute('content', '#F5F5F3'); 
                 }
-                
-                try {
-                    if (navigator.vibrate) navigator.vibrate(10);
-                } catch (e) {} 
+                try { if (navigator.vibrate) navigator.vibrate(10); } catch (e) {} 
             });
 
             let isAutonomous = true;
-
             function autonomousLoop() {
                 if (!isAutonomous) return;
-
                 const time = Date.now() * 0.001; 
-                const winW = window.innerWidth;
-                const winH = window.innerHeight;
-
+                const winW = window.innerWidth; const winH = window.innerHeight;
                 const percentX = 50 + 35 * Math.sin(time * 0.7); 
                 const percentY = 50 + 15 * Math.sin(time * 1.4);
-
                 preloader.style.setProperty('--mouse-x', `${percentX}%`);
                 preloader.style.setProperty('--mouse-y', `${percentY}%`);
-
-                const absX = (percentX / 100) * winW;
-                const absY = (percentY / 100) * winH;
-
-                const moveX = (absX - winW / 2) * -0.05;
-                const moveY = (absY - winH / 2) * -0.05;
+                const absX = (percentX / 100) * winW; const absY = (percentY / 100) * winH;
+                const moveX = (absX - winW / 2) * -0.05; const moveY = (absY - winH / 2) * -0.05;
                 preloader.style.setProperty('--parallax-x', `${moveX}px`);
                 preloader.style.setProperty('--parallax-y', `${moveY}px`);
-
-                const normX = (absX - winW / 2) / (winW / 2);
-                const normY = (absY - winH / 2) / (winH / 2);
-                
+                const normX = (absX - winW / 2) / (winW / 2); const normY = (absY - winH / 2) / (winH / 2);
                 preloader.style.setProperty('--shadow-x', `${normX * 30}px`);
                 preloader.style.setProperty('--shadow-y', `${normY * 30}px`);
                 preloader.style.setProperty('--tilt-x', `${normX * 12}deg`);
                 preloader.style.setProperty('--tilt-y', `${-normY * 12}deg`);
-
                 requestAnimationFrame(autonomousLoop);
             }
-
             requestAnimationFrame(autonomousLoop);
 
             const handleMove = (e) => {
-                const winW = window.innerWidth;
-                const winH = window.innerHeight;
-
+                const winW = window.innerWidth; const winH = window.innerHeight;
                 if (isAutonomous) {
                     isAutonomous = false;
                     if (winW > 768 && cursor) cursor.style.opacity = '1'; 
                 }
-
                 let x, y;
                 if (e.type.includes('touch')) {
                     if (!e.touches || e.touches.length === 0) return;
-                    x = e.touches[0].clientX;
-                    y = e.touches[0].clientY;
+                    x = e.touches[0].clientX; y = e.touches[0].clientY;
                 } else {
-                    x = e.clientX;
-                    y = e.clientY;
+                    x = e.clientX; y = e.clientY;
                 }
-                
                 if (x !== undefined && y !== undefined) {
-                    const percentX = (x / winW) * 100;
-                    const percentY = (y / winH) * 100;
-                    
-                    preloader.style.setProperty('--mouse-x', `${percentX}%`);
-                    preloader.style.setProperty('--mouse-y', `${percentY}%`);
-                    
-                    const moveX = (x - winW / 2) * -0.05;
-                    const moveY = (y - winH / 2) * -0.05;
-                    preloader.style.setProperty('--parallax-x', `${moveX}px`);
-                    preloader.style.setProperty('--parallax-y', `${moveY}px`);
+                    if (preloader.style.display !== 'none') {
+                        const percentX = (x / winW) * 100; const percentY = (y / winH) * 100;
+                        preloader.style.setProperty('--mouse-x', `${percentX}%`);
+                        preloader.style.setProperty('--mouse-y', `${percentY}%`);
+                        const moveX = (x - winW / 2) * -0.05; const moveY = (y - winH / 2) * -0.05;
+                        preloader.style.setProperty('--parallax-x', `${moveX}px`);
+                        preloader.style.setProperty('--parallax-y', `${moveY}px`);
+                        const normX = (x - winW / 2) / (winW / 2); const normY = (y - winH / 2) / (winH / 2);
+                        preloader.style.setProperty('--shadow-x', `${normX * 30}px`);
+                        preloader.style.setProperty('--shadow-y', `${normY * 30}px`);
+                        preloader.style.setProperty('--tilt-x', `${normX * 12}deg`);
+                        preloader.style.setProperty('--tilt-y', `${-normY * 12}deg`);
+                    }
 
-                    const normX = (x - winW / 2) / (winW / 2);
-                    const normY = (y - winH / 2) / (winH / 2);
-                    
-                    preloader.style.setProperty('--shadow-x', `${normX * 30}px`);
-                    preloader.style.setProperty('--shadow-y', `${normY * 30}px`);
-                    preloader.style.setProperty('--tilt-x', `${normX * 12}deg`);
-                    preloader.style.setProperty('--tilt-y', `${-normY * 12}deg`);
-
-                    if (winW > 768) {
-                        cursor.style.left = x + 'px';
-                        cursor.style.top = y + 'px';
-
-                        const rect = magArea.getBoundingClientRect();
-                        const centerX = rect.left + rect.width / 2;
-                        const centerY = rect.top + rect.height / 2;
-                        const dist = Math.sqrt(Math.pow(x - centerX, 2) + Math.pow(y - centerY, 2));
-
-                        if (dist < 150) {
-                            const attractX = (x - centerX) * 0.4;
-                            const attractY = (y - centerY) * 0.4;
-                            btn.style.transform = `translate(${attractX}px, ${attractY}px)`;
-                            cursor.style.width = '60px';
-                            cursor.style.height = '60px';
-                            cursor.style.background = 'var(--cursor-focus)';
-                            cursor.style.borderColor = 'transparent';
-                        } else {
-                            btn.style.transform = `translate(0, 0)`;
-                            cursor.style.width = '25px';
-                            cursor.style.height = '25px';
-                            cursor.style.background = 'transparent';
-                            cursor.style.borderColor = 'var(--text-color)';
+                    if (winW > 768 && cursor) {
+                        cursor.style.left = x + 'px'; cursor.style.top = y + 'px';
+                        if (preloader.style.display !== 'none' && magArea) {
+                            const rect = magArea.getBoundingClientRect();
+                            const centerX = rect.left + rect.width / 2; const centerY = rect.top + rect.height / 2;
+                            const dist = Math.sqrt(Math.pow(x - centerX, 2) + Math.pow(y - centerY, 2));
+                            if (dist < 150) {
+                                btn.style.transform = `translate(${(x - centerX)*0.4}px, ${(y - centerY)*0.4}px)`;
+                                cursor.style.width = '60px'; cursor.style.height = '60px';
+                                cursor.style.background = 'var(--cursor-focus)'; cursor.style.borderColor = 'transparent';
+                            } else {
+                                btn.style.transform = `translate(0, 0)`;
+                                cursor.style.width = '25px'; cursor.style.height = '25px';
+                                cursor.style.background = 'transparent'; cursor.style.borderColor = 'var(--text-color)';
+                            }
                         }
                     } else {
-                        btn.style.transform = `translate(0, 0)`;
+                        if(btn) btn.style.transform = `translate(0, 0)`;
                     }
                 }
             };
-
             window.addEventListener('mousemove', handleMove, { passive: true });
             window.addEventListener('touchstart', handleMove, { passive: true });
             window.addEventListener('touchmove', handleMove, { passive: true });
 
+
+            // --- TRANSIÇÃO PARA O FUNIL SEO 4.0 ---
             btn.addEventListener('click', () => {
-                try {
-                    if (navigator.vibrate) navigator.vibrate([20, 30, 20, 30, 60]);
-                } catch (e) {}
+                try { if (navigator.vibrate) navigator.vibrate([20, 30, 20, 30, 60]); } catch (e) {}
 
                 preloader.classList.add('exit-ritual');
                 mainContent.classList.remove('opacity-0', 'pointer-events-none');
-                mainContent.classList.add('opacity-100');
+                mainContent.classList.add('relative');
+                mainContent.classList.remove('absolute');
                 visionToggle.style.opacity = '0';
+
+                // Evolui o Cursor Global para Dedal
+                if (window.innerWidth > 768 && cursor) cursor.classList.add('thimble-mode');
 
                 setTimeout(() => {
                     preloader.style.display = 'none';
-                    document.body.classList.remove('overflow-hidden');
-                    document.body.style.overflow = 'auto'; 
+                    document.body.style.overflowY = 'auto'; 
+                    paperTexture.classList.add('active');
+                    // Mostra o Header fixo com fade
+                    mainHeader.classList.remove('opacity-0');
+                    mainHeader.classList.add('opacity-100');
+                    
+                    // Inicia Observer para revelar secções
+                    initScrollReveal();
                 }, 850);
             });
+
+
+            // --- LÓGICA DO FUNIL (MAIN CONTENT) ---
+            
+            // 1. Haptic Feedback Universal
+            document.querySelectorAll('.haptic-target').forEach(el => {
+                const triggerHaptic = () => {
+                    const val = el.getAttribute('data-vibrate') || 10;
+                    try { if (navigator.vibrate) navigator.vibrate(parseInt(val)); } catch(e){}
+                };
+                el.addEventListener('mouseenter', triggerHaptic);
+                el.addEventListener('touchstart', triggerHaptic, {passive: true});
+            });
+
+            // 2. Intersection Observer (Scroll Reveal SEO 4.0)
+            const initScrollReveal = () => {
+                const observerOptions = { root: null, rootMargin: '0px', threshold: 0.15 };
+                const observer = new IntersectionObserver((entries, observer) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('is-visible');
+                            observer.unobserve(entry.target);
+                        }
+                    });
+                }, observerOptions);
+
+                document.querySelectorAll('.reveal-on-scroll').forEach(section => {
+                    observer.observe(section);
+                });
+            };
+
+            // 3. Before/After Slider Interativo
+            const sliderContainer = document.getElementById('ba-container');
+            const beforePanel = document.getElementById('ba-before');
+            const handle = document.getElementById('ba-handle');
+            let isDraggingSlider = false;
+
+            if (sliderContainer) {
+                const updateSlider = (clientX) => {
+                    const rect = sliderContainer.getBoundingClientRect();
+                    let x = clientX - rect.left;
+                    x = Math.max(0, Math.min(x, rect.width)); // Limites
+                    const percentage = (x / rect.width) * 100;
+                    
+                    beforePanel.style.width = `${percentage}%`;
+                    handle.style.left = `${percentage}%`;
+                };
+
+                // Desktop
+                sliderContainer.addEventListener('mousedown', () => isDraggingSlider = true);
+                window.addEventListener('mouseup', () => isDraggingSlider = false);
+                window.addEventListener('mousemove', (e) => {
+                    if (!isDraggingSlider) return;
+                    updateSlider(e.clientX);
+                    try { if (navigator.vibrate && Math.random() > 0.8) navigator.vibrate(5); } catch(e){} // Micro vibração ao arrastar
+                });
+
+                // Mobile
+                sliderContainer.addEventListener('touchstart', () => isDraggingSlider = true, {passive: true});
+                window.addEventListener('touchend', () => isDraggingSlider = false);
+                window.addEventListener('touchmove', (e) => {
+                    if (!isDraggingSlider) return;
+                    updateSlider(e.touches[0].clientX);
+                    try { if (navigator.vibrate && Math.random() > 0.8) navigator.vibrate(5); } catch(e){}
+                }, {passive: true});
+            }
         });
     </script>
 </body>
