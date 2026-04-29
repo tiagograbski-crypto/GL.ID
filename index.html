@@ -80,7 +80,8 @@
         /* Logo com Sombra Dinâmica */
         .logo-container {
             position: relative;
-            width: 230px;
+            /* Largura fluida adaptável ao ecrã */
+            width: clamp(160px, 40vw, 230px);
             margin-bottom: 2.5rem;
             z-index: 10;
             transition: filter 0.1s ease-out;
@@ -131,8 +132,9 @@
             background: transparent;
             border: 1px solid rgba(44, 44, 44, 0.15);
             color: var(--color-gunmetal);
-            padding: 1.1rem 3rem;
-            font-size: 11px;
+            /* Padding e fonte fluidos para todos os ecrãs */
+            padding: clamp(0.8rem, 2vh, 1.1rem) clamp(1.8rem, 5vw, 3rem);
+            font-size: clamp(9px, 2.5vw, 11px);
             text-transform: uppercase;
             letter-spacing: 0.6em;
             font-weight: 600;
@@ -156,12 +158,13 @@
         .identity-text {
             color: var(--color-gunmetal);
             opacity: 0.4;
-            font-size: 9px;
+            /* Fonte adaptável */
+            font-size: clamp(8px, 2.2vw, 9px);
             text-transform: uppercase;
             letter-spacing: 1em;
             margin-bottom: 2.5rem;
             font-weight: 400;
-            font-family: 'Georgia', serif;
+            font-family: 'Georgia', serif; /* Font safe serifada */
             z-index: 10;
         }
 
@@ -207,7 +210,12 @@
             .custom-cursor { display: none !important; }
             #preloader { cursor: auto; }
             .mag-wrap { padding: 15px; }
-            .logo-container { width: 190px; }
+            
+            /* Melhoria do Monograma no Mobile (mais presente e visível) */
+            .monogram-container { 
+                opacity: 0.08 !important; 
+                background-size: 70px !important; 
+            }
         }
 
         /* Ritual de Saída */
@@ -250,13 +258,14 @@
     </div>
 
     <!-- CONTEÚDO FINAL DO TEU SITE -->
+    <!-- Começa invisível (opacity-0) e fica visível após o botão ser clicado -->
     <main id="main-content" class="min-h-screen flex flex-col items-center justify-center p-10 opacity-0 pointer-events-none transition-opacity duration-1000 ease-in-out">
         <div class="text-center max-w-2xl">
-            <h1 style="font-family: 'Georgia', serif;" class="text-sm md:text-base uppercase tracking-[1.5em] text-[#2C2C2C] mb-8">
+            <h1 style="font-family: 'Georgia', serif;" class="text-[clamp(12px,4vw,16px)] uppercase tracking-[1.5em] text-[#2C2C2C] mb-8">
                 Draft Protocol Active
             </h1>
             <div class="w-16 h-[1px] bg-[#2C2C2C] mx-auto opacity-20 mb-8"></div>
-            <p class="text-[#2C2C2C] font-light leading-relaxed opacity-60">
+            <p class="text-[#2C2C2C] font-light leading-relaxed opacity-60 text-[clamp(12px,3vw,16px)]">
                 O front-end de elite foi revelado. Podes construir o resto do teu site a partir desta secção.
             </p>
         </div>
