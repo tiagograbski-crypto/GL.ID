@@ -3,33 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GLID | Preload de Elite</title>
+    <title>GLID | Architecture of Elite</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         :root {
+            /* Paleta Vencedora: Cashmere & Bone */
             --gold-light: #E8D5C4; 
             --gold-base: #B8A38E;  
             --gold-deep: #8D7A65;  
             --color-gunmetal: #2C2C2C;
             --color-cashmere: #F5F5F3;
             
-            /* Variáveis para o Efeito Lanterna */
             --mouse-x: 50%;
             --mouse-y: 50%;
+            --parallax-x: 0px;
+            --parallax-y: 0px;
         }
 
-        /* Foundation: Metal Polido com Efeito Lanterna */
+        /* Foundation: Metal Polido Dinâmico */
         #preloader {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            /* O gradiente base agora reage à posição do rato */
             background: radial-gradient(
                 circle at var(--mouse-x) var(--mouse-y),
                 var(--gold-light) 0%,
-                var(--gold-base) 30%,
+                var(--gold-base) 35%,
                 var(--gold-deep) 100%
             );
             display: flex;
@@ -37,25 +38,28 @@
             align-items: center;
             z-index: 9999;
             overflow: hidden;
-            cursor: none; /* Ocultamos para usar o feixe de luz como guia */
+            cursor: none;
+            transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.85, 0, 0.15, 1);
         }
 
-        /* Camada de Monogramas (Wallpaper de Luxo) */
-        .monogram-overlay {
+        /* Monograma 45º com Paralaxe */
+        .monogram-container {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            width: 220%;
+            height: 220%;
+            top: -60%;
+            left: -60%;
             background-image: url('https://glid.carrd.co/assets/images/image03.png?v=951bca55');
-            background-size: 80px; /* Tamanho delicado do monograma */
+            background-size: 90px;
             background-repeat: repeat;
-            opacity: 0.04; /* Quase invisível, sentido apenas no brilho */
+            opacity: 0.04;
+            /* O movimento de paralaxe dá vida ao fundo */
+            transform: rotate(-45deg) translate(var(--parallax-x), var(--parallax-y));
             mix-blend-mode: multiply;
             pointer-events: none;
+            transition: transform 0.2s ease-out;
         }
 
-        /* Brilho da Lanterna (Foco de Luz Dinâmico) */
         .lantern-glow {
             position: absolute;
             top: 0;
@@ -63,30 +67,30 @@
             width: 100%;
             height: 100%;
             background: radial-gradient(
-                600px circle at var(--mouse-x) var(--mouse-y),
+                800px circle at var(--mouse-x) var(--mouse-y),
                 rgba(232, 213, 196, 0.4),
-                transparent 40%
+                transparent 50%
             );
             pointer-events: none;
             z-index: 1;
         }
 
-        /* Container da Logo */
+        /* Logo com Sombra Dinâmica */
         .logo-container {
             position: relative;
-            width: 200px;
-            margin-bottom: 3rem;
+            width: 230px;
+            margin-bottom: 2.5rem;
             z-index: 10;
+            /* A sombra será controlada via JS para reagir à lanterna */
+            transition: filter 0.1s ease-out;
         }
 
         .logo-base {
             width: 100%;
             height: auto;
             display: block;
-            filter: drop-shadow(0 20px 30px rgba(0,0,0,0.15));
         }
 
-        /* Reflexo Mascarado (Metallic Sweep) */
         .logo-shimmer {
             position: absolute;
             top: 0;
@@ -96,7 +100,7 @@
             background: linear-gradient(
                 110deg,
                 transparent 20%,
-                rgba(255, 255, 255, 0.7) 50%,
+                rgba(255, 255, 255, 0.6) 50%,
                 transparent 80%
             );
             background-size: 200% 100%;
@@ -105,24 +109,66 @@
             -webkit-mask-size: contain;
             mask-size: contain;
             -webkit-mask-repeat: no-repeat;
-            mask-repeat: no-repeat;
-            animation: metallicSweep 4s infinite ease-in-out;
+            animation: metallicSweep 6s infinite ease-in-out;
         }
 
         @keyframes metallicSweep {
             0% { background-position: 200% 0; opacity: 0; }
-            15% { opacity: 1; }
-            45% { background-position: -200% 0; opacity: 1; }
-            60%, 100% { background-position: -200% 0; opacity: 0; }
+            10% { opacity: 1; }
+            35% { background-position: -200% 0; opacity: 1; }
+            50%, 100% { background-position: -200% 0; opacity: 0; }
         }
 
-        /* A Costura Digital - Agora como um detalhe de alfaiataria */
+        /* Botão Magnético de Elite */
+        .mag-wrap {
+            padding: 30px;
+            z-index: 20;
+        }
+
+        .elite-btn {
+            background: transparent;
+            border: 1px solid rgba(44, 44, 44, 0.15);
+            color: var(--color-gunmetal);
+            padding: 1.1rem 3rem;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.6em;
+            font-weight: 600;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            background-color: rgba(245, 245, 243, 0.05);
+            backdrop-filter: blur(2px);
+        }
+
+        .elite-btn:hover {
+            border-color: var(--color-gunmetal);
+            letter-spacing: 0.8em;
+            transform: scale(1.02);
+            background-color: var(--color-gunmetal);
+            color: var(--color-cashmere);
+        }
+
+        /* Tipografia Serifada de Atelier */
+        .identity-text {
+            color: var(--color-gunmetal);
+            opacity: 0.4;
+            font-size: 9px;
+            text-transform: uppercase;
+            letter-spacing: 1em;
+            margin-bottom: 2.5rem;
+            font-weight: 400;
+            font-family: serif; /* Elegância clássica */
+            z-index: 10;
+        }
+
         .stitch-container {
             position: relative;
-            width: 140px;
+            width: 120px;
             height: 1px;
-            background-color: rgba(44, 44, 44, 0.1); 
+            background-color: rgba(44, 44, 44, 0.08); 
             overflow: hidden;
+            margin-bottom: 3.5rem;
             z-index: 10;
         }
 
@@ -131,8 +177,8 @@
             width: 100%;
             height: 100%;
             background: var(--color-cashmere);
-            box-shadow: 0 0 15px var(--gold-light);
-            animation: stitchFlow 2.5s infinite cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 0 12px var(--color-cashmere);
+            animation: stitchFlow 4s infinite ease-in-out;
         }
 
         @keyframes stitchFlow {
@@ -140,66 +186,139 @@
             100% { transform: translateX(100%); }
         }
 
-        .technical-label {
-            color: var(--color-gunmetal);
-            opacity: 0.5;
-            font-size: 9px;
-            text-transform: uppercase;
-            letter-spacing: 0.8em;
-            margin-top: 2rem;
-            font-weight: 600;
-            z-index: 10;
+        /* Cursor de Inspeção */
+        .custom-cursor {
+            width: 25px;
+            height: 25px;
+            border: 1px solid var(--color-gunmetal);
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 10000;
+            transform: translate(-50%, -50%);
+            transition: width 0.3s, height 0.3s, background 0.3s;
+        }
+
+        /* Ritual de Saída */
+        .exit-ritual {
+            transform: scale(1.1) !important;
+            opacity: 0 !important;
+            filter: blur(10px);
+            pointer-events: none;
         }
     </style>
 </head>
-<body style="margin: 0; overflow: hidden;">
+<body style="margin: 0; background-color: #F5F5F3; overflow: hidden;">
+
+    <div class="custom-cursor" id="cursor"></div>
 
     <div id="preloader">
-        <!-- Camadas de Textura e Luz -->
-        <div class="monogram-overlay"></div>
+        <!-- Wallpaper Monograma 45º com Movimento -->
+        <div class="monogram-container" id="monogram"></div>
         <div class="lantern-glow"></div>
 
         <div class="flex flex-col items-center">
-            <!-- Logo Container -->
-            <div class="logo-container">
+            <!-- Branding Identity -->
+            <span class="identity-text italic">Elite Front-end Atelier</span>
+
+            <!-- Logo com sombra reativa -->
+            <div class="logo-container" id="logo-box">
                 <img src="https://glid.carrd.co/assets/images/image03.png?v=951bca55" alt="GLID" class="logo-base">
                 <div class="logo-shimmer"></div>
             </div>
             
-            <!-- A Costura -->
+            <!-- Progress Detail -->
             <div class="stitch-container">
                 <div class="stitch-line"></div>
             </div>
             
-            <span class="technical-label">Performance Radical</span>
+            <!-- Magnetic Action -->
+            <div class="mag-wrap" id="mag-area">
+                <button class="elite-btn" id="protocol-btn">
+                    Acessar Protocolo
+                </button>
+            </div>
         </div>
     </div>
 
+    <!-- Conteúdo Final -->
+    <main class="min-h-screen flex items-center justify-center p-10 opacity-10">
+        <div class="text-center">
+            <h1 style="font-family: serif;" class="text-xs uppercase tracking-[2em]">Draft Protocol active</h1>
+        </div>
+    </main>
+
     <script>
         const preloader = document.getElementById('preloader');
+        const monogram = document.getElementById('monogram');
+        const logoBox = document.getElementById('logo-box');
+        const cursor = document.getElementById('cursor');
+        const magArea = document.getElementById('mag-area');
+        const btn = document.getElementById('protocol-btn');
 
-        // Lógica da Lanterna: Segue o movimento do rato e do toque
         const handleMove = (e) => {
             const x = e.clientX || (e.touches && e.touches[0].clientX);
             const y = e.clientY || (e.touches && e.touches[0].clientY);
             
             if (x && y) {
-                const percentX = (x / window.innerWidth) * 100;
-                const percentY = (y / window.innerHeight) * 100;
+                const winW = window.innerWidth;
+                const winH = window.innerHeight;
+
+                const percentX = (x / winW) * 100;
+                const percentY = (y / winH) * 100;
                 
+                // 1. Lantern Effect
                 preloader.style.setProperty('--mouse-x', `${percentX}%`);
                 preloader.style.setProperty('--mouse-y', `${percentY}%`);
+                
+                // 2. Parallax Background
+                const moveX = (x - winW / 2) * -0.05;
+                const moveY = (y - winH / 2) * -0.05;
+                preloader.style.setProperty('--parallax-x', `${moveX}px`);
+                preloader.style.setProperty('--parallax-y', `${moveY}px`);
+
+                // 3. Dynamic Shadow on Logo
+                const shadowX = (x - winW / 2) * 0.04;
+                const shadowY = (y - winH / 2) * 0.04;
+                logoBox.style.filter = `drop-shadow(${-shadowX}px ${-shadowY}px 25px rgba(0,0,0,0.12))`;
+
+                // 4. Cursor Follow
+                cursor.style.left = x + 'px';
+                cursor.style.top = y + 'px';
+
+                // 5. Magnet Logic
+                const rect = magArea.getBoundingClientRect();
+                const centerX = rect.left + rect.width / 2;
+                const centerY = rect.top + rect.height / 2;
+                const dist = Math.sqrt(Math.pow(x - centerX, 2) + Math.pow(y - centerY, 2));
+
+                if (dist < 150) {
+                    const attractX = (x - centerX) * 0.4;
+                    const attractY = (y - centerY) * 0.4;
+                    btn.style.transform = `translate(${attractX}px, ${attractY}px)`;
+                    cursor.style.width = '60px';
+                    cursor.style.height = '60px';
+                    cursor.style.background = 'rgba(44, 44, 44, 0.03)';
+                } else {
+                    btn.style.transform = `translate(0, 0)`;
+                    cursor.style.width = '25px';
+                    cursor.style.height = '25px';
+                    cursor.style.background = 'transparent';
+                }
             }
         };
 
         window.addEventListener('mousemove', handleMove);
         window.addEventListener('touchmove', handleMove);
 
-        /**
-         * MODO DE EDIÇÃO:
-         * O preloader não sumirá. Teste a interação com o rato/dedo 
-         * para ver a lanterna revelando o monograma no fundo metálico.
-         */
+        // Ritual de Saída: Transição de Elite
+        btn.addEventListener('click', () => {
+            preloader.classList.add('exit-ritual');
+            setTimeout(() => {
+                preloader.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }, 850);
+        });
     </script>
 </body>
 </html>
