@@ -40,6 +40,7 @@
             overflow: hidden;
             cursor: none;
             transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.85, 0, 0.15, 1);
+            will-change: transform, opacity;
         }
 
         /* Monograma 45º com Paralaxe */
@@ -53,11 +54,11 @@
             background-size: 90px;
             background-repeat: repeat;
             opacity: 0.04;
-            /* O movimento de paralaxe dá vida ao fundo */
             transform: rotate(-45deg) translate(var(--parallax-x), var(--parallax-y));
             mix-blend-mode: multiply;
             pointer-events: none;
             transition: transform 0.2s ease-out;
+            will-change: transform;
         }
 
         .lantern-glow {
@@ -73,6 +74,7 @@
             );
             pointer-events: none;
             z-index: 1;
+            will-change: background;
         }
 
         /* Logo com Sombra Dinâmica */
@@ -81,8 +83,8 @@
             width: 230px;
             margin-bottom: 2.5rem;
             z-index: 10;
-            /* A sombra será controlada via JS para reagir à lanterna */
             transition: filter 0.1s ease-out;
+            will-change: filter;
         }
 
         .logo-base {
@@ -139,6 +141,7 @@
             overflow: hidden;
             background-color: rgba(245, 245, 243, 0.05);
             backdrop-filter: blur(2px);
+            cursor: pointer;
         }
 
         .elite-btn:hover {
@@ -158,7 +161,7 @@
             letter-spacing: 1em;
             margin-bottom: 2.5rem;
             font-weight: 400;
-            font-family: serif; /* Elegância clássica */
+            font-family: 'Georgia', serif; /* Font safe serifada */
             z-index: 10;
         }
 
@@ -199,6 +202,14 @@
             transition: width 0.3s, height 0.3s, background 0.3s;
         }
 
+        /* Ocultar cursor customizado em ecrãs touch/mobile para evitar bugs */
+        @media (max-width: 768px) {
+            .custom-cursor { display: none !important; }
+            #preloader { cursor: auto; }
+            .mag-wrap { padding: 15px; }
+            .logo-container { width: 190px; }
+        }
+
         /* Ritual de Saída */
         .exit-ritual {
             transform: scale(1.1) !important;
@@ -208,10 +219,12 @@
         }
     </style>
 </head>
-<body style="margin: 0; background-color: #F5F5F3; overflow: hidden;">
+<body class="m-0 bg-[#F5F5F3] overflow-hidden">
 
+    <!-- Cursor interativo -->
     <div class="custom-cursor" id="cursor"></div>
 
+    <!-- PRELOADER DE ELITE -->
     <div id="preloader">
         <!-- Wallpaper Monograma 45º com Movimento -->
         <div class="monogram-container" id="monogram"></div>
@@ -223,7 +236,7 @@
 
             <!-- Logo com sombra reativa -->
             <div class="logo-container" id="logo-box">
-                <img src="https://glid.carrd.co/assets/images/image03.png?v=951bca55" alt="GLID" class="logo-base">
+                <img src="https://glid.carrd.co/assets/images/image03.png?v=951bca55" alt="GLID Logo" class="logo-base">
                 <div class="logo-shimmer"></div>
             </div>
             
@@ -234,90 +247,128 @@
             
             <!-- Magnetic Action -->
             <div class="mag-wrap" id="mag-area">
-                <button class="elite-btn" id="protocol-btn">
+                <button type="button" class="elite-btn" id="protocol-btn">
                     Acessar Protocolo
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- Conteúdo Final -->
-    <main class="min-h-screen flex items-center justify-center p-10 opacity-10">
-        <div class="text-center">
-            <h1 style="font-family: serif;" class="text-xs uppercase tracking-[2em]">Draft Protocol active</h1>
+    <!-- CONTEÚDO FINAL DO TEU SITE -->
+    <!-- Começa invisível (opacity-0) e fica visível após o botão ser clicado -->
+    <main id="main-content" class="min-h-screen flex flex-col items-center justify-center p-10 opacity-0 pointer-events-none transition-opacity duration-1000 ease-in-out">
+        <div class="text-center max-w-2xl">
+            <h1 style="font-family: 'Georgia', serif;" class="text-sm md:text-base uppercase tracking-[1.5em] text-[#2C2C2C] mb-8">
+                Draft Protocol Active
+            </h1>
+            <div class="w-16 h-[1px] bg-[#2C2C2C] mx-auto opacity-20 mb-8"></div>
+            <p class="text-[#2C2C2C] font-light leading-relaxed opacity-60">
+                O front-end de elite foi revelado. Podes construir o resto do teu site a partir desta secção.
+            </p>
         </div>
     </main>
 
     <script>
-        const preloader = document.getElementById('preloader');
-        const monogram = document.getElementById('monogram');
-        const logoBox = document.getElementById('logo-box');
-        const cursor = document.getElementById('cursor');
-        const magArea = document.getElementById('mag-area');
-        const btn = document.getElementById('protocol-btn');
+        document.addEventListener('DOMContentLoaded', () => {
+            const preloader = document.getElementById('preloader');
+            const monogram = document.getElementById('monogram');
+            const logoBox = document.getElementById('logo-box');
+            const cursor = document.getElementById('cursor');
+            const magArea = document.getElementById('mag-area');
+            const btn = document.getElementById('protocol-btn');
+            const mainContent = document.getElementById('main-content');
 
-        const handleMove = (e) => {
-            const x = e.clientX || (e.touches && e.touches[0].clientX);
-            const y = e.clientY || (e.touches && e.touches[0].clientY);
-            
-            if (x && y) {
-                const winW = window.innerWidth;
-                const winH = window.innerHeight;
-
-                const percentX = (x / winW) * 100;
-                const percentY = (y / winH) * 100;
+            // Função para gerir movimento (Rato e Toque)
+            const handleMove = (e) => {
+                let x, y;
                 
-                // 1. Lantern Effect
-                preloader.style.setProperty('--mouse-x', `${percentX}%`);
-                preloader.style.setProperty('--mouse-y', `${percentY}%`);
-                
-                // 2. Parallax Background
-                const moveX = (x - winW / 2) * -0.05;
-                const moveY = (y - winH / 2) * -0.05;
-                preloader.style.setProperty('--parallax-x', `${moveX}px`);
-                preloader.style.setProperty('--parallax-y', `${moveY}px`);
-
-                // 3. Dynamic Shadow on Logo
-                const shadowX = (x - winW / 2) * 0.04;
-                const shadowY = (y - winH / 2) * 0.04;
-                logoBox.style.filter = `drop-shadow(${-shadowX}px ${-shadowY}px 25px rgba(0,0,0,0.12))`;
-
-                // 4. Cursor Follow
-                cursor.style.left = x + 'px';
-                cursor.style.top = y + 'px';
-
-                // 5. Magnet Logic
-                const rect = magArea.getBoundingClientRect();
-                const centerX = rect.left + rect.width / 2;
-                const centerY = rect.top + rect.height / 2;
-                const dist = Math.sqrt(Math.pow(x - centerX, 2) + Math.pow(y - centerY, 2));
-
-                if (dist < 150) {
-                    const attractX = (x - centerX) * 0.4;
-                    const attractY = (y - centerY) * 0.4;
-                    btn.style.transform = `translate(${attractX}px, ${attractY}px)`;
-                    cursor.style.width = '60px';
-                    cursor.style.height = '60px';
-                    cursor.style.background = 'rgba(44, 44, 44, 0.03)';
+                // Tratar eventos de rato vs touch
+                if (e.type.includes('touch')) {
+                    if (!e.touches || e.touches.length === 0) return;
+                    x = e.touches[0].clientX;
+                    y = e.touches[0].clientY;
                 } else {
-                    btn.style.transform = `translate(0, 0)`;
-                    cursor.style.width = '25px';
-                    cursor.style.height = '25px';
-                    cursor.style.background = 'transparent';
+                    x = e.clientX;
+                    y = e.clientY;
                 }
-            }
-        };
+                
+                if (x !== undefined && y !== undefined) {
+                    const winW = window.innerWidth;
+                    const winH = window.innerHeight;
 
-        window.addEventListener('mousemove', handleMove);
-        window.addEventListener('touchmove', handleMove);
+                    const percentX = (x / winW) * 100;
+                    const percentY = (y / winH) * 100;
+                    
+                    // 1. Lantern Effect
+                    preloader.style.setProperty('--mouse-x', `${percentX}%`);
+                    preloader.style.setProperty('--mouse-y', `${percentY}%`);
+                    
+                    // 2. Parallax Background
+                    const moveX = (x - winW / 2) * -0.05;
+                    const moveY = (y - winH / 2) * -0.05;
+                    preloader.style.setProperty('--parallax-x', `${moveX}px`);
+                    preloader.style.setProperty('--parallax-y', `${moveY}px`);
 
-        // Ritual de Saída: Transição de Elite
-        btn.addEventListener('click', () => {
-            preloader.classList.add('exit-ritual');
-            setTimeout(() => {
-                preloader.style.display = 'none';
-                document.body.style.overflow = 'auto';
-            }, 850);
+                    // 3. Dynamic Shadow on Logo
+                    const shadowX = (x - winW / 2) * 0.04;
+                    const shadowY = (y - winH / 2) * 0.04;
+                    logoBox.style.filter = `drop-shadow(${-shadowX}px ${-shadowY}px 25px rgba(0,0,0,0.12))`;
+
+                    // 4. Cursor Follow (Apenas se o ecrã for maior que 768px)
+                    if (winW > 768) {
+                        cursor.style.left = x + 'px';
+                        cursor.style.top = y + 'px';
+                    }
+
+                    // 5. Magnet Logic
+                    const rect = magArea.getBoundingClientRect();
+                    const centerX = rect.left + rect.width / 2;
+                    const centerY = rect.top + rect.height / 2;
+                    const dist = Math.sqrt(Math.pow(x - centerX, 2) + Math.pow(y - centerY, 2));
+
+                    if (dist < 150) {
+                        const attractX = (x - centerX) * 0.4;
+                        const attractY = (y - centerY) * 0.4;
+                        btn.style.transform = `translate(${attractX}px, ${attractY}px)`;
+                        
+                        if (winW > 768) {
+                            cursor.style.width = '60px';
+                            cursor.style.height = '60px';
+                            cursor.style.background = 'rgba(44, 44, 44, 0.03)';
+                        }
+                    } else {
+                        btn.style.transform = `translate(0, 0)`;
+                        
+                        if (winW > 768) {
+                            cursor.style.width = '25px';
+                            cursor.style.height = '25px';
+                            cursor.style.background = 'transparent';
+                        }
+                    }
+                }
+            };
+
+            // Adicionar Listeners
+            window.addEventListener('mousemove', handleMove, { passive: true });
+            window.addEventListener('touchstart', handleMove, { passive: true });
+            window.addEventListener('touchmove', handleMove, { passive: true });
+
+            // Ritual de Saída: Transição de Elite
+            btn.addEventListener('click', () => {
+                // Animação de saída do preloader
+                preloader.classList.add('exit-ritual');
+                
+                // Revelação do conteúdo principal (Fade In suave)
+                mainContent.classList.remove('opacity-0', 'pointer-events-none');
+                mainContent.classList.add('opacity-100');
+
+                // Limpeza após animação terminar
+                setTimeout(() => {
+                    preloader.style.display = 'none';
+                    document.body.classList.remove('overflow-hidden');
+                    document.body.style.overflow = 'auto'; // Restaura o scroll para o site
+                }, 850);
+            });
         });
     </script>
 </body>
