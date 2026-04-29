@@ -5,13 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GLID | Architecture of Elite</title>
     
-    <!-- Favicon Estratégico e Cor Dinâmica do Navegador -->
     <link rel="icon" type="image/png" href="https://glid.carrd.co/assets/images/image03.png?v=951bca55">
     <meta name="theme-color" content="#F5F5F3" id="theme-color-meta">
     
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* --- CORE VARIABLES --- */
         :root {
             /* Visão: Cashmere (Light/Gold) */
             --bg-color: #F5F5F3;
@@ -27,7 +25,6 @@
             --btn-hover-bg: rgba(44, 44, 44, 0.08);
             --cursor-focus: rgba(44, 44, 44, 0.04);
             
-            /* Identidade Dinâmica */
             --mouse-x: 50%;
             --mouse-y: 50%;
             --parallax-x: 0px;
@@ -54,7 +51,6 @@
             --cursor-focus: rgba(255, 255, 255, 0.05);
         }
 
-        /* --- GLOBAL & PRELOADER --- */
         * { transition: background-color 0.5s ease, color 0.5s ease; }
 
         body {
@@ -85,7 +81,7 @@
             will-change: transform, opacity;
         }
 
-        /* --- UI ELEMENTS --- */
+        /* Alternador de Tema */
         .theme-toggle {
             position: absolute;
             top: clamp(1.5rem, 4vh, 3rem);
@@ -108,7 +104,9 @@
             letter-spacing: 0.4em;
         }
 
+        /* Bolinha do Alternador com Animação de Pulso */
         .theme-indicator {
+            position: relative;
             width: 6px;
             height: 6px;
             border-radius: 50%;
@@ -116,23 +114,26 @@
             transition: transform 0.3s;
         }
 
-        .identity-text {
+        /* Anel Fantasma para o efeito de sonar */
+        .theme-indicator::after {
+            content: '';
             position: absolute;
-            top: clamp(1.5rem, 4vh, 3rem);
-            left: 0;
-            width: 100%;
-            text-align: center;
-            color: var(--text-color);
-            opacity: 0.4;
-            font-size: clamp(8px, 2.2vw, 9px);
-            text-transform: uppercase;
-            letter-spacing: 1em;
-            font-weight: 400;
-            font-family: 'Georgia', serif; 
-            z-index: 10;
+            top: 0; left: 0; right: 0; bottom: 0;
+            border-radius: 50%;
+            border: 1px solid var(--text-color);
+            opacity: 0;
         }
 
-        /* --- BACKGROUND MONOGRAMS --- */
+        /* Classe que ativa o pulso (inserida via JS) */
+        .pulse-active .theme-indicator::after {
+            animation: ringPulse 2s infinite ease-out;
+        }
+
+        @keyframes ringPulse {
+            0% { transform: scale(1); opacity: 0.8; }
+            100% { transform: scale(3.5); opacity: 0; }
+        }
+
         .monogram-wrapper {
             position: absolute;
             top: 0;
@@ -157,8 +158,10 @@
             will-change: transform;
         }
 
-        [data-theme="cashmere"] .monogram-pattern { mix-blend-mode: multiply; }
-        [data-theme="obsidian"] .monogram-pattern { mix-blend-mode: screen; filter: grayscale(100%) invert(1); }
+        [data-theme="obsidian"] .monogram-pattern {
+            mix-blend-mode: screen;
+            filter: grayscale(100%) invert(1);
+        }
 
         .base-mono { opacity: 0.04; }
 
@@ -185,11 +188,10 @@
             will-change: background;
         }
 
-        /* --- LOGO 3D & SHADOWS --- */
         .logo-container {
             position: relative;
             width: clamp(200px, 45vw, 280px);
-            margin-bottom: 1.5rem; /* Reduzido ligeiramente para acomodar a tagline */
+            margin-bottom: 2.5rem;
             z-index: 10;
             filter: drop-shadow(var(--shadow-x) var(--shadow-y) 25px rgba(var(--shadow-rgb), 0.12));
             transform: perspective(1000px) rotateX(var(--tilt-y)) rotateY(var(--tilt-x));
@@ -198,7 +200,6 @@
             transform-style: preserve-3d;
         }
 
-        /* Removido absolutamente o filtro: a logo com os dois escudos manterá a SUA COR ORIGINAL sempre */
         .logo-base {
             width: 100%;
             height: auto;
@@ -226,21 +227,6 @@
             10% { opacity: 1; }
             35% { background-position: -200% 0; opacity: 1; }
             50%, 100% { background-position: -200% 0; opacity: 0; }
-        }
-
-        /* --- BUTTON & DETAILS --- */
-        /* Proposta de Valor (Tagline) */
-        .brand-tagline {
-            color: var(--text-color);
-            opacity: 0.65;
-            font-size: clamp(8px, 2vw, 10px);
-            text-transform: uppercase;
-            letter-spacing: 0.4em;
-            font-weight: 300;
-            margin-bottom: 2.5rem;
-            text-align: center;
-            max-width: 85vw;
-            z-index: 10;
         }
 
         .mag-wrap {
@@ -272,36 +258,56 @@
             backdrop-filter: blur(8px);
         }
 
-        /* Tipografia de Topo Fixa (Focada em Conversão e Alto Contraste) */
+        /* Tipografia Haute Couture (Ultra Luxo) */
         .identity-text {
-            position: absolute;
-            top: clamp(1.5rem, 4vh, 3rem);
-            left: 0;
-            width: 100%;
-            text-align: center;
             color: var(--text-color);
-            opacity: 0.85; /* Muito mais contraste e legibilidade */
-            font-size: clamp(9px, 2.5vw, 11px); /* Ligeiramente maior */
+            opacity: 0.7; 
+            font-size: clamp(9px, 1.2vw, 11px); 
             text-transform: uppercase;
-            letter-spacing: 0.5em; /* Espaçamento mais compacto para facilitar leitura rápida */
-            font-weight: 400;
-            font-family: 'Georgia', serif; 
+            letter-spacing: 0.35em; 
+            font-weight: 300;
+            /* Stack de fontes de alta-costura (Vogue, YSL, Dior) */
+            font-family: 'Didot', 'Bodoni MT', 'Cinzel', 'Playfair Display', 'Times New Roman', serif;
+            text-align: center;
+            margin-top: 1.5rem;
+            margin-bottom: 3rem;
+            padding: 0 1.5rem;
             z-index: 10;
-            padding: 0 1rem; /* Margem de segurança no mobile */
+            line-height: 1.6;
         }
 
         .stitch-container {
             position: relative;
             width: 120px;
-            height: 1px;
-            background-color: rgba(var(--shadow-rgb), 0.1); 
-            overflow: hidden;
-            margin-bottom: 3.5rem;
-            z-index: 10;
+        .lantern-glow {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(
+                1000px circle at var(--mouse-x) var(--mouse-y),
+                var(--lantern-glow),
+                transparent 60%
+            );
+            pointer-events: none;
+            z-index: 1;
+            will-change: background;
         }
 
-        .stitch-line {
-            position: absolute;
+        /* Logo Dinâmica e 3D */
+        .logo-container {
+            position: relative;
+            width: clamp(200px, 45vw, 280px);
+            z-index: 10;
+            filter: drop-shadow(var(--shadow-x) var(--shadow-y) 25px rgba(var(--shadow-rgb), 0.12));
+            transform: perspective(1000px) rotateX(var(--tilt-y)) rotateY(var(--tilt-x));
+            transition: filter 0.1s ease-out, transform 0.1s ease-out;
+            will-change: filter, transform;
+            transform-style: preserve-3d;
+        }
+
+        .logo-base {
             width: 100%;
             height: 100%;
             background: var(--stitch-glow);
@@ -327,7 +333,6 @@
             opacity: 0; 
         }
 
-        /* --- MOBILE ADJUSTMENTS --- */
         @media (max-width: 768px) {
             .custom-cursor { display: none !important; }
             #preloader { cursor: auto; }
@@ -337,7 +342,6 @@
             .base-mono { opacity: 0.08 !important; }
             .reveal-mono { opacity: 0.28 !important; }
             
-            /* Evita colisão entre logo de texto e botão de tema no mobile */
             .theme-toggle { top: 1.5rem; right: 1.5rem; font-size: 7px; }
             .identity-text { top: 4rem; } 
         }
@@ -358,7 +362,8 @@
         
         <div class="theme-toggle" id="vision-toggle">
             <div class="theme-indicator" id="theme-dot"></div>
-            <span id="theme-label">CASHMERE</span>
+            <!-- translate="no" e class="notranslate" bloqueiam o Google Translate e outros -->
+            <span id="theme-label" translate="no" class="notranslate">CASHMERE</span>
         </div>
 
         <div class="monogram-wrapper base-mono">
@@ -371,23 +376,21 @@
         
         <div class="lantern-glow"></div>
 
-        <!-- Promessa principal única e destacada no topo -->
-        <span class="identity-text">Front-end exclusivo moldado ao DNA da sua marca</span>
-
-        <div class="flex flex-col items-center justify-center">
+        <div class="flex flex-col items-center justify-center relative w-full z-10 px-4">
             
             <div class="logo-container" id="logo-box">
-                <!-- A Logo original sem distorção de cores -->
                 <img src="https://glid.carrd.co/assets/images/image03.png?v=951bca55" alt="GLID Logo" class="logo-base">
                 <div class="logo-shimmer"></div>
             </div>
+            
+            <!-- Tagline reposicionada para ancorar a marca (Estilo Grife) -->
+            <span class="identity-text">Front-end exclusivo moldado ao DNA da sua marca</span>
             
             <div class="stitch-container">
                 <div class="stitch-line"></div>
             </div>
             
             <div class="mag-wrap" id="mag-area">
-                <!-- Botão focado em conversão de tráfego -->
                 <button type="button" class="elite-btn" id="protocol-btn">
                     Iniciar Experiência
                 </button>
@@ -422,24 +425,33 @@
             const themeDot = document.getElementById('theme-dot');
             const themeMeta = document.getElementById('theme-color-meta');
 
+            // Timer para chamar atenção para o botão de tema
+            let attentionTimer = setTimeout(() => {
+                visionToggle.classList.add('pulse-active');
+            }, 4000); // Começa a pulsar passados 4 segundos
+
             let isObsidian = false;
             visionToggle.addEventListener('click', () => {
+                // Ao clicar, o utilizador já reparou no botão, o pulso é desativado para sempre
+                visionToggle.classList.remove('pulse-active');
+                clearTimeout(attentionTimer);
+
                 isObsidian = !isObsidian;
                 if (isObsidian) {
                     document.documentElement.setAttribute('data-theme', 'obsidian');
                     themeLabel.textContent = 'OBSIDIAN';
                     themeDot.style.transform = 'scale(1.5)';
-                    if (themeMeta) themeMeta.setAttribute('content', '#050505'); /* Cor da barra do navegador em modo escuro */
+                    if (themeMeta) themeMeta.setAttribute('content', '#050505'); 
                 } else {
                     document.documentElement.setAttribute('data-theme', 'cashmere');
                     themeLabel.textContent = 'CASHMERE';
                     themeDot.style.transform = 'scale(1)';
-                    if (themeMeta) themeMeta.setAttribute('content', '#F5F5F3'); /* Cor da barra do navegador em modo claro */
+                    if (themeMeta) themeMeta.setAttribute('content', '#F5F5F3'); 
                 }
                 
                 try {
                     if (navigator.vibrate) navigator.vibrate(10);
-                } catch (e) {} // Proteção silenciosa para browsers antigos
+                } catch (e) {} 
             });
 
             let isAutonomous = true;
