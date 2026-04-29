@@ -258,15 +258,14 @@
             backdrop-filter: blur(8px);
         }
 
-        /* Tipografia Haute Couture (Ultra Luxo) */
+        /* Tipografia Haute Couture (Ultra Luxo - Abaixo da Logo) */
         .identity-text {
             color: var(--text-color);
-            opacity: 0.7; 
-            font-size: clamp(9px, 1.2vw, 11px); 
+            opacity: 0.75;
+            font-size: clamp(9px, 2vw, 11px);
             text-transform: uppercase;
-            letter-spacing: 0.35em; 
+            letter-spacing: 0.35em;
             font-weight: 300;
-            /* Stack de fontes de alta-costura (Vogue, YSL, Dior) */
             font-family: 'Didot', 'Bodoni MT', 'Cinzel', 'Playfair Display', 'Times New Roman', serif;
             text-align: center;
             margin-top: 1.5rem;
@@ -274,6 +273,14 @@
             padding: 0 1.5rem;
             z-index: 10;
             line-height: 1.6;
+        }
+
+        /* Destaque de Luxo para a Palavra-Chave */
+        .dna-highlight {
+            font-weight: 700;
+            opacity: 1; /* Brilho/solidez total */
+            letter-spacing: 0.45em; /* Ligeiramente mais espaçado para impor respeito */
+            font-style: italic;
         }
 
         .stitch-container {
@@ -383,8 +390,8 @@
                 <div class="logo-shimmer"></div>
             </div>
             
-            <!-- Tagline reposicionada para ancorar a marca (Estilo Grife) -->
-            <span class="identity-text">Front-end exclusivo moldado ao DNA da sua marca</span>
+            <!-- Frase ÚNICA com o destaque estratégico aplicado -->
+            <span class="identity-text">Front-end exclusivo moldado ao <br class="md:hidden"> <span class="dna-highlight">DNA da sua marca</span></span>
             
             <div class="stitch-container">
                 <div class="stitch-line"></div>
