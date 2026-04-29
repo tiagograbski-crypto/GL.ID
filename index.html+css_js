@@ -161,7 +161,7 @@
             letter-spacing: 1em;
             margin-bottom: 2.5rem;
             font-weight: 400;
-            font-family: 'Georgia', serif; /* Font safe serifada */
+            font-family: 'Georgia', serif;
             z-index: 10;
         }
 
@@ -226,36 +226,30 @@
 
     <!-- PRELOADER DE ELITE -->
     <div id="preloader">
-        <!-- Wallpaper Monograma 45º com Movimento -->
         <div class="monogram-container" id="monogram"></div>
         <div class="lantern-glow"></div>
 
         <div class="flex flex-col items-center">
-            <!-- Branding Identity -->
             <span class="identity-text italic">Elite Front-end Atelier</span>
 
-            <!-- Logo com sombra reativa -->
             <div class="logo-container" id="logo-box">
                 <img src="https://glid.carrd.co/assets/images/image03.png?v=951bca55" alt="GLID Logo" class="logo-base">
                 <div class="logo-shimmer"></div>
             </div>
             
-            <!-- Progress Detail -->
             <div class="stitch-container">
                 <div class="stitch-line"></div>
             </div>
             
-            <!-- Magnetic Action -->
             <div class="mag-wrap" id="mag-area">
                 <button type="button" class="elite-btn" id="protocol-btn">
-                    Acessar Protocolo
+                    Acessar Alfaiataria Digital
                 </button>
             </div>
         </div>
     </div>
 
     <!-- CONTEÚDO FINAL DO TEU SITE -->
-    <!-- Começa invisível (opacity-0) e fica visível após o botão ser clicado -->
     <main id="main-content" class="min-h-screen flex flex-col items-center justify-center p-10 opacity-0 pointer-events-none transition-opacity duration-1000 ease-in-out">
         <div class="text-center max-w-2xl">
             <h1 style="font-family: 'Georgia', serif;" class="text-sm md:text-base uppercase tracking-[1.5em] text-[#2C2C2C] mb-8">
