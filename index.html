@@ -31,6 +31,13 @@
         :root {
             /* Visão: Cashmere (Light/Gold) */
             --bg-color: #F5F5F3;
+            --bg-alt: #EBEBE9; /* Fundo alternativo para alívio cognitivo */
+            --bg-abismo: #E6E4E0; /* Fundo terroso leve para o Abismo */
+            
+            /* Banner Ticker com a exata cor do Preloader (Gradiente de Ouro Cashmere) */
+            --marquee-bg: linear-gradient(90deg, var(--radial-1) 0%, var(--radial-2) 50%, var(--radial-3) 100%); 
+            --marquee-text: #2C2C2C; /* Texto escuro contrastante no banner */
+            
             --text-color: #2C2C2C;
             --border-color: rgba(44, 44, 44, 0.15);
             --radial-1: #E8D5C4; 
@@ -46,6 +53,13 @@
             --gold-accent: #B8A38E; 
             --grid-line: rgba(184, 163, 142, 0.12);
             --gold-gradient: linear-gradient(135deg, #CBA381 0%, #9F8265 50%, #765D46 100%);
+
+            /* Sistema de Elevação de Cartões (Tons Pastéis Claros para Cashmere) */
+            --card-0-bg: #F5F3F0; /* Osso */
+            --card-1-bg: #EFECE7; /* Areia */
+            --card-2-bg: #E8E4DD; /* Argila clara */
+            --card-3-bg: #DFDAD2; /* Taupe suave */
+            --card-5-bg: #D5CFC6; /* Cinza quente pastel */
             
             --mouse-x: 50%; --mouse-y: 50%;
             --parallax-x: 0px; --parallax-y: 0px;
@@ -56,6 +70,13 @@
         [data-theme="obsidian"] {
             /* Visão: Obsidian (Dark/Chrome) */
             --bg-color: #050505;
+            --bg-alt: #0A0A0A; /* Quebra o preto absoluto */
+            --bg-abismo: #0F0F0F; /* Elevação escura */
+            
+            /* Banner Ticker com a exata cor do Preloader Escuro (Gradiente Obsidian) */
+            --marquee-bg: linear-gradient(90deg, var(--radial-1) 0%, var(--radial-2) 50%, var(--radial-3) 100%); 
+            --marquee-text: var(--gold-accent); /* Texto dourado no banner escuro */
+
             --text-color: #F8F9FA;
             --border-color: rgba(248, 249, 250, 0.15);
             --radial-1: #1a1a1a; 
@@ -71,6 +92,13 @@
             --gold-accent: #E8D5C4; 
             --grid-line: rgba(232, 213, 196, 0.06); 
             --gold-gradient: linear-gradient(135deg, #E8D5C4 0%, #B8A38E 50%, #8D7A65 100%);
+
+            /* Elevação Escura (Prevenção de fadiga visual com gradação de cinzas e ónix) */
+            --card-0-bg: #080808; 
+            --card-1-bg: #0A0A0A; 
+            --card-2-bg: #0D0D0D; 
+            --card-3-bg: #121212; 
+            --card-5-bg: #161616; 
         }
 
         * { transition: background-color 0.5s ease, color 0.5s ease, border-color 0.5s ease; -webkit-tap-highlight-color: transparent; }
@@ -124,13 +152,12 @@
             will-change: transform, opacity;
         }
 
-        .theme-toggle {
-            position: absolute; top: clamp(1.5rem, 4vh, 3rem); right: clamp(1.5rem, 4vw, 3rem); z-index: 100;
-            color: var(--text-color); font-size: clamp(10px, 3vw, 11px); text-transform: uppercase; letter-spacing: 0.3em;
-            cursor: pointer; opacity: 0.4; transition: opacity 0.3s, letter-spacing 0.3s; display: flex; align-items: center; gap: 8px;
+        .theme-toggle-btn {
+            color: var(--text-color); font-size: clamp(9px, 2.5vw, 10px); text-transform: uppercase; letter-spacing: 0.3em;
+            cursor: pointer; opacity: 0.5; transition: opacity 0.3s, letter-spacing 0.3s; display: flex; align-items: center; gap: 8px;
         }
-        .theme-toggle:hover { opacity: 1; letter-spacing: 0.4em; }
-
+        .theme-toggle-btn:hover { opacity: 1; letter-spacing: 0.4em; }
+        
         .theme-indicator { position: relative; width: 6px; height: 6px; border-radius: 50%; background-color: var(--text-color); transition: transform 0.3s; }
         .theme-indicator::after { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; border-radius: 50%; border: 1px solid var(--text-color); opacity: 0; }
         .pulse-active .theme-indicator::after { animation: ringPulse 2s infinite ease-out; }
@@ -204,7 +231,6 @@
             .custom-cursor { display: none !important; }
             #preloader { cursor: auto; }
             .mag-wrap { padding: 15px; }
-            .theme-toggle { top: 1.5rem; right: 1.5rem; }
         }
 
         .exit-ritual { transform: scale(1.1) !important; opacity: 0 !important; filter: blur(10px); pointer-events: none; }
@@ -263,9 +289,10 @@
             overflow: hidden;
             border-top: 1px solid var(--border-color);
             border-bottom: 1px solid var(--border-color);
-            background: rgba(var(--shadow-rgb), 0.02);
+            background: var(--marquee-bg);
             position: relative;
             z-index: 10;
+            transition: background 0.5s ease, border-color 0.5s ease;
         }
         .marquee-content {
             display: flex;
@@ -277,7 +304,7 @@
             padding: 1.5rem 0;
             display: flex;
             align-items: center;
-            gap: 3rem; /* Espaço entre as marcas */
+            gap: 3rem;
             margin-right: 3rem;
         }
         .marquee-brand {
@@ -285,8 +312,8 @@
             font-size: clamp(1rem, 2vw, 1.5rem);
             text-transform: uppercase;
             letter-spacing: 0.3em;
-            color: var(--text-color);
-            opacity: 0.5;
+            color: var(--marquee-text); 
+            opacity: 0.7;
             transition: opacity 0.4s, color 0.4s;
             white-space: nowrap;
             cursor: default;
@@ -354,7 +381,8 @@
             opacity: 0;
         }
         .faq-answer.open {
-            max-height: 200px;
+            /* Limite expandido (500px) para acomodar descrições completas sem cortar o texto em telemóveis pequenos */
+            max-height: 500px;
             opacity: 1;
             margin-top: 1rem;
         }
@@ -370,9 +398,9 @@
 
     <!-- PRELOADER FRONTIER -->
     <div id="preloader">
-        <div class="theme-toggle" id="vision-toggle">
-            <div class="theme-indicator" id="theme-dot"></div>
-            <span id="theme-label" translate="no" class="notranslate">CASHMERE</span>
+        <div class="theme-toggle-btn absolute top-[clamp(1.5rem,4vh,3rem)] right-[clamp(1.5rem,4vw,3rem)] z-100 theme-switcher">
+            <div class="theme-indicator"></div>
+            <span class="theme-label-txt" translate="no" class="notranslate">CASHMERE</span>
         </div>
         <div class="monogram-wrapper base-mono"><div class="monogram-pattern"></div></div>
         <div class="monogram-wrapper reveal-mono"><div class="monogram-pattern"></div></div>
@@ -397,11 +425,20 @@
         
         <header class="fixed top-0 left-0 w-full z-50 px-6 py-4 flex justify-between items-center backdrop-blur-[10px] border-b border-[var(--border-color)] bg-[var(--bg-color)]/70 transition-opacity duration-1000 opacity-0" id="main-header" aria-label="Cabeçalho Principal">
             <img src="https://glid.carrd.co/assets/images/image03.png?v=951bca55" alt="GLID" class="h-7 md:h-10 hover:opacity-80 transition-opacity drop-shadow-lg">
-            <button onclick="window.open('https://wa.me/5549999999999?text=Ol%C3%A1%20Thiago,%20desejo%20agendar%20uma%20an%C3%A1lise%20private%20da%20minha%20marca.', '_blank')" class="border border-[#B8A38E] text-[var(--text-color)] px-5 py-2 text-[9px] md:text-xs uppercase tracking-[0.2em] hover:bg-[#B8A38E] hover:text-[#F5F5F3] transition-colors haptic-target" data-vibrate="10">Análise Private</button>
+            
+            <div class="flex items-center gap-6">
+                <!-- Theme Toggle Fixado na Header -->
+                <div class="theme-toggle-btn hidden md:flex theme-switcher haptic-target" data-vibrate="5">
+                    <div class="theme-indicator"></div>
+                    <span class="theme-label-txt" translate="no" class="notranslate">CASHMERE</span>
+                </div>
+                
+                <button onclick="window.open('https://wa.me/5549999999999?text=Ol%C3%A1%20Thiago,%20desejo%20agendar%20uma%20an%C3%A1lise%20private%20da%20minha%20marca.', '_blank')" class="border border-[#B8A38E] text-[var(--text-color)] px-5 py-2 text-[9px] md:text-xs uppercase tracking-[0.2em] hover:bg-[#B8A38E] hover:text-[#F5F5F3] transition-colors haptic-target" data-vibrate="10">Análise Private</button>
+            </div>
         </header>
 
         <!-- 2. HERO -->
-        <section class="h-[100dvh] w-full flex flex-col justify-center items-center px-6 text-center reveal-on-scroll relative overflow-hidden" aria-labelledby="hero-title">
+        <section class="min-h-[100dvh] w-full flex flex-col justify-center items-center px-6 py-20 text-center reveal-on-scroll relative overflow-hidden" aria-labelledby="hero-title">
             <div class="hero-line"></div>
             <div class="hero-aura"></div>
             
@@ -416,43 +453,28 @@
             </button>
         </section>
 
-        <!-- NOVO: MARCAS DE AUTORIDADE (INFINITY TICKER) -->
+        <!-- MARCAS DE AUTORIDADE (INFINITY TICKER) -->
         <section class="marquee-container reveal-on-scroll" aria-label="Marcas de Autoridade">
-            <!-- Duplicamos o conteúdo dentro para criar o loop perfeito -->
             <div class="marquee-content haptic-target" data-vibrate="2">
                 <!-- Conjunto 1 -->
                 <div class="marquee-item">
-                    <span class="marquee-brand">Doré</span>
-                    <span class="text-[8px] text-[#B8A38E]">✦</span>
-                    <span class="marquee-brand">GL PRO</span>
-                    <span class="text-[8px] text-[#B8A38E]">✦</span>
-                    <span class="marquee-brand">Simone Araujo</span>
-                    <span class="text-[8px] text-[#B8A38E]">✦</span>
-                    <span class="marquee-brand">Essência Rara</span>
-                    <span class="text-[8px] text-[#B8A38E]">✦</span>
-                    <span class="marquee-brand">Black Car</span>
-                    <span class="text-[8px] text-[#B8A38E]">✦</span>
-                    <span class="marquee-brand">Essência de Romã</span>
-                    <span class="text-[8px] text-[#B8A38E]">✦</span>
-                    <span class="marquee-brand">Aureum</span>
-                    <span class="text-[8px] text-[#B8A38E]">✦</span>
+                    <span class="marquee-brand">Doré</span><span class="text-[8px] text-[#B8A38E]">✦</span>
+                    <span class="marquee-brand">GL PRO</span><span class="text-[8px] text-[#B8A38E]">✦</span>
+                    <span class="marquee-brand">Simone Araujo</span><span class="text-[8px] text-[#B8A38E]">✦</span>
+                    <span class="marquee-brand">Essência Rara</span><span class="text-[8px] text-[#B8A38E]">✦</span>
+                    <span class="marquee-brand">Black Car</span><span class="text-[8px] text-[#B8A38E]">✦</span>
+                    <span class="marquee-brand">Essência de Romã</span><span class="text-[8px] text-[#B8A38E]">✦</span>
+                    <span class="marquee-brand">Aureum</span><span class="text-[8px] text-[#B8A38E]">✦</span>
                 </div>
                 <!-- Conjunto 2 -->
                 <div class="marquee-item">
-                    <span class="marquee-brand">Doré</span>
-                    <span class="text-[8px] text-[#B8A38E]">✦</span>
-                    <span class="marquee-brand">GL PRO</span>
-                    <span class="text-[8px] text-[#B8A38E]">✦</span>
-                    <span class="marquee-brand">Simone Araujo</span>
-                    <span class="text-[8px] text-[#B8A38E]">✦</span>
-                    <span class="marquee-brand">Essência Rara</span>
-                    <span class="text-[8px] text-[#B8A38E]">✦</span>
-                    <span class="marquee-brand">Black Car</span>
-                    <span class="text-[8px] text-[#B8A38E]">✦</span>
-                    <span class="marquee-brand">Essência de Romã</span>
-                    <span class="text-[8px] text-[#B8A38E]">✦</span>
-                    <span class="marquee-brand">Aureum</span>
-                    <span class="text-[8px] text-[#B8A38E]">✦</span>
+                    <span class="marquee-brand">Doré</span><span class="text-[8px] text-[#B8A38E]">✦</span>
+                    <span class="marquee-brand">GL PRO</span><span class="text-[8px] text-[#B8A38E]">✦</span>
+                    <span class="marquee-brand">Simone Araujo</span><span class="text-[8px] text-[#B8A38E]">✦</span>
+                    <span class="marquee-brand">Essência Rara</span><span class="text-[8px] text-[#B8A38E]">✦</span>
+                    <span class="marquee-brand">Black Car</span><span class="text-[8px] text-[#B8A38E]">✦</span>
+                    <span class="marquee-brand">Essência de Romã</span><span class="text-[8px] text-[#B8A38E]">✦</span>
+                    <span class="marquee-brand">Aureum</span><span class="text-[8px] text-[#B8A38E]">✦</span>
                 </div>
             </div>
         </section>
@@ -468,13 +490,10 @@
             
             <div class="flex overflow-x-auto snap-x snap-mandatory elegant-scrollbar drag-slider px-6 md:px-12 gap-6 pb-4 max-w-[1500px] mx-auto" id="acervo-slider">
                 
-                <!-- Ativo 1 -->
                 <article class="portfolio-card group haptic-target drag-item relative flex flex-col cursor-pointer" data-vibrate="5">
                     <div class="aspect-[4/5] mb-4 relative shadow-[inset_0_0_20px_rgba(0,0,0,0.5)] card-img-container shrink-0">
                          <img src="https://glid.carrd.co/assets/images/image04.jpg?v=d70ffd67" loading="lazy" decoding="async" alt="Império Barber" class="card-img absolute inset-0 z-0">
-                         <!-- Vídeo Oculto (Só carrega/roda no JS) -->
                          <video src="https://www.w3schools.com/html/mov_bbb.mp4" loop muted playsinline preload="none" class="portfolio-video absolute inset-0 w-full h-full object-cover opacity-0 z-10 pointer-events-none"></video>
-                         
                          <div class="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none z-20">
                              <span class="gold-gradient-text text-sm tracking-widest uppercase border border-[#B8A38E] px-6 py-2 backdrop-blur-sm">+ Inspecionar</span>
                          </div>
@@ -486,12 +505,10 @@
                     </div>
                 </article>
                 
-                <!-- Ativo 2 -->
                 <article class="portfolio-card group haptic-target drag-item relative flex flex-col cursor-pointer" data-vibrate="5">
                     <div class="aspect-[4/5] mb-4 relative shadow-[inset_0_0_20px_rgba(0,0,0,0.5)] card-img-container shrink-0">
                          <img src="https://glid.carrd.co/assets/images/image05.jpg?v=d70ffd67" loading="lazy" decoding="async" alt="Salão de Beleza High-End" class="card-img absolute inset-0 z-0">
                          <video src="https://www.w3schools.com/html/mov_bbb.mp4" loop muted playsinline preload="none" class="portfolio-video absolute inset-0 w-full h-full object-cover opacity-0 z-10 pointer-events-none"></video>
-                         
                          <div class="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none z-20">
                              <span class="gold-gradient-text text-sm tracking-widest uppercase border border-[#B8A38E] px-6 py-2 backdrop-blur-sm">+ Inspecionar</span>
                          </div>
@@ -503,12 +520,10 @@
                     </div>
                 </article>
 
-                <!-- Ativo 3 -->
                 <article class="portfolio-card group haptic-target drag-item relative flex flex-col cursor-pointer" data-vibrate="5">
                     <div class="aspect-[4/5] mb-4 relative shadow-[inset_0_0_20px_rgba(0,0,0,0.5)] card-img-container shrink-0">
                          <img src="https://glid.carrd.co/assets/images/image06.jpg?v=d70ffd67" loading="lazy" decoding="async" alt="Kinetix Auto Studio" class="card-img absolute inset-0 z-0">
                          <video src="https://www.w3schools.com/html/mov_bbb.mp4" loop muted playsinline preload="none" class="portfolio-video absolute inset-0 w-full h-full object-cover opacity-0 z-10 pointer-events-none"></video>
-                         
                          <div class="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none z-20">
                              <span class="gold-gradient-text text-sm tracking-widest uppercase border border-[#B8A38E] px-6 py-2 backdrop-blur-sm">+ Inspecionar</span>
                          </div>
@@ -520,12 +535,10 @@
                     </div>
                 </article>
 
-                <!-- Ativo 4 -->
                 <article class="portfolio-card group haptic-target drag-item relative flex flex-col cursor-pointer" data-vibrate="5">
                     <div class="aspect-[4/5] mb-4 relative shadow-[inset_0_0_20px_rgba(0,0,0,0.5)] card-img-container shrink-0">
                          <img src="https://images.unsplash.com/photo-1600565193348-f74bd3c7ccdf?q=80&w=800&auto=format&fit=crop" loading="lazy" decoding="async" alt="Arquitetura de Alto Padrão" class="card-img absolute inset-0 z-0">
                          <video src="https://www.w3schools.com/html/mov_bbb.mp4" loop muted playsinline preload="none" class="portfolio-video absolute inset-0 w-full h-full object-cover opacity-0 z-10 pointer-events-none"></video>
-
                          <div class="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none z-20">
                              <span class="gold-gradient-text text-sm tracking-widest uppercase border border-[#B8A38E] px-6 py-2 backdrop-blur-sm">+ Inspecionar</span>
                          </div>
@@ -537,12 +550,10 @@
                     </div>
                 </article>
 
-                <!-- Ativo 5 -->
                 <article class="portfolio-card group haptic-target drag-item relative flex flex-col cursor-pointer" data-vibrate="5">
                     <div class="aspect-[4/5] mb-4 relative shadow-[inset_0_0_20px_rgba(0,0,0,0.5)] card-img-container shrink-0">
                          <img src="https://images.unsplash.com/photo-1606811841689-23dfddce3e95?q=80&w=800&auto=format&fit=crop" loading="lazy" decoding="async" alt="Odontologia de Luxo" class="card-img absolute inset-0 z-0 object-center">
                          <video src="https://www.w3schools.com/html/mov_bbb.mp4" loop muted playsinline preload="none" class="portfolio-video absolute inset-0 w-full h-full object-cover opacity-0 z-10 pointer-events-none"></video>
-
                          <div class="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none z-20">
                              <span class="gold-gradient-text text-sm tracking-widest uppercase border border-[#B8A38E] px-6 py-2 backdrop-blur-sm">+ Inspecionar</span>
                          </div>
@@ -554,12 +565,10 @@
                     </div>
                 </article>
 
-                <!-- Ativo 6 -->
                 <article class="portfolio-card group haptic-target drag-item relative flex flex-col cursor-pointer" data-vibrate="5">
                     <div class="aspect-[4/5] mb-4 relative shadow-[inset_0_0_20px_rgba(0,0,0,0.5)] card-img-container shrink-0">
                          <img src="https://images.unsplash.com/photo-1599643477874-c5a8106a7170?q=80&w=800&auto=format&fit=crop" loading="lazy" decoding="async" alt="Alta Joalharia" class="card-img absolute inset-0 z-0 object-center">
                          <video src="https://www.w3schools.com/html/mov_bbb.mp4" loop muted playsinline preload="none" class="portfolio-video absolute inset-0 w-full h-full object-cover opacity-0 z-10 pointer-events-none"></video>
-
                          <div class="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none z-20">
                              <span class="gold-gradient-text text-sm tracking-widest uppercase border border-[#B8A38E] px-6 py-2 backdrop-blur-sm">+ Inspecionar</span>
                          </div>
@@ -571,12 +580,10 @@
                     </div>
                 </article>
 
-                <!-- Ativo 7 -->
                 <article class="portfolio-card group haptic-target drag-item relative flex flex-col cursor-pointer" data-vibrate="5">
                     <div class="aspect-[4/5] mb-4 relative shadow-[inset_0_0_20px_rgba(0,0,0,0.5)] card-img-container shrink-0">
                          <img src="https://images.unsplash.com/photo-1589829085413-56de8ae18c73?q=80&w=800&auto=format&fit=crop" loading="lazy" decoding="async" alt="Advocacia Corporativa" class="card-img absolute inset-0 z-0 object-center">
                          <video src="https://www.w3schools.com/html/mov_bbb.mp4" loop muted playsinline preload="none" class="portfolio-video absolute inset-0 w-full h-full object-cover opacity-0 z-10 pointer-events-none"></video>
-
                          <div class="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none z-20">
                              <span class="gold-gradient-text text-sm tracking-widest uppercase border border-[#B8A38E] px-6 py-2 backdrop-blur-sm">+ Inspecionar</span>
                          </div>
@@ -593,7 +600,7 @@
         </section>
 
         <!-- 4. O ABISMO ESTRUTURAL -->
-        <section class="h-[100dvh] w-full flex flex-col justify-center max-w-6xl mx-auto px-6 border-t border-[var(--border-color)] reveal-on-scroll relative z-10 bg-[var(--bg-color)]" aria-labelledby="transformation-title">
+        <section class="min-h-[100dvh] w-full flex flex-col justify-center max-w-6xl mx-auto px-6 py-20 border-t border-[var(--border-color)] reveal-on-scroll relative z-10 bg-[var(--bg-abismo)]" aria-labelledby="transformation-title">
             <div class="text-center mb-6 md:mb-10 shrink-0">
                 <h2 id="transformation-title" class="text-xl md:text-3xl lg:text-4xl text-[var(--text-color)] uppercase tracking-[0.2em]">O Abismo Estrutural.</h2>
             </div>
@@ -636,7 +643,7 @@
                 </div>
             </div>
             
-            <div class="mt-4 md:mt-8 flex justify-center pointer-events-none opacity-80 drop-shadow-md shrink-0">
+            <div class="mt-4 md:mt-6 flex justify-center pointer-events-none opacity-80 drop-shadow-md shrink-0">
                 <span class="text-[8px] md:text-[10px] uppercase tracking-[0.3em] text-[var(--text-color)] animate-pulse">← Arraste para auditar a infraestrutura →</span>
             </div>
         </section>
@@ -705,7 +712,7 @@
         </section>
 
         <!-- ENGENHARIA DE CONVERSÃO -->
-        <section class="py-20 md:py-32 px-6 w-full max-w-6xl mx-auto border-t border-[var(--border-color)] reveal-on-scroll relative z-10 bg-[var(--bg-color)]">
+        <section class="py-20 md:py-32 px-6 w-full max-w-6xl mx-auto border-t border-[var(--border-color)] reveal-on-scroll relative z-10 bg-[var(--bg-alt)]">
             <div class="text-center mb-12">
                 <h2 class="text-xl md:text-4xl text-[var(--text-color)] mb-3 uppercase tracking-[0.2em] font-serif">Engenharia de Conversão</h2>
                 <p class="text-[9px] md:text-sm uppercase tracking-widest text-[#B8A38E] opacity-80">Previsibilidade e Handover.</p>
@@ -765,10 +772,10 @@
                 </div>
             </div>
             
-            <div class="flex overflow-x-auto snap-x snap-mandatory elegant-scrollbar 2xl:grid 2xl:grid-cols-6 gap-4 md:gap-6 2xl:gap-6 items-stretch px-6 lg:px-12 max-w-[1900px] mx-auto pb-10 drag-slider" id="pricing-slider">
+            <div class="flex overflow-x-auto snap-x snap-mandatory elegant-scrollbar 2xl:grid 2xl:grid-cols-6 gap-4 md:gap-6 2xl:gap-6 items-stretch px-6 lg:px-12 max-w-[1900px] mx-auto pb-10 pt-6 md:pt-8 drag-slider" id="pricing-slider">
                 
                 <!-- TIER 00: NEXUS -->
-                <div class="drag-item flex flex-col h-full relative border border-[var(--border-color)] p-6 md:p-8 bg-[var(--bg-color)] hover:bg-[var(--cursor-focus)] transition-all duration-500 haptic-target backdrop-blur-sm overflow-hidden" data-vibrate="10">
+                <div class="drag-item flex flex-col h-full relative border border-[var(--border-color)] p-6 md:p-8 hover:bg-[var(--cursor-focus)] transition-all duration-500 haptic-target backdrop-blur-sm overflow-hidden" style="background-color: var(--card-0-bg);" data-vibrate="10">
                     <div class="absolute -top-6 -right-2 text-[100px] md:text-[140px] font-serif opacity-[0.03] text-[var(--text-color)] leading-none pointer-events-none select-none z-0">00</div>
                     <div class="relative z-10 flex-1 flex flex-col">
                         <h3 class="text-sm md:text-base uppercase tracking-widest text-[var(--text-color)] mb-2 font-serif">Nexus</h3>
@@ -796,7 +803,7 @@
                 </div>
 
                 <!-- TIER 01: ESSENTIEL -->
-                <div class="drag-item flex flex-col h-full relative border border-[var(--border-color)] p-6 md:p-8 bg-[var(--bg-color)] hover:bg-[var(--cursor-focus)] transition-all duration-500 haptic-target backdrop-blur-sm overflow-hidden" data-vibrate="10">
+                <div class="drag-item flex flex-col h-full relative border border-[var(--border-color)] p-6 md:p-8 hover:bg-[var(--cursor-focus)] transition-all duration-500 haptic-target backdrop-blur-sm overflow-hidden" style="background-color: var(--card-1-bg);" data-vibrate="10">
                     <div class="absolute -top-6 -right-2 text-[100px] md:text-[140px] font-serif opacity-[0.03] text-[var(--text-color)] leading-none pointer-events-none select-none z-0">01</div>
                     <div class="relative z-10 flex-1 flex flex-col">
                         <h3 class="text-sm md:text-base uppercase tracking-widest text-[var(--text-color)] mb-2 font-serif">Essentiel</h3>
@@ -830,8 +837,8 @@
                 </div>
 
                 <!-- TIER 02: PROTOCOLO EMPRESARIAL -->
-                <div class="drag-item flex flex-col h-full relative border border-[var(--border-color)] p-6 md:p-8 bg-[var(--bg-color)] hover:bg-[var(--cursor-focus)] transition-all duration-500 haptic-target backdrop-blur-sm overflow-hidden" data-vibrate="10">
-                    <div class="absolute -top-6 -right-2 text-[100px] md:text-[140px] font-serif opacity-[0.03] text-[var(--text-color)] leading-none pointer-events-none select-none z-0">01</div>
+                <div class="drag-item flex flex-col h-full relative border border-[var(--border-color)] p-6 md:p-8 hover:bg-[var(--cursor-focus)] transition-all duration-500 haptic-target backdrop-blur-sm overflow-hidden" style="background-color: var(--card-2-bg);" data-vibrate="10">
+                    <div class="absolute -top-6 -right-2 text-[100px] md:text-[140px] font-serif opacity-[0.03] text-[var(--text-color)] leading-none pointer-events-none select-none z-0">02</div>
                     <div class="relative z-10 flex-1 flex flex-col">
                         <h3 class="text-sm md:text-base uppercase tracking-widest text-[var(--text-color)] mb-2 font-serif">Protocolo Empresarial</h3>
                         <p class="text-[8px] md:text-[9px] uppercase tracking-[0.3em] text-[#B8A38E] mb-6">Presença Local Essencial</p>
@@ -857,8 +864,8 @@
                 </div>
 
                 <!-- TIER 03: SIGNATURE -->
-                <div class="drag-item flex flex-col h-full relative border border-[var(--border-color)] p-6 md:p-8 bg-[var(--bg-color)] hover:bg-[var(--cursor-focus)] transition-all duration-500 haptic-target backdrop-blur-sm overflow-hidden" data-vibrate="10">
-                    <div class="absolute -top-6 -right-2 text-[100px] md:text-[140px] font-serif opacity-[0.03] text-[var(--text-color)] leading-none pointer-events-none select-none z-0">02</div>
+                <div class="drag-item flex flex-col h-full relative border border-[var(--border-color)] p-6 md:p-8 hover:bg-[var(--cursor-focus)] transition-all duration-500 haptic-target backdrop-blur-sm overflow-hidden" style="background-color: var(--card-3-bg);" data-vibrate="10">
+                    <div class="absolute -top-6 -right-2 text-[100px] md:text-[140px] font-serif opacity-[0.03] text-[var(--text-color)] leading-none pointer-events-none select-none z-0">03</div>
                     <div class="relative z-10 flex-1 flex flex-col">
                         <h3 class="text-sm md:text-base uppercase tracking-widest text-[var(--text-color)] mb-2 font-serif">Signature</h3>
                         <p class="text-[8px] md:text-[9px] uppercase tracking-[0.3em] text-[#B8A38E] mb-6">Posicionamento de Autoridade</p>
@@ -882,14 +889,14 @@
                 </div>
 
                 <!-- TIER 04: ALFAIATARIA DE FUNIL (MONOLITO NEGRO) -->
-                <div class="drag-item flex flex-col h-full relative border border-[#B8A38E] p-8 md:p-12 bg-[#111111] z-20 shadow-[0_0_40px_rgba(184,163,142,0.15)] lg:scale-[1.03] haptic-press haptic-target overflow-hidden text-[#F5F5F3]" data-vibrate="20">
-                    <div class="absolute inset-0 opacity-5 pointer-events-none z-0" style="background-image: url('https://glid.carrd.co/assets/images/image03.png?v=951bca55'); background-size: 90px; mix-blend-mode: screen; filter: grayscale(100%) invert(1);"></div>
+                <div class="drag-item flex flex-col h-full relative border border-[#B8A38E] p-8 md:p-12 z-20 shadow-[0_0_40px_rgba(184,163,142,0.15)] lg:scale-[1.03] haptic-press haptic-target text-[#F5F5F3]" style="background-color: #111111;" data-vibrate="20">
+                    <div class="absolute inset-0 opacity-5 pointer-events-none z-0 overflow-hidden" style="background-image: url('https://glid.carrd.co/assets/images/image03.png?v=951bca55'); background-size: 90px; mix-blend-mode: screen; filter: grayscale(100%) invert(1);"></div>
                     <div class="absolute -top-6 -right-2 text-[100px] md:text-[140px] font-serif opacity-[0.02] text-[#B8A38E] leading-none pointer-events-none select-none z-0">03</div>
                     
-                    <div class="absolute -top-3 md:-top-4 left-1/2 transform -translate-x-1/2 gold-gradient-bg text-[#111] px-4 md:px-6 py-1.5 md:py-2 text-[8px] md:text-[10px] uppercase tracking-[0.4em] whitespace-nowrap shadow-lg font-bold z-20">
+                    <div class="absolute -top-5 md:-top-6 left-1/2 transform -translate-x-1/2 gold-gradient-bg text-[#111] px-5 md:px-8 py-2 md:py-2.5 text-[9px] md:text-[11px] uppercase tracking-[0.4em] whitespace-nowrap shadow-xl font-bold z-30 rounded-sm">
                         A Escolha da Elite
                     </div>
-                    <div class="relative z-10 flex-1 flex flex-col">
+                    <div class="relative z-10 flex-1 flex flex-col pt-6 md:pt-8">
                         <h3 class="text-base md:text-xl uppercase tracking-widest text-[#F5F5F3] mb-2 font-serif mt-2">Alfaiataria de Funil</h3>
                         <p class="text-[8px] md:text-[9px] uppercase tracking-[0.3em] text-[#B8A38E] mb-6">A Experiência Private High-Ticket</p>
                         <div class="mb-6 md:mb-8 mt-2">
@@ -914,8 +921,8 @@
                 </div>
 
                 <!-- TIER 05: HAUTE COUTURE -->
-                <div class="drag-item flex flex-col h-full relative border border-[var(--border-color)] p-6 md:p-8 bg-[var(--bg-color)] hover:bg-[var(--cursor-focus)] transition-all duration-500 haptic-target backdrop-blur-sm overflow-hidden" data-vibrate="10">
-                    <div class="absolute -top-6 -right-2 text-[100px] md:text-[140px] font-serif opacity-[0.03] text-[var(--text-color)] leading-none pointer-events-none select-none z-0">04</div>
+                <div class="drag-item flex flex-col h-full relative border border-[var(--border-color)] p-6 md:p-8 hover:bg-[var(--cursor-focus)] transition-all duration-500 haptic-target backdrop-blur-sm overflow-hidden" style="background-color: var(--card-5-bg);" data-vibrate="10">
+                    <div class="absolute -top-6 -right-2 text-[100px] md:text-[140px] font-serif opacity-[0.03] text-[var(--text-color)] leading-none pointer-events-none select-none z-0">05</div>
                     <div class="relative z-10 flex-1 flex flex-col">
                         <h3 class="text-sm md:text-base uppercase tracking-widest text-[var(--text-color)] mb-2 font-serif">Haute Couture</h3>
                         <p class="text-[8px] md:text-[9px] uppercase tracking-[0.3em] text-[#B8A38E] mb-6">Domínio Digital Absoluto</p>
@@ -1017,7 +1024,7 @@
         </section>
 
         <!-- CTA DE ALTA FRICÇÃO -->
-        <section class="py-20 md:py-40 px-6 w-full bg-[#111111] text-[#F5F5F3] text-center reveal-on-scroll relative z-10 flex flex-col justify-center h-[70dvh] md:h-auto border-t border-[#333]">
+        <section class="min-h-[60dvh] w-full bg-[#111111] text-[#F5F5F3] text-center reveal-on-scroll relative z-10 flex flex-col justify-center border-t border-[#333] py-20 px-6">
             <h2 class="text-xl md:text-4xl lg:text-5xl mb-10 md:mb-16 uppercase tracking-[0.2em] max-w-4xl mx-auto leading-tight font-serif">
                 Inicie o Protocolo de Elevação.
             </h2>
@@ -1074,32 +1081,21 @@
             const mainContent = document.getElementById('main-content');
             const mainHeader = document.getElementById('main-header');
             
-            const visionToggle = document.getElementById('vision-toggle');
-            const themeLabel = document.getElementById('theme-label');
-            const themeDot = document.getElementById('theme-dot');
+            const visionToggles = document.querySelectorAll('.theme-switcher');
+            const themeLabels = document.querySelectorAll('.theme-label-txt');
             const themeMeta = document.getElementById('theme-color-meta');
             const paperTexture = document.getElementById('paper-texture');
 
-            // --- LÓGICA DO PRELOADER ---
-            let attentionTimer = setTimeout(() => { visionToggle.classList.add('pulse-active'); }, 4000);
-
+            // --- LÓGICA DO TEMA (Header e Preloader Sincronizados) ---
             let isObsidian = false;
-            visionToggle.addEventListener('click', () => {
-                visionToggle.classList.remove('pulse-active');
-                clearTimeout(attentionTimer);
-                isObsidian = !isObsidian;
-                if (isObsidian) {
-                    document.documentElement.setAttribute('data-theme', 'obsidian');
-                    themeLabel.textContent = 'OBSIDIAN';
-                    themeDot.style.transform = 'scale(1.5)';
-                    if (themeMeta) themeMeta.setAttribute('content', '#050505'); 
-                } else {
-                    document.documentElement.setAttribute('data-theme', 'cashmere');
-                    themeLabel.textContent = 'CASHMERE';
-                    themeDot.style.transform = 'scale(1)';
-                    if (themeMeta) themeMeta.setAttribute('content', '#F5F5F3'); 
-                }
-                try { if (navigator.vibrate) navigator.vibrate(10); } catch (e) {} 
+            visionToggles.forEach(toggle => {
+                toggle.addEventListener('click', () => {
+                    isObsidian = !isObsidian;
+                    document.documentElement.setAttribute('data-theme', isObsidian ? 'obsidian' : 'cashmere');
+                    themeLabels.forEach(lbl => lbl.textContent = isObsidian ? 'OBSIDIAN' : 'CASHMERE');
+                    if (themeMeta) themeMeta.setAttribute('content', isObsidian ? '#050505' : '#F5F5F3'); 
+                    try { if (navigator.vibrate) navigator.vibrate(10); } catch (e) {} 
+                });
             });
 
             let isAutonomous = true;
@@ -1212,7 +1208,6 @@
                 mainContent.classList.remove('opacity-0', 'pointer-events-none');
                 mainContent.classList.add('relative');
                 mainContent.classList.remove('absolute');
-                visionToggle.style.opacity = '0';
 
                 if (window.innerWidth > 768 && cursor && !document.documentElement.classList.contains('legacy-mode')) {
                     cursor.classList.add('thimble-mode');
@@ -1244,7 +1239,6 @@
                 const vid = card.querySelector('.portfolio-video');
                 if(!vid) return;
 
-                // Para Desktop (Hover via rato)
                 card.addEventListener('mouseenter', () => {
                     if(!document.documentElement.classList.contains('legacy-mode')) {
                         vid.play().catch(e => { /* Silencia erros de autoplay no browser */ });
@@ -1255,11 +1249,9 @@
                     vid.pause();
                 });
 
-                // Para Mobile (Toque)
                 card.addEventListener('touchstart', () => {
                     if(!document.documentElement.classList.contains('legacy-mode')) {
                         if(vid.paused) {
-                            // Pausa os outros antes de iniciar este
                             document.querySelectorAll('.portfolio-video').forEach(v => v.pause());
                             vid.play().catch(e => {});
                         }
@@ -1274,7 +1266,6 @@
                     const answer = item.querySelector('.faq-answer');
                     const icon = item.querySelector('.faq-icon');
                     
-                    // Close others
                     faqItems.forEach(otherItem => {
                         if (otherItem !== item) {
                             otherItem.querySelector('.faq-answer').classList.remove('open');
@@ -1282,7 +1273,6 @@
                         }
                     });
 
-                    // Toggle current
                     answer.classList.toggle('open');
                     icon.classList.toggle('open');
                 });
@@ -1325,6 +1315,7 @@
                     slider.addEventListener('mousedown', (e) => {
                         isDown = true;
                         slider.classList.add('active');
+                        // Desliga o Snap temporariamente enquanto arrasta para não encravar
                         slider.style.scrollSnapType = 'none';
                         startX = e.pageX - slider.offsetLeft;
                         scrollLeft = slider.scrollLeft;
