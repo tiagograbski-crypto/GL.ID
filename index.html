@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-PT" data-theme="cashmere">
+<html lang="pt-PT" data-theme="cashmere" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,6 +8,23 @@
     
     <link rel="icon" type="image/png" href="https://glid.carrd.co/assets/images/image03.png?v=951bca55">
     <meta name="theme-color" content="#F5F5F3" id="theme-color-meta">
+
+    <!-- INTELIGÊNCIA DE TRIAGEM 2.0 (Feature Detection Agressivo para GPU 2016) -->
+    <script>
+        (function() {
+            var isLegacy = false;
+            try {
+                if (!('IntersectionObserver' in window) || !('CSS' in window) || typeof CSS.supports !== 'function' || !CSS.supports('display', 'grid')) {
+                    isLegacy = true;
+                }
+                var isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+                if (isTouch && CSS.supports && !CSS.supports('-webkit-backdrop-filter', 'blur(1px)') && !CSS.supports('backdrop-filter', 'blur(1px)')) {
+                    isLegacy = true;
+                }
+            } catch(e) { isLegacy = true; }
+            if (isLegacy) document.documentElement.classList.add('legacy-mode');
+        })();
+    </script>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -63,6 +80,11 @@
             font-family: 'Didot', 'Bodoni MT', 'Cinzel', 'Playfair Display', serif;
         }
 
+        #preloader, .logo-container, .logo-shimmer, .monogram-pattern, .lantern-glow {
+            -webkit-transform: translateZ(0); -moz-transform: translateZ(0); -ms-transform: translateZ(0); transform: translateZ(0);
+            -webkit-backface-visibility: hidden; backface-visibility: hidden;
+        }
+
         .elegant-scrollbar { overflow-x: auto; padding-bottom: 1.5rem; }
         .elegant-scrollbar::-webkit-scrollbar { height: 3px; }
         .elegant-scrollbar::-webkit-scrollbar-track { background: var(--grid-line); border-radius: 4px; }
@@ -77,8 +99,21 @@
         .paper-grain.active { opacity: 0.03; }
         [data-theme="obsidian"] .paper-grain.active { opacity: 0.02; filter: invert(1); }
 
+        /* DEGRADAÇÃO GRACIOSA P/ LEGACY */
+        .legacy-mode .reveal-on-scroll { opacity: 1 !important; transform: none !important; filter: none !important; transition: none !important; }
+        .legacy-mode .backdrop-blur-[10px], .legacy-mode .backdrop-blur-sm { backdrop-filter: none !important; background-color: var(--bg-color) !important; }
+        .legacy-mode .mix-blend-mode { mix-blend-mode: normal !important; opacity: 0.05 !important; }
+        .legacy-mode .custom-cursor { display: none !important; }
+        .legacy-mode * { animation-play-state: paused !important; }
+        .legacy-mode .hero-aura, .legacy-mode .lantern-glow, .legacy-mode .logo-shimmer { display: none !important; animation: none !important; }
+        .legacy-mode .logo-container { filter: none !important; transform: none !important; }
+        .legacy-mode #acervo-slider, .legacy-mode #pricing-slider { display: block !important; white-space: nowrap !important; }
+        .legacy-mode .drag-item { display: inline-block !important; vertical-align: top; white-space: normal; min-width: 80vw; margin-right: 20px; flex: none !important; }
+        .legacy-mode .portfolio-video { display: none !important; }
+        .legacy-mode .marquee-content { animation: none !important; flex-wrap: wrap; justify-content: center; width: 100%; gap: 2rem; padding: 2rem 0; }
+
         /* =========================================
-           1. PRELOADER / FRONTIER (BLINDADO)
+           1. PRELOADER / FRONTIER
            ========================================= */
         #preloader {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -169,16 +204,13 @@
             .custom-cursor { display: none !important; }
             #preloader { cursor: auto; }
             .mag-wrap { padding: 15px; }
-            .monogram-pattern { background-size: 70px !important; }
-            .base-mono { opacity: 0.08 !important; }
-            .reveal-mono { opacity: 0.28 !important; }
             .theme-toggle { top: 1.5rem; right: 1.5rem; }
         }
 
         .exit-ritual { transform: scale(1.1) !important; opacity: 0 !important; filter: blur(10px); pointer-events: none; }
 
         /* =========================================
-           2. FUNIL MAIN CONTENT (SEO 4.0)
+           2. FUNIL MAIN CONTENT
            ========================================= */
         #main-content {
             background-color: var(--bg-color); color: var(--text-color);
@@ -225,20 +257,66 @@
         }
         .reveal-on-scroll.is-visible { opacity: 1; transform: translateY(0); filter: blur(0); }
 
+        /* --- MARQUEE INFINITO (AUTHORITY TICKER) --- */
+        .marquee-container {
+            width: 100%;
+            overflow: hidden;
+            border-top: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+            background: rgba(var(--shadow-rgb), 0.02);
+            position: relative;
+            z-index: 10;
+        }
+        .marquee-content {
+            display: flex;
+            width: max-content;
+            animation: scrollMarquee 40s linear infinite;
+        }
+        .marquee-content:hover { animation-play-state: paused; }
+        .marquee-item {
+            padding: 1.5rem 0;
+            display: flex;
+            align-items: center;
+            gap: 3rem; /* Espaço entre as marcas */
+            margin-right: 3rem;
+        }
+        .marquee-brand {
+            font-family: 'Didot', 'Bodoni MT', 'Cinzel', 'Playfair Display', serif;
+            font-size: clamp(1rem, 2vw, 1.5rem);
+            text-transform: uppercase;
+            letter-spacing: 0.3em;
+            color: var(--text-color);
+            opacity: 0.5;
+            transition: opacity 0.4s, color 0.4s;
+            white-space: nowrap;
+            cursor: default;
+        }
+        .marquee-brand:hover {
+            opacity: 1;
+            color: var(--gold-accent);
+        }
+        @keyframes scrollMarquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); } 
+        }
+
         .card-img-container { overflow: hidden; position: absolute; inset: 0; }
         .card-img { 
             width: 100%; height: 100%; object-fit: cover; 
             filter: grayscale(100%) contrast(1.1) brightness(0.8); 
             transition: transform 1.2s cubic-bezier(0.16, 1, 0.3, 1), filter 1.2s ease; 
         }
-        .group:hover .card-img { 
-            transform: scale(1.08); filter: grayscale(0%) contrast(1) brightness(1); 
-        }
+        .portfolio-video { transition: opacity 0.5s ease; }
+        .portfolio-card:hover .card-img { transform: scale(1.08); filter: grayscale(0%) contrast(1) brightness(1); opacity: 0; }
+        .portfolio-card:hover .portfolio-video { opacity: 1; }
 
-        .drag-slider { cursor: grab; scroll-behavior: smooth; }
-        .drag-slider:active { cursor: grabbing; scroll-behavior: auto; }
-        .drag-item { scroll-snap-align: center; flex: 0 0 78vw; }
-        @media (min-width: 768px) { .drag-item { flex: 0 0 380px; } }
+        .drag-slider { scroll-behavior: smooth; }
+        .drag-slider.mouse-drag { cursor: grab; }
+        .drag-slider.mouse-drag:active { cursor: grabbing; }
+        
+        .drag-item { scroll-snap-align: center; flex: 0 0 82vw; }
+        @media (min-width: 768px) { .drag-item { flex: 0 0 350px; } }
+        @media (min-width: 1536px) { .drag-item { flex: 1; min-width: 250px; } }
 
         .slider-container { cursor: ew-resize; touch-action: pan-y; }
         .slider-handle { transform: translateX(-50%); }
@@ -260,26 +338,28 @@
         }
         @keyframes silkFlow { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
 
-        /* Estilo para a Metodologia (Roadmap) */
         .process-line {
-            position: absolute;
-            left: 24px;
-            top: 0;
-            bottom: 0;
-            width: 1px;
-            background: var(--border-color);
-            z-index: 0;
+            position: absolute; left: 24px; top: 0; bottom: 0; width: 1px;
+            background: var(--border-color); z-index: 0;
         }
         @media (min-width: 768px) {
-            .process-line {
-                left: 0;
-                top: 24px;
-                right: 0;
-                bottom: auto;
-                height: 1px;
-                width: 100%;
-            }
+            .process-line { left: 0; top: 24px; right: 0; bottom: auto; height: 1px; width: 100%; }
         }
+
+        /* --- FAQ Accordion CSS --- */
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease, opacity 0.5s ease, margin-top 0.5s ease;
+            opacity: 0;
+        }
+        .faq-answer.open {
+            max-height: 200px;
+            opacity: 1;
+            margin-top: 1rem;
+        }
+        .faq-icon { transition: transform 0.4s ease; }
+        .faq-icon.open { transform: rotate(45deg); color: var(--gold-accent); }
 
     </style>
 </head>
@@ -315,320 +395,556 @@
     <!-- FUNIL PRINCIPAL SEO 4.0 -->
     <main id="main-content" class="opacity-0 pointer-events-none absolute top-0 left-0 w-full min-h-screen pb-0 arch-grid">
         
-        <header class="fixed top-0 left-0 w-full z-50 px-6 py-5 flex justify-between items-center backdrop-blur-[10px] border-b border-[var(--border-color)] bg-[var(--bg-color)]/70 transition-opacity duration-1000 opacity-0" id="main-header" aria-label="Cabeçalho Principal">
-            <img src="https://glid.carrd.co/assets/images/image03.png?v=951bca55" alt="GLID" class="h-8 md:h-10 hover:opacity-80 transition-opacity drop-shadow-lg">
-            <button class="border border-[#B8A38E] text-[var(--text-color)] px-6 py-2 text-[10px] md:text-xs uppercase tracking-[0.2em] hover:bg-[#B8A38E] hover:text-[#F5F5F3] transition-colors haptic-target" data-vibrate="10">Análise Private</button>
+        <header class="fixed top-0 left-0 w-full z-50 px-6 py-4 flex justify-between items-center backdrop-blur-[10px] border-b border-[var(--border-color)] bg-[var(--bg-color)]/70 transition-opacity duration-1000 opacity-0" id="main-header" aria-label="Cabeçalho Principal">
+            <img src="https://glid.carrd.co/assets/images/image03.png?v=951bca55" alt="GLID" class="h-7 md:h-10 hover:opacity-80 transition-opacity drop-shadow-lg">
+            <button onclick="window.open('https://wa.me/5549999999999?text=Ol%C3%A1%20Thiago,%20desejo%20agendar%20uma%20an%C3%A1lise%20private%20da%20minha%20marca.', '_blank')" class="border border-[#B8A38E] text-[var(--text-color)] px-5 py-2 text-[9px] md:text-xs uppercase tracking-[0.2em] hover:bg-[#B8A38E] hover:text-[#F5F5F3] transition-colors haptic-target" data-vibrate="10">Análise Private</button>
         </header>
 
-        <section class="min-h-screen flex flex-col justify-center items-center px-6 text-center pt-24 pb-16 reveal-on-scroll relative overflow-hidden" aria-labelledby="hero-title">
+        <!-- 2. HERO -->
+        <section class="h-[100dvh] w-full flex flex-col justify-center items-center px-6 text-center reveal-on-scroll relative overflow-hidden" aria-labelledby="hero-title">
             <div class="hero-line"></div>
             <div class="hero-aura"></div>
             
-            <h1 id="hero-title" class="text-3xl md:text-5xl lg:text-6xl text-[var(--text-color)] leading-[1.2] mb-8 max-w-5xl tracking-tight uppercase relative z-10">
-                Sua autoridade digital merece a precisão de um Atelier, não o ruído de uma agência.
+            <h1 id="hero-title" class="text-2xl sm:text-3xl md:text-5xl lg:text-6xl text-[var(--text-color)] leading-[1.15] mb-4 md:mb-8 max-w-5xl tracking-tight uppercase relative z-10">
+                Sua autoridade merece a precisão de um Atelier, não o ruído de uma agência.
             </h1>
-            <p class="text-xs md:text-base text-[var(--text-color)] opacity-70 max-w-3xl mb-14 font-light leading-relaxed relative z-10">
-                Nós não entregamos sites genéricos. Esculpimos infraestruturas de conversão ultra-luxo, hand-coded, que justificam o seu preço high-ticket antes mesmo do cliente ler a oferta. Sinta a textura da exclusividade.
+            <p class="text-[11px] sm:text-xs md:text-base text-[var(--text-color)] opacity-70 max-w-3xl mb-8 md:mb-14 font-light leading-relaxed relative z-10">
+                Esculpimos infraestruturas de conversão ultra-luxo, hand-coded, que justificam o seu ticket high-end antes mesmo do cliente ler a oferta. Sinta a textura da exclusividade.
             </p>
-            <button class="bg-[#2C2C2C] text-[#E8D5C4] px-10 py-5 uppercase tracking-[0.3em] text-[10px] md:text-xs font-semibold haptic-press haptic-target relative z-10" data-vibrate="20">
+            <button onclick="window.open('https://wa.me/5549999999999?text=Ol%C3%A1%20Thiago,%20desejo%20agendar%20uma%20an%C3%A1lise%20private%20da%20minha%20marca.', '_blank')" class="bg-[#2C2C2C] text-[#E8D5C4] px-8 py-4 md:px-10 md:py-5 uppercase tracking-[0.3em] text-[9px] md:text-xs font-semibold haptic-press haptic-target relative z-10" data-vibrate="20">
                 Solicitar Acesso ao Atelier
             </button>
         </section>
 
-        <!-- ACERVO PRIVATE -->
-        <section class="py-32 w-full max-w-[100vw] overflow-hidden border-t border-[var(--border-color)] reveal-on-scroll relative z-10 bg-[var(--bg-color)]" aria-labelledby="gallery-title">
-            <div class="px-6 md:px-12 mb-10 flex flex-col md:flex-row justify-between items-end gap-4 max-w-[1500px] mx-auto">
-                <h2 id="gallery-title" class="text-2xl md:text-3xl lg:text-4xl text-[var(--text-color)] uppercase tracking-[0.2em] max-w-xl">Arquitetura de Intenção.<br>Nosso Acervo Private.</h2>
-                <div class="flex items-center gap-4 text-[9px] md:text-[10px] uppercase tracking-widest text-[var(--text-color)] opacity-60">
-                    <span class="w-10 h-px bg-[var(--text-color)]"></span> Deslize para explorar
+        <!-- NOVO: MARCAS DE AUTORIDADE (INFINITY TICKER) -->
+        <section class="marquee-container reveal-on-scroll" aria-label="Marcas de Autoridade">
+            <!-- Duplicamos o conteúdo dentro para criar o loop perfeito -->
+            <div class="marquee-content haptic-target" data-vibrate="2">
+                <!-- Conjunto 1 -->
+                <div class="marquee-item">
+                    <span class="marquee-brand">Doré</span>
+                    <span class="text-[8px] text-[#B8A38E]">✦</span>
+                    <span class="marquee-brand">GL PRO</span>
+                    <span class="text-[8px] text-[#B8A38E]">✦</span>
+                    <span class="marquee-brand">Simone Araujo</span>
+                    <span class="text-[8px] text-[#B8A38E]">✦</span>
+                    <span class="marquee-brand">Essência Rara</span>
+                    <span class="text-[8px] text-[#B8A38E]">✦</span>
+                    <span class="marquee-brand">Black Car</span>
+                    <span class="text-[8px] text-[#B8A38E]">✦</span>
+                    <span class="marquee-brand">Essência de Romã</span>
+                    <span class="text-[8px] text-[#B8A38E]">✦</span>
+                    <span class="marquee-brand">Aureum</span>
+                    <span class="text-[8px] text-[#B8A38E]">✦</span>
+                </div>
+                <!-- Conjunto 2 -->
+                <div class="marquee-item">
+                    <span class="marquee-brand">Doré</span>
+                    <span class="text-[8px] text-[#B8A38E]">✦</span>
+                    <span class="marquee-brand">GL PRO</span>
+                    <span class="text-[8px] text-[#B8A38E]">✦</span>
+                    <span class="marquee-brand">Simone Araujo</span>
+                    <span class="text-[8px] text-[#B8A38E]">✦</span>
+                    <span class="marquee-brand">Essência Rara</span>
+                    <span class="text-[8px] text-[#B8A38E]">✦</span>
+                    <span class="marquee-brand">Black Car</span>
+                    <span class="text-[8px] text-[#B8A38E]">✦</span>
+                    <span class="marquee-brand">Essência de Romã</span>
+                    <span class="text-[8px] text-[#B8A38E]">✦</span>
+                    <span class="marquee-brand">Aureum</span>
+                    <span class="text-[8px] text-[#B8A38E]">✦</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. ACERVO EM DESTAQUE COM 7 CARDS E VÍDEOS ESCONDIDOS -->
+        <section class="py-16 md:py-32 w-full max-w-[100vw] overflow-hidden border-t border-[var(--border-color)] reveal-on-scroll relative z-10 bg-[var(--bg-color)]" aria-labelledby="gallery-title">
+            <div class="px-6 md:px-12 mb-6 md:mb-10 flex flex-col md:flex-row justify-between items-end gap-4 max-w-[1500px] mx-auto">
+                <h2 id="gallery-title" class="text-xl md:text-3xl lg:text-4xl text-[var(--text-color)] uppercase tracking-[0.2em] max-w-xl">Arquitetura de Intenção.<br>Acervo em Destaque.</h2>
+                <div class="flex items-center gap-4 text-[8px] md:text-[10px] uppercase tracking-widest text-[var(--text-color)] opacity-60">
+                    <span class="w-8 md:w-10 h-px bg-[var(--text-color)]"></span> Deslize para explorar
                 </div>
             </div>
             
-            <div class="flex overflow-x-auto snap-x snap-mandatory elegant-scrollbar drag-slider px-6 md:px-12 gap-6 pb-6 max-w-[1500px] mx-auto" id="acervo-slider">
+            <div class="flex overflow-x-auto snap-x snap-mandatory elegant-scrollbar drag-slider px-6 md:px-12 gap-6 pb-4 max-w-[1500px] mx-auto" id="acervo-slider">
                 
-                <article class="group haptic-target drag-item relative" data-vibrate="5">
-                    <div class="aspect-[4/5] md:aspect-[3/4] mb-6 relative shadow-[inset_0_0_20px_rgba(0,0,0,0.5)] card-img-container">
-                         <img src="https://glid.carrd.co/assets/images/image05.jpg?v=648bf2be" decoding="async" alt="GL PRO Cosméticos de Luxo" class="card-img pointer-events-none">
-                         <div class="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none">
+                <!-- Ativo 1 -->
+                <article class="portfolio-card group haptic-target drag-item relative flex flex-col cursor-pointer" data-vibrate="5">
+                    <div class="aspect-[4/5] mb-4 relative shadow-[inset_0_0_20px_rgba(0,0,0,0.5)] card-img-container shrink-0">
+                         <img src="https://glid.carrd.co/assets/images/image04.jpg?v=d70ffd67" loading="lazy" decoding="async" alt="Império Barber" class="card-img absolute inset-0 z-0">
+                         <!-- Vídeo Oculto (Só carrega/roda no JS) -->
+                         <video src="https://www.w3schools.com/html/mov_bbb.mp4" loop muted playsinline preload="none" class="portfolio-video absolute inset-0 w-full h-full object-cover opacity-0 z-10 pointer-events-none"></video>
+                         
+                         <div class="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none z-20">
                              <span class="gold-gradient-text text-sm tracking-widest uppercase border border-[#B8A38E] px-6 py-2 backdrop-blur-sm">+ Inspecionar</span>
                          </div>
                     </div>
-                    <h3 class="text-lg text-[var(--text-color)] uppercase tracking-[0.2em] mb-2 font-bold pointer-events-none">GL PRO</h3>
-                    <span class="text-[10px] text-[#B8A38E] tracking-[0.3em] uppercase block mb-4 border-b border-[var(--border-color)] pb-2 inline-block pointer-events-none">High-End Cosmetics</span>
-                    <p class="text-[11px] md:text-sm text-[var(--text-color)] opacity-60 font-light leading-relaxed pointer-events-none">Engenharia visual para protocolos 8K e reestruturação capilar de elite.</p>
+                    <div>
+                        <h3 class="text-base md:text-lg text-[var(--text-color)] uppercase tracking-[0.2em] mb-1 font-bold pointer-events-none">IMPÉRIO BARBER</h3>
+                        <span class="text-[9px] md:text-[10px] text-[#B8A38E] tracking-[0.3em] uppercase block mb-2 border-b border-[var(--border-color)] pb-2 inline-block pointer-events-none">Grooming Premium</span>
+                        <p class="text-[10px] md:text-sm text-[var(--text-color)] opacity-60 font-light leading-relaxed pointer-events-none">Posicionamento digital de alto padrão para grooming masculino e barbearia clássica.</p>
+                    </div>
                 </article>
                 
-                <article class="group haptic-target drag-item relative" data-vibrate="5">
-                    <div class="aspect-[4/5] md:aspect-[3/4] mb-6 relative shadow-[inset_0_0_20px_rgba(0,0,0,0.5)] card-img-container">
-                         <img src="https://glid.carrd.co/assets/images/image06.jpg?v=648bf2be" loading="lazy" decoding="async" alt="LX Élixir Noir Garrafa" class="card-img pointer-events-none">
-                         <div class="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none">
+                <!-- Ativo 2 -->
+                <article class="portfolio-card group haptic-target drag-item relative flex flex-col cursor-pointer" data-vibrate="5">
+                    <div class="aspect-[4/5] mb-4 relative shadow-[inset_0_0_20px_rgba(0,0,0,0.5)] card-img-container shrink-0">
+                         <img src="https://glid.carrd.co/assets/images/image05.jpg?v=d70ffd67" loading="lazy" decoding="async" alt="Salão de Beleza High-End" class="card-img absolute inset-0 z-0">
+                         <video src="https://www.w3schools.com/html/mov_bbb.mp4" loop muted playsinline preload="none" class="portfolio-video absolute inset-0 w-full h-full object-cover opacity-0 z-10 pointer-events-none"></video>
+                         
+                         <div class="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none z-20">
                              <span class="gold-gradient-text text-sm tracking-widest uppercase border border-[#B8A38E] px-6 py-2 backdrop-blur-sm">+ Inspecionar</span>
                          </div>
                     </div>
-                    <h3 class="text-lg text-[var(--text-color)] uppercase tracking-[0.2em] mb-2 font-bold pointer-events-none">LX ÉLIXIR NOIR</h3>
-                    <span class="text-[10px] text-[#B8A38E] tracking-[0.3em] uppercase block mb-4 border-b border-[var(--border-color)] pb-2 inline-block pointer-events-none">Functional Luxury</span>
-                    <p class="text-[11px] md:text-sm text-[var(--text-color)] opacity-60 font-light leading-relaxed pointer-events-none">Materialização digital para bebidas funcionais voltadas à beleza e saúde premium.</p>
+                    <div>
+                        <h3 class="text-base md:text-lg text-[var(--text-color)] uppercase tracking-[0.2em] mb-1 font-bold pointer-events-none">MAISON DE BEAUTÉ</h3>
+                        <span class="text-[9px] md:text-[10px] text-[#B8A38E] tracking-[0.3em] uppercase block mb-2 border-b border-[var(--border-color)] pb-2 inline-block pointer-events-none">Beauty & Hair SPA</span>
+                        <p class="text-[10px] md:text-sm text-[var(--text-color)] opacity-60 font-light leading-relaxed pointer-events-none">Arquitetura visual fluida para salões de beleza de elite e reestruturação capilar.</p>
+                    </div>
                 </article>
 
-                <article class="group haptic-target drag-item relative" data-vibrate="5">
-                    <div class="aspect-[4/5] md:aspect-[3/4] mb-6 relative shadow-[inset_0_0_20px_rgba(0,0,0,0.5)] card-img-container">
-                         <img src="https://glid.carrd.co/assets/images/image07.jpg?v=a8738403" decoding="async" alt="Doré Gastronomia Sensorial" class="card-img pointer-events-none">
-                         <div class="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none">
+                <!-- Ativo 3 -->
+                <article class="portfolio-card group haptic-target drag-item relative flex flex-col cursor-pointer" data-vibrate="5">
+                    <div class="aspect-[4/5] mb-4 relative shadow-[inset_0_0_20px_rgba(0,0,0,0.5)] card-img-container shrink-0">
+                         <img src="https://glid.carrd.co/assets/images/image06.jpg?v=d70ffd67" loading="lazy" decoding="async" alt="Kinetix Auto Studio" class="card-img absolute inset-0 z-0">
+                         <video src="https://www.w3schools.com/html/mov_bbb.mp4" loop muted playsinline preload="none" class="portfolio-video absolute inset-0 w-full h-full object-cover opacity-0 z-10 pointer-events-none"></video>
+                         
+                         <div class="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none z-20">
                              <span class="gold-gradient-text text-sm tracking-widest uppercase border border-[#B8A38E] px-6 py-2 backdrop-blur-sm">+ Inspecionar</span>
                          </div>
                     </div>
-                    <h3 class="text-lg text-[var(--text-color)] uppercase tracking-[0.2em] mb-2 font-bold pointer-events-none">DORÉ</h3>
-                    <span class="text-[10px] text-[#B8A38E] tracking-[0.3em] uppercase block mb-4 border-b border-[var(--border-color)] pb-2 inline-block pointer-events-none">Sensorial Gastronomy</span>
-                    <p class="text-[11px] md:text-sm text-[var(--text-color)] opacity-60 font-light leading-relaxed pointer-events-none">Experiência tátil e visual para alta gastronomia e acompanhamentos gourmet.</p>
+                    <div>
+                        <h3 class="text-base md:text-lg text-[var(--text-color)] uppercase tracking-[0.2em] mb-1 font-bold pointer-events-none">KINETIX AUTO</h3>
+                        <span class="text-[9px] md:text-[10px] text-[#B8A38E] tracking-[0.3em] uppercase block mb-2 border-b border-[var(--border-color)] pb-2 inline-block pointer-events-none">Estética Automotiva</span>
+                        <p class="text-[10px] md:text-sm text-[var(--text-color)] opacity-60 font-light leading-relaxed pointer-events-none">Engenharia visual de alta precisão para vitrificação, PPF e detailing de superesportivos.</p>
+                    </div>
+                </article>
+
+                <!-- Ativo 4 -->
+                <article class="portfolio-card group haptic-target drag-item relative flex flex-col cursor-pointer" data-vibrate="5">
+                    <div class="aspect-[4/5] mb-4 relative shadow-[inset_0_0_20px_rgba(0,0,0,0.5)] card-img-container shrink-0">
+                         <img src="https://images.unsplash.com/photo-1600565193348-f74bd3c7ccdf?q=80&w=800&auto=format&fit=crop" loading="lazy" decoding="async" alt="Arquitetura de Alto Padrão" class="card-img absolute inset-0 z-0">
+                         <video src="https://www.w3schools.com/html/mov_bbb.mp4" loop muted playsinline preload="none" class="portfolio-video absolute inset-0 w-full h-full object-cover opacity-0 z-10 pointer-events-none"></video>
+
+                         <div class="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none z-20">
+                             <span class="gold-gradient-text text-sm tracking-widest uppercase border border-[#B8A38E] px-6 py-2 backdrop-blur-sm">+ Inspecionar</span>
+                         </div>
+                    </div>
+                    <div>
+                        <h3 class="text-base md:text-lg text-[var(--text-color)] uppercase tracking-[0.2em] mb-1 font-bold pointer-events-none">MONOLITH ARCH.</h3>
+                        <span class="text-[9px] md:text-[10px] text-[#B8A38E] tracking-[0.3em] uppercase block mb-2 border-b border-[var(--border-color)] pb-2 inline-block pointer-events-none">Arquitetura High-End</span>
+                        <p class="text-[10px] md:text-sm text-[var(--text-color)] opacity-60 font-light leading-relaxed pointer-events-none">Imersão visual 3D e portfólio de grife para construtoras e design de interiores de luxo.</p>
+                    </div>
+                </article>
+
+                <!-- Ativo 5 -->
+                <article class="portfolio-card group haptic-target drag-item relative flex flex-col cursor-pointer" data-vibrate="5">
+                    <div class="aspect-[4/5] mb-4 relative shadow-[inset_0_0_20px_rgba(0,0,0,0.5)] card-img-container shrink-0">
+                         <img src="https://images.unsplash.com/photo-1606811841689-23dfddce3e95?q=80&w=800&auto=format&fit=crop" loading="lazy" decoding="async" alt="Odontologia de Luxo" class="card-img absolute inset-0 z-0 object-center">
+                         <video src="https://www.w3schools.com/html/mov_bbb.mp4" loop muted playsinline preload="none" class="portfolio-video absolute inset-0 w-full h-full object-cover opacity-0 z-10 pointer-events-none"></video>
+
+                         <div class="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none z-20">
+                             <span class="gold-gradient-text text-sm tracking-widest uppercase border border-[#B8A38E] px-6 py-2 backdrop-blur-sm">+ Inspecionar</span>
+                         </div>
+                    </div>
+                    <div>
+                        <h3 class="text-base md:text-lg text-[var(--text-color)] uppercase tracking-[0.2em] mb-1 font-bold pointer-events-none">ODONTO PRIME</h3>
+                        <span class="text-[9px] md:text-[10px] text-[#B8A38E] tracking-[0.3em] uppercase block mb-2 border-b border-[var(--border-color)] pb-2 inline-block pointer-events-none">Odontologia de Luxo</span>
+                        <p class="text-[10px] md:text-sm text-[var(--text-color)] opacity-60 font-light leading-relaxed pointer-events-none">Reabilitação oral e estética dental de alta precisão embalada numa presença digital blindada.</p>
+                    </div>
+                </article>
+
+                <!-- Ativo 6 -->
+                <article class="portfolio-card group haptic-target drag-item relative flex flex-col cursor-pointer" data-vibrate="5">
+                    <div class="aspect-[4/5] mb-4 relative shadow-[inset_0_0_20px_rgba(0,0,0,0.5)] card-img-container shrink-0">
+                         <img src="https://images.unsplash.com/photo-1599643477874-c5a8106a7170?q=80&w=800&auto=format&fit=crop" loading="lazy" decoding="async" alt="Alta Joalharia" class="card-img absolute inset-0 z-0 object-center">
+                         <video src="https://www.w3schools.com/html/mov_bbb.mp4" loop muted playsinline preload="none" class="portfolio-video absolute inset-0 w-full h-full object-cover opacity-0 z-10 pointer-events-none"></video>
+
+                         <div class="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none z-20">
+                             <span class="gold-gradient-text text-sm tracking-widest uppercase border border-[#B8A38E] px-6 py-2 backdrop-blur-sm">+ Inspecionar</span>
+                         </div>
+                    </div>
+                    <div>
+                        <h3 class="text-base md:text-lg text-[var(--text-color)] uppercase tracking-[0.2em] mb-1 font-bold pointer-events-none">AURA FINE JEWELRY</h3>
+                        <span class="text-[9px] md:text-[10px] text-[#B8A38E] tracking-[0.3em] uppercase block mb-2 border-b border-[var(--border-color)] pb-2 inline-block pointer-events-none">Alta Joalheria</span>
+                        <p class="text-[10px] md:text-sm text-[var(--text-color)] opacity-60 font-light leading-relaxed pointer-events-none">Vitrines imersivas e arquitetura sensorial para peças exclusivas e diamantes certificados.</p>
+                    </div>
+                </article>
+
+                <!-- Ativo 7 -->
+                <article class="portfolio-card group haptic-target drag-item relative flex flex-col cursor-pointer" data-vibrate="5">
+                    <div class="aspect-[4/5] mb-4 relative shadow-[inset_0_0_20px_rgba(0,0,0,0.5)] card-img-container shrink-0">
+                         <img src="https://images.unsplash.com/photo-1589829085413-56de8ae18c73?q=80&w=800&auto=format&fit=crop" loading="lazy" decoding="async" alt="Advocacia Corporativa" class="card-img absolute inset-0 z-0 object-center">
+                         <video src="https://www.w3schools.com/html/mov_bbb.mp4" loop muted playsinline preload="none" class="portfolio-video absolute inset-0 w-full h-full object-cover opacity-0 z-10 pointer-events-none"></video>
+
+                         <div class="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none z-20">
+                             <span class="gold-gradient-text text-sm tracking-widest uppercase border border-[#B8A38E] px-6 py-2 backdrop-blur-sm">+ Inspecionar</span>
+                         </div>
+                    </div>
+                    <div>
+                        <h3 class="text-base md:text-lg text-[var(--text-color)] uppercase tracking-[0.2em] mb-1 font-bold pointer-events-none">APEX CORPORATE</h3>
+                        <span class="text-[9px] md:text-[10px] text-[#B8A38E] tracking-[0.3em] uppercase block mb-2 border-b border-[var(--border-color)] pb-2 inline-block pointer-events-none">Advocacia de Elite</span>
+                        <p class="text-[10px] md:text-sm text-[var(--text-color)] opacity-60 font-light leading-relaxed pointer-events-none">Posicionamento digital sóbrio e imponente focado em bancas jurídicas high-ticket e fusões.</p>
+                    </div>
                 </article>
 
                 <div class="shrink-0 w-2 md:w-6"></div>
             </div>
         </section>
 
-        <!-- A TRANSFORMAÇÃO & AFFORDANCE -->
-        <section class="py-32 px-6 w-full max-w-6xl mx-auto border-t border-[var(--border-color)] reveal-on-scroll relative z-10 bg-[var(--bg-color)]" aria-labelledby="transformation-title">
-            <h2 id="transformation-title" class="text-2xl md:text-3xl lg:text-4xl text-[var(--text-color)] text-center mb-16 uppercase tracking-[0.2em]">O Custo do Ruído.</h2>
+        <!-- 4. O ABISMO ESTRUTURAL -->
+        <section class="h-[100dvh] w-full flex flex-col justify-center max-w-6xl mx-auto px-6 border-t border-[var(--border-color)] reveal-on-scroll relative z-10 bg-[var(--bg-color)]" aria-labelledby="transformation-title">
+            <div class="text-center mb-6 md:mb-10 shrink-0">
+                <h2 id="transformation-title" class="text-xl md:text-3xl lg:text-4xl text-[var(--text-color)] uppercase tracking-[0.2em]">O Abismo Estrutural.</h2>
+            </div>
             
-            <div class="relative w-full aspect-square md:aspect-[21/9] overflow-hidden slider-container shadow-2xl haptic-target border border-[var(--border-color)]" id="ba-container" data-vibrate="2">
-                <div class="absolute inset-0 flex items-center justify-end p-6 md:p-16 silk-effect text-[var(--text-color)]">
+            <div class="relative w-full h-[60dvh] md:h-[70dvh] overflow-hidden slider-container shadow-2xl haptic-target border border-[var(--border-color)] shrink-0" id="ba-container" data-vibrate="2">
+                <div class="absolute inset-0 flex items-center justify-end p-4 md:p-16 silk-effect text-[var(--text-color)]">
                     <div class="text-right w-full md:w-1/2 max-w-md ml-auto">
-                        <h4 class="text-lg md:text-3xl mb-4 uppercase tracking-widest font-bold">Arquitetura de Elite</h4>
-                        <ul class="text-[10px] md:text-sm font-light italic opacity-80 flex flex-col gap-2 mb-6 items-end">
-                            <li>✦ Código Limpo (Hand-coded) puro e escalável.</li>
-                            <li>✦ Performance radical (Sub 0.8s load time).</li>
-                            <li>✦ Arquitetura semântica e SEO 4.0 Nativo.</li>
-                            <li>✦ Haptic UX e micro-interações sensoriais.</li>
+                        <h4 class="text-base md:text-3xl mb-3 uppercase tracking-widest font-bold">Arquitetura de Elite</h4>
+                        <ul class="text-[9px] md:text-sm font-light italic opacity-80 flex flex-col gap-1.5 md:gap-2 mb-4 items-end">
+                            <li>✦ Código Limpo (Hand-coded) puro.</li>
+                            <li>✦ Performance radical (Sub 0.8s load).</li>
+                            <li>✦ Arquitetura semântica (SEO 4.0 Nativo).</li>
                             <li>✦ Roteamento de conversão sem atrito.</li>
                         </ul>
-                        <p class="text-[8px] md:text-[10px] uppercase tracking-widest text-[#8D7A65] border-t border-[#8D7A65]/30 pt-4">O DNA da sua marca esculpido na raiz da internet.</p>
+                        <p class="text-[8px] md:text-[10px] uppercase tracking-widest text-[#8D7A65] border-t border-[#8D7A65]/30 pt-3">O DNA esculpido na raiz da internet.</p>
                     </div>
                 </div>
                 
                 <div class="absolute inset-y-0 left-0 w-1/2 overflow-hidden border-r border-[#B8A38E] z-10 noise-bg text-[#F5F5F3] shadow-[5px_0_20px_rgba(0,0,0,0.8)]" id="ba-before">
-                    <div class="absolute inset-0 w-[200vw] md:w-[600px] lg:w-[1152px] flex items-center justify-start p-6 md:p-16">
+                    <div class="absolute inset-0 w-[200vw] md:w-[600px] lg:w-[1152px] flex items-center justify-start p-4 md:p-16">
                         <div class="w-full md:w-1/2 max-w-md">
-                            <h4 class="text-lg md:text-3xl mb-4 uppercase tracking-widest text-red-50/80">Infraestrutura de Ruído</h4>
-                            <ul class="text-[10px] md:text-sm font-light italic opacity-60 flex flex-col gap-2 mb-6">
-                                <li>✕ Templates pesados, engessados e frágeis.</li>
-                                <li>✕ Plugins inchados gerando lentidão crônica.</li>
+                            <h4 class="text-base md:text-3xl mb-3 uppercase tracking-widest text-red-50/80">Infraestrutura de Ruído</h4>
+                            <ul class="text-[9px] md:text-sm font-light italic opacity-60 flex flex-col gap-1.5 md:gap-2 mb-4">
+                                <li>✕ Templates pesados e frágeis.</li>
                                 <li>✕ Dependência estrutural de terceiros.</li>
                                 <li>✕ SEO quebrado e código-fonte poluído.</li>
-                                <li>✕ Fricção no funil e perda silenciosa de leads.</li>
+                                <li>✕ Fricção no funil e perda de leads.</li>
                             </ul>
-                            <p class="text-[8px] md:text-[10px] uppercase tracking-widest text-gray-500 border-t border-gray-700 pt-4">A sua marca diluída num mar de código genérico.</p>
+                            <p class="text-[8px] md:text-[10px] uppercase tracking-widest text-gray-500 border-t border-gray-700 pt-3">A sua marca diluída num código genérico.</p>
                         </div>
                     </div>
                 </div>
 
-                <div class="absolute inset-y-0 -ml-[2px] flex items-center justify-center z-20 pointer-events-none slider-handle" style="left: 50%; width: 4px;" id="ba-handle">
-                    <div class="w-[3px] h-full bg-gradient-to-b from-[#E8D5C4] via-[#B8A38E] to-[#8D7A65] shadow-[0_0_15px_rgba(184,163,142,0.8)]"></div>
-                    <div class="absolute w-8 h-12 bg-[#2C2C2C] border border-[#B8A38E] rounded-sm flex items-center justify-center gap-1 shadow-lg">
-                        <div class="w-px h-4 bg-[#B8A38E]"></div>
-                        <div class="w-px h-4 bg-[#B8A38E]"></div>
+                <div class="absolute inset-y-0 -ml-[1px] flex items-center justify-center z-20 pointer-events-none slider-handle" style="left: 50%; width: 2px;" id="ba-handle">
+                    <div class="w-[1px] h-full bg-[#B8A38E] shadow-[0_0_10px_rgba(184,163,142,0.8)] relative flex items-center justify-center">
+                        <div class="absolute w-6 h-6 md:w-8 md:h-8 rounded-full border border-[#B8A38E] bg-[var(--bg-color)]/80 backdrop-blur-md flex items-center justify-center shadow-lg pointer-events-auto cursor-grab">
+                            <div class="w-1 h-1 md:w-1.5 md:h-1.5 rounded-full bg-[#B8A38E]"></div>
+                        </div>
                     </div>
                 </div>
             </div>
             
-            <div class="mt-8 flex justify-center pointer-events-none opacity-60">
-                <span class="text-[9px] md:text-[10px] uppercase tracking-[0.3em] text-[var(--text-color)] animate-pulse">← Arraste para auditar a infraestrutura →</span>
+            <div class="mt-4 md:mt-8 flex justify-center pointer-events-none opacity-80 drop-shadow-md shrink-0">
+                <span class="text-[8px] md:text-[10px] uppercase tracking-[0.3em] text-[var(--text-color)] animate-pulse">← Arraste para auditar a infraestrutura →</span>
             </div>
         </section>
 
-        <!-- A VISÃO DO ATELIER & PROVA SOCIAL -->
-        <section class="py-32 px-6 w-full max-w-5xl mx-auto border-t border-[var(--border-color)] reveal-on-scroll relative z-10 bg-[var(--bg-color)] flex flex-col md:flex-row gap-16 items-center">
-            <div class="w-full md:w-1/3 aspect-[3/4] bg-[#111] relative overflow-hidden filter grayscale contrast-125 shadow-2xl">
-                <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=800&auto=format&fit=crop" loading="lazy" decoding="async" class="w-full h-full object-cover" alt="Equipe GL.ID">
-                <div class="absolute inset-0 bg-black/20"></div>
-            </div>
-            <div class="w-full md:w-2/3">
-                <h3 class="text-[10px] md:text-xs uppercase tracking-[0.4em] text-[#B8A38E] mb-6">A Visão do Atelier</h3>
-                <p class="text-2xl md:text-4xl font-serif text-[var(--text-color)] leading-snug mb-8">
-                    "Nós construímos a GL.ID porque nos recusamos a ver marcas de alto valor limitadas por códigos genéricos e soluções de prateleira."
-                </p>
-                <span class="text-[10px] md:text-xs uppercase tracking-widest text-[var(--text-color)] opacity-60 block mb-16">— Thiago Grabski & Equipe GL.ID</span>
+        <!-- 4.5. O PADRÃO 2026 (GRELHA DE VÍDEOS DE ALTA PERFORMANCE) -->
+        <section class="py-20 md:py-32 px-6 w-full max-w-6xl mx-auto border-t border-[var(--border-color)] reveal-on-scroll relative z-10 bg-[var(--bg-color)] flex flex-col md:flex-row gap-10 md:gap-16 items-center">
+            
+            <div class="w-full md:w-5/12 aspect-[4/5] bg-[var(--border-color)] relative overflow-hidden shadow-2xl haptic-target shrink-0 p-[2px]" data-vibrate="5">
+                <div class="grid grid-cols-2 grid-rows-2 gap-[2px] w-full h-full relative z-0">
+                    <div class="relative bg-black overflow-hidden group">
+                        <video src="https://www.w3schools.com/html/mov_bbb.mp4" autoplay loop muted playsinline class="w-full h-full object-cover filter grayscale opacity-70 group-hover:opacity-100 transition-opacity duration-700"></video>
+                    </div>
+                    <div class="relative bg-black overflow-hidden group">
+                        <video src="https://www.w3schools.com/html/mov_bbb.mp4" autoplay loop muted playsinline class="w-full h-full object-cover filter grayscale opacity-70 group-hover:opacity-100 transition-opacity duration-700"></video>
+                    </div>
+                    <div class="relative bg-black overflow-hidden group">
+                        <video src="https://www.w3schools.com/html/mov_bbb.mp4" autoplay loop muted playsinline class="w-full h-full object-cover filter grayscale opacity-70 group-hover:opacity-100 transition-opacity duration-700"></video>
+                    </div>
+                    <div class="relative bg-black overflow-hidden group">
+                        <video src="https://www.w3schools.com/html/mov_bbb.mp4" autoplay loop muted playsinline class="w-full h-full object-cover filter grayscale opacity-70 group-hover:opacity-100 transition-opacity duration-700"></video>
+                    </div>
+                </div>
 
-                <div class="border-t border-[var(--border-color)] pt-12">
-                    <h4 class="text-[9px] md:text-[10px] uppercase tracking-[0.3em] text-[var(--text-color)] opacity-40 mb-6">Notas de Auditoria Externa</h4>
-                    <p class="text-[13px] md:text-base font-light italic text-[var(--text-color)] opacity-80 leading-relaxed mb-4">
-                        "A GL.ID não nos entregou um site, entregou um ativo que se pagou no primeiro mês. O nível de retenção de clientes high-ticket subiu instantaneamente."
-                    </p>
-                    <span class="text-[9px] md:text-[10px] uppercase tracking-widest text-[#B8A38E]">✦ Diretoria Executiva, Marca Privada</span>
+                <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent flex flex-col justify-end p-6 md:p-10 pointer-events-none z-10">
+                    <span class="gold-gradient-text text-3xl md:text-5xl font-serif tracking-widest mb-1 md:mb-2 font-bold">2026</span>
+                    <span class="text-[#F5F5F3] text-[8px] md:text-[10px] uppercase tracking-[0.4em] opacity-80">Visualizador de Tendências</span>
+                </div>
+            </div>
+            
+            <div class="w-full md:w-7/12">
+                <h3 class="text-[9px] md:text-xs uppercase tracking-[0.4em] text-[#B8A38E] mb-4">A Vanguarda Digital</h3>
+                <p class="text-xl md:text-3xl font-serif text-[var(--text-color)] leading-snug mb-6">
+                    "Não seguimos tendências. Codificamos a arquitetura sensorial que o mercado tentará copiar amanhã."
+                </p>
+                
+                <div class="flex flex-col gap-6 md:gap-8 mt-8 border-t border-[var(--border-color)] pt-8">
+                    <div class="flex items-start gap-4 md:gap-5">
+                        <div class="w-8 h-8 shrink-0 rounded-full border border-[#B8A38E] flex items-center justify-center bg-[var(--bg-color)]">
+                            <span class="text-[9px] md:text-[10px] gold-gradient-text">01</span>
+                        </div>
+                        <div>
+                            <h4 class="text-[10px] md:text-xs font-bold uppercase tracking-widest text-[var(--text-color)] mb-1 md:mb-2">Preloaders Cinéticos</h4>
+                            <p class="text-[10px] md:text-[13px] font-light text-[var(--text-color)] opacity-70 leading-relaxed">A primeira impressão não é uma página estática. Criamos "Salas de Espera" com física 3D que ancoram valor extremo antes do clique inicial.</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-4 md:gap-5">
+                        <div class="w-8 h-8 shrink-0 rounded-full border border-[#B8A38E] flex items-center justify-center bg-[var(--bg-color)]">
+                            <span class="text-[9px] md:text-[10px] gold-gradient-text">02</span>
+                        </div>
+                        <div>
+                            <h4 class="text-[10px] md:text-xs font-bold uppercase tracking-widest text-[var(--text-color)] mb-1 md:mb-2">Dualidade Tátil</h4>
+                            <p class="text-[10px] md:text-[13px] font-light text-[var(--text-color)] opacity-70 leading-relaxed">Abandonamos o "Dark Mode" genérico. Operamos com paletas de grife controladas pelo utilizador (Cashmere & Obsidian) para mimetizar luxo visual.</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-4 md:gap-5">
+                        <div class="w-8 h-8 shrink-0 rounded-full border border-[#B8A38E] flex items-center justify-center bg-[var(--bg-color)]">
+                            <span class="text-[9px] md:text-[10px] gold-gradient-text">03</span>
+                        </div>
+                        <div>
+                            <h4 class="text-[10px] md:text-xs font-bold uppercase tracking-widest text-[var(--text-color)] mb-1 md:mb-2">Haptic UX (Vibração Nativas)</h4>
+                            <p class="text-[10px] md:text-[13px] font-light text-[var(--text-color)] opacity-70 leading-relaxed">Através de micro-vibrações disparadas no smartphone do seu cliente, a tela deixa de ser um vidro frio e torna-se numa experiência sensorial e tátil.</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
 
-        <!-- NOVO: A METODOLOGIA (O ROADMAP DO ATELIER) -->
-        <section class="py-32 px-6 w-full max-w-6xl mx-auto border-t border-[var(--border-color)] reveal-on-scroll relative z-10 bg-[var(--bg-color)]">
-            <div class="text-center mb-20">
-                <h2 class="text-2xl md:text-4xl text-[var(--text-color)] mb-4 uppercase tracking-[0.2em] font-serif">A Metodologia de Escultura</h2>
-                <p class="text-[11px] md:text-sm uppercase tracking-widest text-[#B8A38E] opacity-80">Previsibilidade, Engenharia e Handover.</p>
+        <!-- ENGENHARIA DE CONVERSÃO -->
+        <section class="py-20 md:py-32 px-6 w-full max-w-6xl mx-auto border-t border-[var(--border-color)] reveal-on-scroll relative z-10 bg-[var(--bg-color)]">
+            <div class="text-center mb-12">
+                <h2 class="text-xl md:text-4xl text-[var(--text-color)] mb-3 uppercase tracking-[0.2em] font-serif">Engenharia de Conversão</h2>
+                <p class="text-[9px] md:text-sm uppercase tracking-widest text-[#B8A38E] opacity-80">Previsibilidade e Handover.</p>
             </div>
 
             <div class="relative">
-                <!-- Linha de conexão -->
                 <div class="process-line"></div>
                 
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-12 md:gap-6 relative z-10">
-                    <!-- Passo 1 -->
-                    <div class="flex flex-row md:flex-col gap-6 md:gap-8 haptic-target" data-vibrate="5">
-                        <div class="w-12 h-12 shrink-0 rounded-full bg-[var(--bg-color)] border border-[var(--border-color)] flex items-center justify-center text-[10px] font-bold text-[#B8A38E] shadow-[inset_0_0_10px_rgba(0,0,0,0.05)] relative">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-10 md:gap-6 relative z-10">
+                    <div class="flex flex-row md:flex-col gap-4 md:gap-8 items-start haptic-target" data-vibrate="5">
+                        <div class="w-10 h-10 md:w-12 md:h-12 shrink-0 rounded-full bg-[var(--bg-color)] border border-[var(--border-color)] flex items-center justify-center text-[9px] md:text-[10px] font-bold text-[#B8A38E] shadow-[inset_0_0_10px_rgba(0,0,0,0.05)] relative">
                             01
                             <div class="absolute inset-0 border border-[#B8A38E] rounded-full animate-ping opacity-20"></div>
                         </div>
                         <div>
-                            <h4 class="text-sm md:text-base uppercase tracking-widest text-[var(--text-color)] mb-3 font-serif">Raio-X & Estratégia</h4>
-                            <p class="text-[11px] md:text-xs font-light text-[var(--text-color)] opacity-70 leading-relaxed">Auditoria completa do seu funil atual, definição de KPIs e mapeamento da jornada do seu cliente High-Ticket.</p>
+                            <h4 class="text-xs md:text-base uppercase tracking-widest text-[var(--text-color)] mb-1 md:mb-3 font-serif">Raio-X & Estratégia</h4>
+                            <p class="text-[10px] md:text-xs font-light text-[var(--text-color)] opacity-70 leading-relaxed">Auditoria do seu funil atual, KPIs e mapeamento da jornada do seu cliente High-Ticket.</p>
                         </div>
                     </div>
-                    <!-- Passo 2 -->
-                    <div class="flex flex-row md:flex-col gap-6 md:gap-8 haptic-target" data-vibrate="5">
-                        <div class="w-12 h-12 shrink-0 rounded-full bg-[var(--bg-color)] border border-[var(--border-color)] flex items-center justify-center text-[10px] font-bold text-[#B8A38E] shadow-[inset_0_0_10px_rgba(0,0,0,0.05)]">02</div>
+                    <div class="flex flex-row md:flex-col gap-4 md:gap-8 items-start haptic-target" data-vibrate="5">
+                        <div class="w-10 h-10 md:w-12 md:h-12 shrink-0 rounded-full bg-[var(--bg-color)] border border-[var(--border-color)] flex items-center justify-center text-[9px] md:text-[10px] font-bold text-[#B8A38E] shadow-[inset_0_0_10px_rgba(0,0,0,0.05)]">02</div>
                         <div>
-                            <h4 class="text-sm md:text-base uppercase tracking-widest text-[var(--text-color)] mb-3 font-serif">Neurodesign Visual</h4>
-                            <p class="text-[11px] md:text-xs font-light text-[var(--text-color)] opacity-70 leading-relaxed">Criação de wireframes sensoriais no Figma. Aprovamos a estética e o fluxo de conversão antes de escrever qualquer código.</p>
+                            <h4 class="text-xs md:text-base uppercase tracking-widest text-[var(--text-color)] mb-1 md:mb-3 font-serif">Neurodesign Visual</h4>
+                            <p class="text-[10px] md:text-xs font-light text-[var(--text-color)] opacity-70 leading-relaxed">Criação de wireframes sensoriais no Figma. Aprovamos a estética antes do código.</p>
                         </div>
                     </div>
-                    <!-- Passo 3 -->
-                    <div class="flex flex-row md:flex-col gap-6 md:gap-8 haptic-target" data-vibrate="5">
-                        <div class="w-12 h-12 shrink-0 rounded-full bg-[#111] border border-[#B8A38E] flex items-center justify-center text-[10px] font-bold text-[#E8D5C4] shadow-lg">03</div>
+                    <div class="flex flex-row md:flex-col gap-4 md:gap-8 items-start haptic-target" data-vibrate="5">
+                        <div class="w-10 h-10 md:w-12 md:h-12 shrink-0 rounded-full bg-[#111] border border-[#B8A38E] flex items-center justify-center text-[9px] md:text-[10px] font-bold text-[#E8D5C4] shadow-lg">03</div>
                         <div>
-                            <h4 class="text-sm md:text-base uppercase tracking-widest text-[var(--text-color)] mb-3 font-serif">Engenharia Hand-Coded</h4>
-                            <p class="text-[11px] md:text-xs font-light text-[var(--text-color)] opacity-70 leading-relaxed">Sem construtores. Programação pura. Injeção de Haptic UX, micro-interações 3D e otimização cirúrgica de SEO 4.0.</p>
+                            <h4 class="text-xs md:text-base uppercase tracking-widest text-[var(--text-color)] mb-1 md:mb-3 font-serif">Programação Hand-Coded</h4>
+                            <p class="text-[10px] md:text-xs font-light text-[var(--text-color)] opacity-70 leading-relaxed">Injeção de Haptic UX, micro-interações 3D e otimização cirúrgica de SEO 4.0.</p>
                         </div>
                     </div>
-                    <!-- Passo 4 -->
-                    <div class="flex flex-row md:flex-col gap-6 md:gap-8 haptic-target" data-vibrate="5">
-                        <div class="w-12 h-12 shrink-0 rounded-full bg-[var(--bg-color)] border border-[var(--border-color)] flex items-center justify-center text-[10px] font-bold text-[#B8A38E] shadow-[inset_0_0_10px_rgba(0,0,0,0.05)]">04</div>
+                    <div class="flex flex-row md:flex-col gap-4 md:gap-8 items-start haptic-target" data-vibrate="5">
+                        <div class="w-10 h-10 md:w-12 md:h-12 shrink-0 rounded-full bg-[var(--bg-color)] border border-[var(--border-color)] flex items-center justify-center text-[9px] md:text-[10px] font-bold text-[#B8A38E] shadow-[inset_0_0_10px_rgba(0,0,0,0.05)]">04</div>
                         <div>
-                            <h4 class="text-sm md:text-base uppercase tracking-widest text-[var(--text-color)] mb-3 font-serif">Handover & Deploy</h4>
-                            <p class="text-[11px] md:text-xs font-light text-[var(--text-color)] opacity-70 leading-relaxed">Transição de servidor sem downtime. O Ativo é seu. Entregamos a infraestrutura rodando com máxima estabilidade.</p>
+                            <h4 class="text-xs md:text-base uppercase tracking-widest text-[var(--text-color)] mb-1 md:mb-3 font-serif">Handover & Deploy</h4>
+                            <p class="text-[10px] md:text-xs font-light text-[var(--text-color)] opacity-70 leading-relaxed">Transição de servidor sem downtime. Entregamos a infraestrutura com estabilidade.</p>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- 5. ARQUITETURA DE INVESTIMENTO PRIVATE (Mantido) -->
-        <section class="py-32 w-full bg-[var(--bg-color)] border-t border-[var(--border-color)] reveal-on-scroll relative z-10 overflow-hidden" aria-labelledby="pricing-title">
-            <div class="max-w-[1500px] mx-auto px-6">
-                <div class="text-center mb-16 max-w-4xl mx-auto">
-                    <h2 id="pricing-title" class="text-2xl md:text-3xl lg:text-4xl text-[var(--text-color)] mb-8 uppercase tracking-[0.2em] font-serif">Arquitetura de Investimento Private</h2>
-                    <p class="text-[13px] md:text-base text-[var(--text-color)] opacity-70 mb-10 font-light leading-relaxed">
-                        A Alfaiataria Digital da GL.ID não constrói e-commerces pesados em WordPress. Nós construímos vitrines de desejo e funis de altíssima performance. Escolha o seu nível de exclusividade:
+        <!-- 5. ARQUITETURA DE INVESTIMENTO PRIVATE (TABELAS DE PREÇO COMPLETAS E MATRIZADAS) -->
+        <section class="py-20 md:py-32 w-full bg-[var(--bg-color)] border-t border-[var(--border-color)] reveal-on-scroll relative z-10 overflow-hidden" aria-labelledby="pricing-title">
+            <div class="max-w-[1700px] mx-auto px-6">
+                <div class="text-center mb-10 md:mb-16 max-w-4xl mx-auto">
+                    <h2 id="pricing-title" class="text-xl md:text-3xl lg:text-4xl text-[var(--text-color)] mb-4 md:mb-8 uppercase tracking-[0.2em] font-serif">Arquitetura de Investimento Private</h2>
+                    <p class="text-[11px] md:text-base text-[var(--text-color)] opacity-70 mb-6 md:mb-10 font-light leading-relaxed">
+                        Do posicionamento fundacional de elite para <b>pequenos negócios locais</b> ao domínio digital absoluto para corporações high-ticket. Escolha o seu nível de exclusividade:
                     </p>
-                    <div class="inline-flex items-center justify-center gap-3 border border-[var(--border-color)] px-5 py-2.5 bg-[var(--text-color)] text-[var(--bg-color)] uppercase tracking-widest text-[9px] haptic-target" data-vibrate="5">
-                        <span class="w-1.5 h-1.5 rounded-full bg-[#B8A38E] animate-pulse"></span>
+                    <div class="inline-flex items-center justify-center gap-2 border border-[var(--border-color)] px-4 py-2 bg-[var(--text-color)] text-[var(--bg-color)] uppercase tracking-widest text-[8px] md:text-[9px] haptic-target" data-vibrate="5">
+                        <span class="w-1 h-1 rounded-full bg-[#B8A38E] animate-pulse"></span>
                         Zero WordPress. 100% Hand-Coded Puro.
                     </div>
                 </div>
             </div>
             
-            <div class="flex overflow-x-auto snap-x snap-mandatory elegant-scrollbar lg:grid lg:grid-cols-4 gap-6 lg:gap-0 items-stretch px-6 lg:px-12 max-w-[1500px] mx-auto pb-10 drag-slider" id="pricing-slider">
+            <div class="flex overflow-x-auto snap-x snap-mandatory elegant-scrollbar 2xl:grid 2xl:grid-cols-6 gap-4 md:gap-6 2xl:gap-6 items-stretch px-6 lg:px-12 max-w-[1900px] mx-auto pb-10 drag-slider" id="pricing-slider">
                 
-                <!-- TIER 00 -->
-                <div class="drag-item flex flex-col h-full relative border border-[var(--border-color)] p-8 xl:p-10 bg-[var(--bg-color)] hover:bg-[var(--cursor-focus)] transition-all duration-500 haptic-target backdrop-blur-sm overflow-hidden" data-vibrate="10">
-                    <div class="absolute -top-6 -right-2 text-[140px] font-serif opacity-[0.03] text-[var(--text-color)] leading-none pointer-events-none select-none z-0">00</div>
-                    <div class="relative z-10">
-                        <h3 class="text-base uppercase tracking-widest text-[var(--text-color)] mb-2 font-serif">Protocolo Empresarial</h3>
-                        <p class="text-[9px] uppercase tracking-[0.3em] text-[#B8A38E] mb-6">Presença Local Essencial</p>
-                        <div class="mb-8">
-                            <span class="text-[10px] md:text-xs line-through opacity-40 block mb-1 tracking-widest text-[var(--text-color)]">R$ 4.800</span>
-                            <span class="text-3xl font-serif text-[var(--text-color)] tracking-tight">R$ 2.490</span>
-                            <span class="text-[#B8A38E] text-[8px] md:text-[9px] uppercase tracking-[0.2em] border border-[#B8A38E]/30 px-2 py-1 mt-3 inline-block bg-[#B8A38E]/5">Condição Local Privilegiada</span>
+                <!-- TIER 00: NEXUS -->
+                <div class="drag-item flex flex-col h-full relative border border-[var(--border-color)] p-6 md:p-8 bg-[var(--bg-color)] hover:bg-[var(--cursor-focus)] transition-all duration-500 haptic-target backdrop-blur-sm overflow-hidden" data-vibrate="10">
+                    <div class="absolute -top-6 -right-2 text-[100px] md:text-[140px] font-serif opacity-[0.03] text-[var(--text-color)] leading-none pointer-events-none select-none z-0">00</div>
+                    <div class="relative z-10 flex-1 flex flex-col">
+                        <h3 class="text-sm md:text-base uppercase tracking-widest text-[var(--text-color)] mb-2 font-serif">Nexus</h3>
+                        <p class="text-[8px] md:text-[9px] uppercase tracking-[0.3em] text-[#B8A38E] mb-6">Presença Digital Pocket</p>
+                        
+                        <div class="mb-6 md:mb-8 mt-2 md:mt-4">
+                            <span class="text-[9px] md:text-xs line-through opacity-40 block mb-1 tracking-widest text-[var(--text-color)]">R$ 1.500</span>
+                            <span class="text-2xl md:text-3xl font-serif text-[var(--text-color)] tracking-tight">R$ 997</span>
+                            <span class="block text-[8px] md:text-[9px] mt-4 opacity-50 uppercase tracking-widest">Maturação: 07 Dias Úteis</span>
                         </div>
+                        
+                        <ul class="flex flex-col gap-2 md:gap-3 text-[10px] md:text-[11px] font-light tracking-wide text-[var(--text-color)] opacity-80 mb-6 flex-1 relative z-10">
+                            <li class="flex items-center gap-2 md:gap-3"><span class="text-[#B8A38E] text-[12px]">✦</span> Escopo: Hub de Links (Digital Card)</li>
+                            <li class="flex items-center gap-2 md:gap-3"><span class="text-[#B8A38E] text-[12px]">✦</span> Design: Identidade Visual GL.ID</li>
+                            <li class="flex items-center gap-2 md:gap-3"><span class="text-[#B8A38E] text-[12px]">✦</span> Infra: Estrutura Hand-Coded Básico</li>
+                            <li class="flex items-center gap-2 md:gap-3 opacity-30"><span class="text-[var(--text-color)] text-[10px] font-bold">✕</span> Otimização de SEO (Indexação)</li>
+                            <li class="flex items-center gap-2 md:gap-3 opacity-30"><span class="text-[var(--text-color)] text-[10px] font-bold">✕</span> Tracking de Conversão Avançado</li>
+                            <li class="flex items-center gap-2 md:gap-3 opacity-30"><span class="text-[var(--text-color)] text-[10px] font-bold">✕</span> Estratégia de Copywriting High-Ticket</li>
+                            <li class="flex items-center gap-2 md:gap-3 opacity-30"><span class="text-[var(--text-color)] text-[10px] font-bold">✕</span> Experiência Sensorial (Haptic UX)</li>
+                            <li class="flex items-center gap-2 md:gap-3 opacity-30"><span class="text-[var(--text-color)] text-[10px] font-bold">✕</span> Integrações Nativas (CRM/Checkout)</li>
+                            <li class="flex items-center gap-2 md:gap-3 opacity-30"><span class="text-[var(--text-color)] text-[10px] font-bold">✕</span> Engine WebGL & CMS Headless</li>
+                        </ul>
                     </div>
-                    <ul class="flex flex-col gap-4 text-[11px] md:text-xs font-light tracking-wide text-[var(--text-color)] opacity-80 mb-12 flex-1 relative z-10">
-                        <li class="flex items-start gap-3"><span class="text-[#B8A38E]">✦</span> Single-Page Essencial (Hand-coded)</li>
-                        <li class="flex items-start gap-3"><span class="text-[#B8A38E]">✦</span> SEO Local (Google Sync)</li>
-                        <li class="flex items-start gap-3"><span class="text-[#B8A38E]">✦</span> Roteamento Dinâmico WhatsApp API</li>
-                        <li class="flex items-start gap-3"><span class="text-[#B8A38E]">✦</span> Setup de Domínio & Hospedagem Edge</li>
-                        <li class="flex items-start gap-3 opacity-30 mt-4 pt-4 border-t border-[var(--border-color)]"><span class="text-[var(--text-color)]">✕</span> Haptic UX Sensorial</li>
-                        <li class="flex items-start gap-3 opacity-30"><span class="text-[var(--text-color)]">✕</span> Estratégia de Copywriting High-Ticket</li>
-                    </ul>
-                    <button class="mt-auto w-full border-t border-[var(--border-color)] text-[var(--text-color)] py-5 text-[10px] md:text-xs uppercase tracking-[0.3em] hover:bg-[var(--text-color)] hover:text-[var(--bg-color)] transition-colors haptic-target relative z-10 font-semibold" data-vibrate="15">Aplicar Agora</button>
+                    <button onclick="window.open('https://wa.me/5549999999999?text=Ol%C3%A1%20Thiago,%20desejo%20aplicar%20para%20o%20plano%20Nexus.', '_blank')" class="mt-auto w-full border-t border-[var(--border-color)] text-[var(--text-color)] py-4 text-[9px] md:text-xs uppercase tracking-[0.3em] hover:bg-[var(--text-color)] hover:text-[var(--bg-color)] transition-colors haptic-target relative z-10 font-semibold" data-vibrate="15">Aplicar Agora</button>
                 </div>
 
-                <!-- TIER 01 -->
-                <div class="drag-item flex flex-col h-full relative border border-[var(--border-color)] p-8 xl:p-10 bg-[var(--bg-color)] hover:bg-[var(--cursor-focus)] transition-all duration-500 haptic-target backdrop-blur-sm lg:border-l-0 overflow-hidden" data-vibrate="10">
-                    <div class="absolute -top-6 -right-2 text-[140px] font-serif opacity-[0.03] text-[var(--text-color)] leading-none pointer-events-none select-none z-0">01</div>
-                    <div class="relative z-10">
-                        <h3 class="text-base uppercase tracking-widest text-[var(--text-color)] mb-2 font-serif">Signature</h3>
-                        <p class="text-[9px] uppercase tracking-[0.3em] text-[#B8A38E] mb-6">Posicionamento de Autoridade</p>
-                        <div class="mb-8 mt-[22px]">
-                            <span class="text-3xl font-serif text-[var(--text-color)] tracking-tight">R$ 8.500</span>
+                <!-- TIER 01: ESSENTIEL -->
+                <div class="drag-item flex flex-col h-full relative border border-[var(--border-color)] p-6 md:p-8 bg-[var(--bg-color)] hover:bg-[var(--cursor-focus)] transition-all duration-500 haptic-target backdrop-blur-sm overflow-hidden" data-vibrate="10">
+                    <div class="absolute -top-6 -right-2 text-[100px] md:text-[140px] font-serif opacity-[0.03] text-[var(--text-color)] leading-none pointer-events-none select-none z-0">01</div>
+                    <div class="relative z-10 flex-1 flex flex-col">
+                        <h3 class="text-sm md:text-base uppercase tracking-widest text-[var(--text-color)] mb-2 font-serif">Essentiel</h3>
+                        <p class="text-[8px] md:text-[9px] uppercase tracking-[0.3em] text-[#B8A38E] mb-6">A Fundação Estratégica</p>
+                        
+                        <div class="mb-5 border border-[#B8A38E]/40 bg-[#111] text-[#F5F5F3] p-2 text-center relative overflow-hidden shadow-sm">
+                            <div class="absolute inset-0 bg-gradient-to-r from-[#B8A38E]/20 to-transparent"></div>
+                            <span class="block text-[9px] md:text-[10px] uppercase tracking-widest font-bold mb-1 relative z-10">3 Licenças (2 Reservadas)</span>
+                            <span class="block text-[8px] uppercase tracking-widest text-[#B8A38E] relative z-10">Expira em 05/05</span>
                         </div>
+
+                        <div class="mb-6 md:mb-8">
+                            <span class="text-[9px] md:text-xs line-through opacity-40 block mb-1 tracking-widest text-[var(--text-color)]">R$ 2.900</span>
+                            <span class="text-2xl md:text-3xl font-serif text-[var(--text-color)] tracking-tight">R$ 1.490</span>
+                            <span class="block text-[8px] md:text-[9px] mt-4 opacity-50 uppercase tracking-widest">Maturação: 15 Dias Úteis</span>
+                        </div>
+                        
+                        <ul class="flex flex-col gap-2 md:gap-3 text-[10px] md:text-[11px] font-light tracking-wide text-[var(--text-color)] opacity-80 mb-6 flex-1 relative z-10">
+                            <li class="flex items-center gap-2 md:gap-3"><span class="text-[#B8A38E] text-[12px]">✦</span> Escopo: Mini Landing Page Institucional</li>
+                            <li class="flex items-center gap-2 md:gap-3"><span class="text-[#B8A38E] text-[12px]">✦</span> Design: Identidade Visual Premium</li>
+                            <li class="flex items-center gap-2 md:gap-3"><span class="text-[#B8A38E] text-[12px]">✦</span> Infra: Hand-Coded & Servidor Edge</li>
+                            <li class="flex items-center gap-2 md:gap-3"><span class="text-[#B8A38E] text-[12px]">✦</span> Roteamento Dinâmico de WhatsApp</li>
+                            <li class="flex items-center gap-2 md:gap-3 opacity-30"><span class="text-[var(--text-color)] text-[10px] font-bold">✕</span> Tracking de Conversão Avançado</li>
+                            <li class="flex items-center gap-2 md:gap-3 opacity-30"><span class="text-[var(--text-color)] text-[10px] font-bold">✕</span> Estratégia de Copywriting High-Ticket</li>
+                            <li class="flex items-center gap-2 md:gap-3 opacity-30"><span class="text-[var(--text-color)] text-[10px] font-bold">✕</span> Experiência Sensorial (Haptic UX)</li>
+                            <li class="flex items-center gap-2 md:gap-3 opacity-30"><span class="text-[var(--text-color)] text-[10px] font-bold">✕</span> Integrações Nativas (CRM/Checkout)</li>
+                            <li class="flex items-center gap-2 md:gap-3 opacity-30"><span class="text-[var(--text-color)] text-[10px] font-bold">✕</span> Engine WebGL & CMS Headless</li>
+                        </ul>
                     </div>
-                    <ul class="flex flex-col gap-4 text-[11px] md:text-xs font-light tracking-wide text-[var(--text-color)] opacity-80 mb-12 flex-1 relative z-10">
-                        <li class="flex items-start gap-3"><span class="text-[#B8A38E]">✦</span> Landing Page Editorial (Neurodesign)</li>
-                        <li class="flex items-start gap-3"><span class="text-[#B8A38E]">✦</span> Copywriting Persuasivo (Seção a Seção)</li>
-                        <li class="flex items-start gap-3"><span class="text-[#B8A38E]">✦</span> Arquitetura Semântica (SEO 4.0 Nacional)</li>
-                        <li class="flex items-start gap-3"><span class="text-[#B8A38E]">✦</span> Performance Radical (Load Sub-0.8s)</li>
-                        <li class="flex items-start gap-3"><span class="text-[#B8A38E]">✦</span> Rastreio Base (Meta Pixel / GA4)</li>
-                        <li class="flex items-start gap-3 opacity-30 mt-4 pt-4 border-t border-[var(--border-color)]"><span class="text-[var(--text-color)]">✕</span> Haptic Feedback (Vibração Tátil)</li>
-                        <li class="flex items-start gap-3 opacity-30"><span class="text-[var(--text-color)]">✕</span> Integrações Avançadas (CRM/Checkout)</li>
-                    </ul>
-                    <button class="mt-auto w-full border-t border-[var(--border-color)] text-[var(--text-color)] py-5 text-[10px] md:text-xs uppercase tracking-[0.3em] hover:bg-[var(--text-color)] hover:text-[var(--bg-color)] transition-colors haptic-target relative z-10 font-semibold" data-vibrate="15">Aplicar Agora</button>
+                    <button onclick="window.open('https://wa.me/5549999999999?text=Ol%C3%A1%20Thiago,%20desejo%20aplicar%20para%20o%20plano%20Essentiel.', '_blank')" class="mt-auto w-full border-t border-[var(--border-color)] text-[var(--text-color)] py-4 text-[9px] md:text-xs uppercase tracking-[0.3em] hover:bg-[var(--text-color)] hover:text-[var(--bg-color)] transition-colors haptic-target relative z-10 font-semibold" data-vibrate="15">Aplicar Agora</button>
                 </div>
 
-                <!-- TIER 02 -->
-                <div class="drag-item flex flex-col h-full relative border border-[#B8A38E] p-10 xl:p-12 bg-[#111111] z-10 shadow-[0_0_40px_rgba(184,163,142,0.15)] lg:scale-[1.03] haptic-press haptic-target overflow-hidden text-[#F5F5F3]" data-vibrate="20">
-                    <div class="absolute inset-0 opacity-20 pointer-events-none z-0" style="background-image: url('https://glid.carrd.co/assets/images/image03.png?v=951bca55'); background-size: 90px; mix-blend-mode: screen; filter: grayscale(100%) invert(1);"></div>
-                    <div class="absolute -top-6 -right-2 text-[140px] font-serif opacity-[0.06] text-[#B8A38E] leading-none pointer-events-none select-none z-0">02</div>
+                <!-- TIER 02: PROTOCOLO EMPRESARIAL -->
+                <div class="drag-item flex flex-col h-full relative border border-[var(--border-color)] p-6 md:p-8 bg-[var(--bg-color)] hover:bg-[var(--cursor-focus)] transition-all duration-500 haptic-target backdrop-blur-sm overflow-hidden" data-vibrate="10">
+                    <div class="absolute -top-6 -right-2 text-[100px] md:text-[140px] font-serif opacity-[0.03] text-[var(--text-color)] leading-none pointer-events-none select-none z-0">01</div>
+                    <div class="relative z-10 flex-1 flex flex-col">
+                        <h3 class="text-sm md:text-base uppercase tracking-widest text-[var(--text-color)] mb-2 font-serif">Protocolo Empresarial</h3>
+                        <p class="text-[8px] md:text-[9px] uppercase tracking-[0.3em] text-[#B8A38E] mb-6">Presença Local Essencial</p>
+                        <div class="mb-6 md:mb-8 mt-2">
+                            <span class="text-[9px] md:text-xs line-through opacity-40 block mb-1 tracking-widest text-[var(--text-color)]">R$ 4.800</span>
+                            <span class="text-2xl md:text-3xl font-serif text-[var(--text-color)] tracking-tight">R$ 2.490</span>
+                            <span class="text-[#B8A38E] text-[7px] md:text-[9px] uppercase tracking-[0.2em] border border-[#B8A38E]/30 px-2 py-1 mt-2 inline-block bg-[#B8A38E]/5">Foco: Negócios Locais</span>
+                            <span class="block text-[8px] md:text-[9px] mt-4 opacity-50 uppercase tracking-widest">Maturação: 20 Dias Úteis</span>
+                        </div>
+                        <ul class="flex flex-col gap-2 md:gap-3 text-[10px] md:text-[11px] font-light tracking-wide text-[var(--text-color)] opacity-80 mb-6 flex-1 relative z-10">
+                            <li class="flex items-center gap-2 md:gap-3"><span class="text-[#B8A38E] text-[12px]">✦</span> Escopo: Single-Page Institucional (Completa)</li>
+                            <li class="flex items-center gap-2 md:gap-3"><span class="text-[#B8A38E] text-[12px]">✦</span> Design: Direção de Arte de Alto Padrão</li>
+                            <li class="flex items-center gap-2 md:gap-3"><span class="text-[#B8A38E] text-[12px]">✦</span> Infra: Hand-Coded & Servidor Edge</li>
+                            <li class="flex items-center gap-2 md:gap-3"><span class="text-[#B8A38E] text-[12px]">✦</span> Otimização de SEO (Local & Google Sync)</li>
+                            <li class="flex items-center gap-2 md:gap-3"><span class="text-[#B8A38E] text-[12px]">✦</span> Roteamento de WhatsApp Inteligente</li>
+                            <li class="flex items-center gap-2 md:gap-3 opacity-30"><span class="text-[var(--text-color)] text-[10px] font-bold">✕</span> Estratégia de Copywriting High-Ticket</li>
+                            <li class="flex items-center gap-2 md:gap-3 opacity-30"><span class="text-[var(--text-color)] text-[10px] font-bold">✕</span> Experiência Sensorial (Haptic UX)</li>
+                            <li class="flex items-center gap-2 md:gap-3 opacity-30"><span class="text-[var(--text-color)] text-[10px] font-bold">✕</span> Integrações Nativas (CRM/Checkout)</li>
+                            <li class="flex items-center gap-2 md:gap-3 opacity-30"><span class="text-[var(--text-color)] text-[10px] font-bold">✕</span> Engine WebGL & CMS Headless</li>
+                        </ul>
+                    </div>
+                    <button onclick="window.open('https://wa.me/5549999999999?text=Ol%C3%A1%20Thiago,%20desejo%20aplicar%20para%20o%20Protocolo%20Empresarial.', '_blank')" class="mt-auto w-full border-t border-[var(--border-color)] text-[var(--text-color)] py-4 text-[9px] md:text-xs uppercase tracking-[0.3em] hover:bg-[var(--text-color)] hover:text-[var(--bg-color)] transition-colors haptic-target relative z-10 font-semibold" data-vibrate="15">Aplicar Agora</button>
+                </div>
+
+                <!-- TIER 03: SIGNATURE -->
+                <div class="drag-item flex flex-col h-full relative border border-[var(--border-color)] p-6 md:p-8 bg-[var(--bg-color)] hover:bg-[var(--cursor-focus)] transition-all duration-500 haptic-target backdrop-blur-sm overflow-hidden" data-vibrate="10">
+                    <div class="absolute -top-6 -right-2 text-[100px] md:text-[140px] font-serif opacity-[0.03] text-[var(--text-color)] leading-none pointer-events-none select-none z-0">02</div>
+                    <div class="relative z-10 flex-1 flex flex-col">
+                        <h3 class="text-sm md:text-base uppercase tracking-widest text-[var(--text-color)] mb-2 font-serif">Signature</h3>
+                        <p class="text-[8px] md:text-[9px] uppercase tracking-[0.3em] text-[#B8A38E] mb-6">Posicionamento de Autoridade</p>
+                        <div class="mb-6 md:mb-8 mt-5 md:mt-8">
+                            <span class="text-2xl md:text-3xl font-serif text-[var(--text-color)] tracking-tight">R$ 8.500</span>
+                            <span class="block text-[8px] md:text-[9px] mt-4 opacity-50 uppercase tracking-widest">Maturação: 30 Dias Úteis</span>
+                        </div>
+                        <ul class="flex flex-col gap-2 md:gap-3 text-[10px] md:text-[11px] font-light tracking-wide text-[var(--text-color)] opacity-80 mb-6 flex-1 relative z-10">
+                            <li class="flex items-center gap-2 md:gap-3"><span class="text-[#B8A38E] text-[12px]">✦</span> Escopo: Landing Page Editorial Longa</li>
+                            <li class="flex items-center gap-2 md:gap-3"><span class="text-[#B8A38E] text-[12px]">✦</span> Design: Neurodesign Visual (Quiet Luxury)</li>
+                            <li class="flex items-center gap-2 md:gap-3"><span class="text-[#B8A38E] text-[12px]">✦</span> Infra: Hand-Coded & Servidor Edge</li>
+                            <li class="flex items-center gap-2 md:gap-3"><span class="text-[#B8A38E] text-[12px]">✦</span> SEO 4.0 Estrutural & Semântico Nacional</li>
+                            <li class="flex items-center gap-2 md:gap-3"><span class="text-[#B8A38E] text-[12px]">✦</span> Tracking de Conversão Base (Pixel/GA4)</li>
+                            <li class="flex items-center gap-2 md:gap-3"><span class="text-[#B8A38E] text-[12px]">✦</span> Estratégia de Copywriting Persuasivo</li>
+                            <li class="flex items-center gap-2 md:gap-3 opacity-30"><span class="text-[var(--text-color)] text-[10px] font-bold">✕</span> Experiência Sensorial (Haptic UX)</li>
+                            <li class="flex items-center gap-2 md:gap-3 opacity-30"><span class="text-[var(--text-color)] text-[10px] font-bold">✕</span> Integrações Nativas (CRM/Checkout)</li>
+                            <li class="flex items-center gap-2 md:gap-3 opacity-30"><span class="text-[var(--text-color)] text-[10px] font-bold">✕</span> Engine WebGL & CMS Headless</li>
+                        </ul>
+                    </div>
+                    <button onclick="window.open('https://wa.me/5549999999999?text=Ol%C3%A1%20Thiago,%20desejo%20aplicar%20para%20o%20Signature.', '_blank')" class="mt-auto w-full border-t border-[var(--border-color)] text-[var(--text-color)] py-4 text-[9px] md:text-xs uppercase tracking-[0.3em] hover:bg-[var(--text-color)] hover:text-[var(--bg-color)] transition-colors haptic-target relative z-10 font-semibold" data-vibrate="15">Aplicar Agora</button>
+                </div>
+
+                <!-- TIER 04: ALFAIATARIA DE FUNIL (MONOLITO NEGRO) -->
+                <div class="drag-item flex flex-col h-full relative border border-[#B8A38E] p-8 md:p-12 bg-[#111111] z-20 shadow-[0_0_40px_rgba(184,163,142,0.15)] lg:scale-[1.03] haptic-press haptic-target overflow-hidden text-[#F5F5F3]" data-vibrate="20">
+                    <div class="absolute inset-0 opacity-5 pointer-events-none z-0" style="background-image: url('https://glid.carrd.co/assets/images/image03.png?v=951bca55'); background-size: 90px; mix-blend-mode: screen; filter: grayscale(100%) invert(1);"></div>
+                    <div class="absolute -top-6 -right-2 text-[100px] md:text-[140px] font-serif opacity-[0.02] text-[#B8A38E] leading-none pointer-events-none select-none z-0">03</div>
                     
-                    <div class="absolute -top-4 left-1/2 transform -translate-x-1/2 gold-gradient-bg text-[#111] px-6 py-2 text-[9px] md:text-[10px] uppercase tracking-[0.4em] whitespace-nowrap shadow-lg font-bold z-20">
+                    <div class="absolute -top-3 md:-top-4 left-1/2 transform -translate-x-1/2 gold-gradient-bg text-[#111] px-4 md:px-6 py-1.5 md:py-2 text-[8px] md:text-[10px] uppercase tracking-[0.4em] whitespace-nowrap shadow-lg font-bold z-20">
                         A Escolha da Elite
                     </div>
-                    <div class="relative z-10">
-                        <h3 class="text-xl uppercase tracking-widest text-[#F5F5F3] mb-2 font-serif mt-2">Alfaiataria de Funil</h3>
-                        <p class="text-[9px] uppercase tracking-[0.3em] text-[#B8A38E] mb-6">A Experiência Private High-Ticket</p>
-                        <div class="mb-8 mt-2">
-                            <span class="text-4xl font-serif gold-gradient-text tracking-tight font-bold">R$ 14.500</span>
+                    <div class="relative z-10 flex-1 flex flex-col">
+                        <h3 class="text-base md:text-xl uppercase tracking-widest text-[#F5F5F3] mb-2 font-serif mt-2">Alfaiataria de Funil</h3>
+                        <p class="text-[8px] md:text-[9px] uppercase tracking-[0.3em] text-[#B8A38E] mb-6">A Experiência Private High-Ticket</p>
+                        <div class="mb-6 md:mb-8 mt-2">
+                            <span class="text-3xl md:text-4xl font-serif gold-gradient-text tracking-tight font-bold">R$ 14.500</span>
+                            <span class="block text-[8px] md:text-[9px] mt-4 text-[#B8A38E] uppercase tracking-widest">Maturação: 45 Dias Úteis</span>
                         </div>
+                        <ul class="flex flex-col gap-2 md:gap-3 text-[10px] md:text-[11px] font-light tracking-wide text-[#F5F5F3] opacity-90 mb-6 flex-1 relative z-10">
+                            <li class="flex items-center gap-2 md:gap-3"><span class="text-[#B8A38E] text-[12px]">✦</span> Escopo: Funil de Escassez (Até 3 Páginas)</li>
+                            <li class="flex items-center gap-2 md:gap-3"><span class="text-[#B8A38E] text-[12px]">✦</span> Design: UI Sensorial com Micro-interações 3D</li>
+                            <li class="flex items-center gap-2 md:gap-3"><span class="text-[#B8A38E] text-[12px]">✦</span> Infra: Hand-Coded BLAZING & Servidor Edge</li>
+                            <li class="flex items-center gap-2 md:gap-3"><span class="text-[#B8A38E] text-[12px]">✦</span> SEO 4.0 Nacional c/ Estrutura de Clusters</li>
+                            <li class="flex items-center gap-2 md:gap-3"><span class="text-[#B8A38E] text-[12px]">✦</span> Tracking Server-Side (API de Conversão Meta)</li>
+                            <li class="flex items-center gap-2 md:gap-3"><span class="text-[#B8A38E] text-[12px]">✦</span> Estratégia de Copywriting High-Ticket Injetado</li>
+                            <li class="flex items-center gap-2 md:gap-3"><span class="text-[#B8A38E] text-[12px]">✦</span> Experiência Sensorial (Integração Haptic UX)</li>
+                            <li class="flex items-center gap-2 md:gap-3"><span class="text-[#B8A38E] text-[12px]">✦</span> Integrações Nativas de Alta Fricção (CRM/Stripe)</li>
+                            <li class="flex items-center gap-2 md:gap-3 opacity-40"><span class="text-[#F5F5F3] text-[10px] font-bold">✕</span> Engine WebGL Cinematográfico & CMS Headless</li>
+                        </ul>
                     </div>
-                    <ul class="flex flex-col gap-4 text-[11px] md:text-xs font-light tracking-wide text-[#F5F5F3] opacity-90 mb-12 flex-1 relative z-10">
-                        <li class="flex items-start gap-3"><span class="text-[#B8A38E]">✦</span> Funil de Escassez (Até 3 Páginas)</li>
-                        <li class="flex items-start gap-3"><span class="text-[#B8A38E]">✦</span> Experiência Sensorial (Haptic UX)</li>
-                        <li class="flex items-start gap-3"><span class="text-[#B8A38E]">✦</span> Micro-interações 3D & Parallax Avançado</li>
-                        <li class="flex items-start gap-3"><span class="text-[#B8A38E]">✦</span> Tracking Server-Side (CAPI do Meta)</li>
-                        <li class="flex items-start gap-3"><span class="text-[#B8A38E]">✦</span> Redirecionamento de Eventos de Conversão</li>
-                        <li class="flex items-start gap-3"><span class="text-[#B8A38E]">✦</span> Integração Nativa (Checkouts e CRMs)</li>
-                        <li class="flex items-start gap-3 opacity-30 mt-4 pt-4 border-t border-[#333]"><span class="text-[#F5F5F3]">✕</span> Ecossistema Escalável Headless</li>
-                    </ul>
-                    <button class="mt-auto w-full gold-gradient-bg text-[#111] py-5 text-[10px] md:text-xs uppercase tracking-[0.3em] font-bold hover:brightness-110 transition-all shadow-[0_10px_30px_rgba(184,163,142,0.2)] haptic-target relative z-10" data-vibrate="30">
+                    <button onclick="window.open('https://wa.me/5549999999999?text=Ol%C3%A1%20Thiago,%20desejo%20reservar%20uma%20vaga%20para%20a%20Alfaiataria%20de%20Funil.', '_blank')" class="mt-auto w-full gold-gradient-bg text-[#111] py-4 md:py-5 text-[9px] md:text-xs uppercase tracking-[0.3em] font-bold hover:brightness-110 transition-all shadow-[0_10px_30px_rgba(184,163,142,0.2)] haptic-target relative z-10" data-vibrate="30">
                         Reservar Vaga no Atelier
                     </button>
                 </div>
 
-                <!-- TIER 03 -->
-                <div class="drag-item flex flex-col h-full relative border border-[var(--border-color)] p-8 xl:p-10 bg-[var(--bg-color)] hover:bg-[var(--cursor-focus)] transition-all duration-500 haptic-target backdrop-blur-sm lg:border-l-0 overflow-hidden" data-vibrate="10">
-                    <div class="absolute -top-6 -right-2 text-[140px] font-serif opacity-[0.03] text-[var(--text-color)] leading-none pointer-events-none select-none z-0">03</div>
-                    <div class="relative z-10">
-                        <h3 class="text-base uppercase tracking-widest text-[var(--text-color)] mb-2 font-serif">Haute Couture</h3>
-                        <p class="text-[9px] uppercase tracking-[0.3em] text-[#B8A38E] mb-6">Domínio Digital Absoluto</p>
-                        <div class="mb-8 flex flex-col justify-center">
-                            <span class="text-[9px] uppercase tracking-widest opacity-50 text-[var(--text-color)] mb-1">A partir de</span>
-                            <span class="text-3xl font-serif text-[var(--text-color)] tracking-tight">R$ 28.000</span>
+                <!-- TIER 05: HAUTE COUTURE -->
+                <div class="drag-item flex flex-col h-full relative border border-[var(--border-color)] p-6 md:p-8 bg-[var(--bg-color)] hover:bg-[var(--cursor-focus)] transition-all duration-500 haptic-target backdrop-blur-sm overflow-hidden" data-vibrate="10">
+                    <div class="absolute -top-6 -right-2 text-[100px] md:text-[140px] font-serif opacity-[0.03] text-[var(--text-color)] leading-none pointer-events-none select-none z-0">04</div>
+                    <div class="relative z-10 flex-1 flex flex-col">
+                        <h3 class="text-sm md:text-base uppercase tracking-widest text-[var(--text-color)] mb-2 font-serif">Haute Couture</h3>
+                        <p class="text-[8px] md:text-[9px] uppercase tracking-[0.3em] text-[#B8A38E] mb-6">Domínio Digital Absoluto</p>
+                        <div class="mb-6 md:mb-8 flex flex-col justify-center mt-2">
+                            <span class="text-[8px] md:text-[9px] uppercase tracking-widest opacity-50 text-[var(--text-color)] mb-1">A partir de</span>
+                            <span class="text-2xl md:text-3xl font-serif text-[var(--text-color)] tracking-tight">R$ 28.000</span>
+                            <span class="block text-[8px] md:text-[9px] mt-4 opacity-50 uppercase tracking-widest">Maturação: Sob Auditoria Técnica</span>
                         </div>
+                        <ul class="flex flex-col gap-2 md:gap-3 text-[10px] md:text-[11px] font-light tracking-wide text-[var(--text-color)] opacity-80 mb-6 flex-1 relative z-10">
+                            <li class="flex items-center gap-2 md:gap-3"><span class="text-[#B8A38E] text-[12px]">✦</span> Escopo: Ecossistema Multi-Vetor Ilimitado</li>
+                            <li class="flex items-center gap-2 md:gap-3"><span class="text-[#B8A38E] text-[12px]">✦</span> Design: Direção de Arte Cinematográfica Imersiva</li>
+                            <li class="flex items-center gap-2 md:gap-3"><span class="text-[#B8A38E] text-[12px]">✦</span> Infra: Arquitetura Avançada Headless (Sanity/Strapi)</li>
+                            <li class="flex items-center gap-2 md:gap-3"><span class="text-[#B8A38E] text-[12px]">✦</span> SEO Enterprise Técnico, Semântico e Estrutural</li>
+                            <li class="flex items-center gap-2 md:gap-3"><span class="text-[#B8A38E] text-[12px]">✦</span> Tracking de Conversão Avançado (CAPI + GTM)</li>
+                            <li class="flex items-center gap-2 md:gap-3"><span class="text-[#B8A38E] text-[12px]">✦</span> Estratégia de Autoridade e Copywriting Nativo</li>
+                            <li class="flex items-center gap-2 md:gap-3"><span class="text-[#B8A38E] text-[12px]">✦</span> Experiência Sensorial Extrema (Haptic UX)</li>
+                            <li class="flex items-center gap-2 md:gap-3"><span class="text-[#B8A38E] text-[12px]">✦</span> Automações Ciber-Físicas Avançadas (Webhooks)</li>
+                            <li class="flex items-center gap-2 md:gap-3"><span class="text-[#B8A38E] text-[12px]">✦</span> Renderização WebGL Cinetica (Modelagem 3D Injetada)</li>
+                        </ul>
                     </div>
-                    <ul class="flex flex-col gap-4 text-[11px] md:text-xs font-light tracking-wide text-[var(--text-color)] opacity-80 mb-12 flex-1 relative z-10">
-                        <li class="flex items-start gap-3"><span class="text-[#B8A38E]">✦</span> Ecossistema Multi-Vetor (Págs Ilimitadas)</li>
-                        <li class="flex items-start gap-3"><span class="text-[#B8A38E]">✦</span> Renderização WebGL (Cinemáticas Fluidas)</li>
-                        <li class="flex items-start gap-3"><span class="text-[#B8A38E]">✦</span> Arquitetura Headless (Sanity/Strapi)</li>
-                        <li class="flex items-start gap-3"><span class="text-[#B8A38E]">✦</span> Data Room Analytics Personalizado</li>
-                        <li class="flex items-start gap-3"><span class="text-[#B8A38E]">✦</span> Automação Ciber-Física (Webhooks)</li>
-                        <li class="flex items-start gap-3"><span class="text-[#B8A38E]">✦</span> Sessão Privada de Planejamento</li>
-                        <li class="flex items-start gap-3"><span class="text-[#B8A38E]">✦</span> Acompanhamento Direto c/ Thiago Grabski</li>
-                    </ul>
-                    <button class="mt-auto w-full border-t border-[var(--border-color)] text-[var(--text-color)] py-5 text-[10px] md:text-xs uppercase tracking-[0.3em] hover:bg-[var(--text-color)] hover:text-[var(--bg-color)] transition-colors haptic-target relative z-10 font-semibold" data-vibrate="15">Aplicar para Seleção</button>
+                    <button onclick="window.open('https://wa.me/5549999999999?text=Ol%C3%A1%20Thiago,%20gostaria%20de%20aplicar%20para%20a%20sele%C3%A7%C3%A3o%20do%20plano%20Haute%20Couture.', '_blank')" class="mt-auto w-full border-t border-[var(--border-color)] text-[var(--text-color)] py-4 text-[9px] md:text-xs uppercase tracking-[0.3em] hover:bg-[var(--text-color)] hover:text-[var(--bg-color)] transition-colors haptic-target relative z-10 font-semibold" data-vibrate="15">Aplicar para Seleção</button>
                 </div>
 
-                <div class="shrink-0 w-2 lg:hidden"></div>
+                <div class="shrink-0 w-2 2xl:hidden"></div>
             </div>
         </section>
 
-        <!-- NOVO: O SELO DE SLA (Garantia Contratual Absoluta) -->
-        <section class="py-12 w-full bg-[var(--bg-color)] border-t border-[var(--border-color)] reveal-on-scroll relative z-10">
+        <!-- O SELO DE SLA -->
+        <section class="py-12 md:py-16 w-full bg-[var(--bg-color)] border-t border-[var(--border-color)] reveal-on-scroll relative z-10">
             <div class="max-w-4xl mx-auto px-6 flex flex-col md:flex-row items-center justify-center gap-6 text-center md:text-left">
                 <div class="w-16 h-16 rounded-full border border-[#B8A38E] flex items-center justify-center bg-[var(--bg-color)] shadow-[inset_0_0_15px_rgba(184,163,142,0.2)] shrink-0 haptic-target" data-vibrate="10">
                     <span class="text-xl gold-gradient-text">✦</span>
@@ -642,61 +958,107 @@
             </div>
         </section>
 
-        <!-- 5.5. PARÂMETROS DE OPERAÇÃO (Crivo de Objeções) -->
-        <section class="py-24 px-6 w-full max-w-6xl mx-auto border-t border-[var(--border-color)] reveal-on-scroll relative z-10 bg-[var(--bg-color)]">
-            <div class="text-center mb-16">
-                <h3 class="text-xl md:text-2xl font-serif text-[var(--text-color)] uppercase tracking-[0.2em]">Parâmetros de Operação</h3>
-                <p class="text-[10px] md:text-xs uppercase tracking-[0.3em] text-[#B8A38E] mt-4">Transparência Técnica Absoluta</p>
+        <!-- FAQ DE ELITE & CONDIÇÕES DE PAGAMENTO (COMPLIANCE) -->
+        <section class="py-16 md:py-24 px-6 w-full max-w-3xl mx-auto reveal-on-scroll relative z-10 bg-[var(--bg-color)] border-t border-[var(--border-color)]">
+            <div class="text-center mb-12 md:mb-16">
+                <h3 class="text-lg md:text-2xl font-serif text-[var(--text-color)] uppercase tracking-[0.2em]">Dossiê de Operação</h3>
+                <p class="text-[9px] md:text-xs uppercase tracking-[0.3em] text-[#B8A38E] mt-3">Transparência & Perguntas Frequentes</p>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
-                <div class="border-l border-[#B8A38E] pl-6 haptic-target" data-vibrate="5">
-                    <h4 class="text-[11px] md:text-xs uppercase tracking-widest text-[var(--text-color)] mb-3 font-bold">01. Independência Tecnológica</h4>
-                    <p class="text-[12px] md:text-sm font-light text-[var(--text-color)] opacity-70 leading-relaxed">Você não se torna refém da agência. O código é purificado e entregue de forma autônoma. O Ativo é 100% propriedade da sua marca, hospedado no seu ambiente.</p>
+            
+            <div class="flex flex-col gap-4">
+                <div class="border-b border-[var(--border-color)] pb-4 faq-item group cursor-pointer haptic-target" data-vibrate="5">
+                    <div class="flex justify-between items-center">
+                        <h4 class="text-[11px] md:text-xs uppercase tracking-widest text-[var(--text-color)] font-bold">Qual é o formato de investimento e pagamento?</h4>
+                        <span class="text-xl text-[#B8A38E] faq-icon">+</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p class="text-[12px] md:text-sm font-light text-[var(--text-color)] opacity-70 leading-relaxed mt-2">
+                            Operamos num modelo de segurança mútua e compromisso absoluto. Para iniciarmos a arquitetura do seu projeto, requeremos <b>50% de sinal</b> para reserva de agenda e alocação da equipa de engenharia. Os restantes <b>50% são pagos apenas no Handover</b> (entrega e aprovação final) do ativo.
+                        </p>
+                    </div>
                 </div>
-                <div class="border-l border-[#B8A38E] pl-6 haptic-target" data-vibrate="5">
-                    <h4 class="text-[11px] md:text-xs uppercase tracking-widest text-[var(--text-color)] mb-3 font-bold">02. Transição Sem Downtime</h4>
-                    <p class="text-[12px] md:text-sm font-light text-[var(--text-color)] opacity-70 leading-relaxed">Se já possui um site, a nossa arquitetura é erguida num ambiente paralelo. A virada de chave acontece em milissegundos, sem que o seu fluxo de caixa atual caia.</p>
+
+                <div class="border-b border-[var(--border-color)] pb-4 faq-item group cursor-pointer haptic-target" data-vibrate="5">
+                    <div class="flex justify-between items-center">
+                        <h4 class="text-[11px] md:text-xs uppercase tracking-widest text-[var(--text-color)] font-bold">O que é a vibração celular (Haptic UX)?</h4>
+                        <span class="text-xl text-[#B8A38E] faq-icon">+</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p class="text-[12px] md:text-sm font-light text-[var(--text-color)] opacity-70 leading-relaxed mt-2">
+                            Haptic UX é a integração de micro-vibrações (como as que sente ao digitar no teclado do iPhone). Programamos o código do seu site para comunicar diretamente com o motor vibratório do smartphone do seu cliente. Quando ele clica num botão de compra, o telemóvel vibra, criando uma resposta física e emocional (Neurodesign) que aumenta a retenção e a conversão.
+                        </p>
+                    </div>
                 </div>
-                <div class="border-l border-[#B8A38E] pl-6 haptic-target" data-vibrate="5">
-                    <h4 class="text-[11px] md:text-xs uppercase tracking-widest text-[var(--text-color)] mb-3 font-bold">03. Manutenção Zero-Atrito</h4>
-                    <p class="text-[12px] md:text-sm font-light text-[var(--text-color)] opacity-70 leading-relaxed">Sites em WordPress exigem atualizações semanais para não quebrarem. Um ecossistema *Hand-coded* é estático, blindado contra invasões comuns e requer virtualmente zero manutenção técnica.</p>
+
+                <div class="border-b border-[var(--border-color)] pb-4 faq-item group cursor-pointer haptic-target" data-vibrate="5">
+                    <div class="flex justify-between items-center">
+                        <h4 class="text-[11px] md:text-xs uppercase tracking-widest text-[var(--text-color)] font-bold">Tenho de pagar mensalidades ou manutenção?</h4>
+                        <span class="text-xl text-[#B8A38E] faq-icon">+</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p class="text-[12px] md:text-sm font-light text-[var(--text-color)] opacity-70 leading-relaxed mt-2">
+                            Não. Diferente de agências que o prendem a contratos de manutenção devido à fragilidade do WordPress, o código <i>hand-coded</i> da GL.ID é puro e estático. O Ativo é 100% sua propriedade e não requer atualizações constantes contra hackers. Custos recorrentes resumem-se apenas à hospedagem básica do seu domínio.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="border-b border-[var(--border-color)] pb-4 faq-item group cursor-pointer haptic-target" data-vibrate="5">
+                    <div class="flex justify-between items-center">
+                        <h4 class="text-[11px] md:text-xs uppercase tracking-widest text-[var(--text-color)] font-bold">O meu site atual vai ficar offline durante o processo?</h4>
+                        <span class="text-xl text-[#B8A38E] faq-icon">+</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p class="text-[12px] md:text-sm font-light text-[var(--text-color)] opacity-70 leading-relaxed mt-2">
+                            Absolutamente não. A nossa arquitetura é erguida num ambiente de testes paralelo e privado (Staging). O seu site atual continua a operar e a gerar vendas normalmente. A transição de servidor (Deploy) acontece em milissegundos, garantindo <b>zero downtime</b> na sua operação.
+                        </p>
+                    </div>
                 </div>
             </div>
         </section>
 
-        <!-- 6. CTA DE ALTA FRICÇÃO -->
-        <section class="py-40 px-6 w-full bg-[#111111] text-[#F5F5F3] text-center reveal-on-scroll relative z-10">
-            <h2 class="text-2xl md:text-4xl lg:text-5xl mb-16 uppercase tracking-[0.2em] max-w-4xl mx-auto leading-tight font-serif">
-                Vamos elevar o seu posicionamento digital?
+        <!-- CTA DE ALTA FRICÇÃO -->
+        <section class="py-20 md:py-40 px-6 w-full bg-[#111111] text-[#F5F5F3] text-center reveal-on-scroll relative z-10 flex flex-col justify-center h-[70dvh] md:h-auto border-t border-[#333]">
+            <h2 class="text-xl md:text-4xl lg:text-5xl mb-10 md:mb-16 uppercase tracking-[0.2em] max-w-4xl mx-auto leading-tight font-serif">
+                Inicie o Protocolo de Elevação.
             </h2>
-            <!-- Dica de Neurovenda: O texto de WhatsApp pode ser ajustado com um link já preenchido -->
-            <a href="https://wa.me/5549999999999?text=Ol%C3%A1%20Thiago,%20estou%20no%20Atelier%20da%20GL.ID%20e%20gostaria%20de%20solicitar%20uma%20an%C3%A1lise%20private." target="_blank" rel="noopener noreferrer" class="inline-block gold-gradient-bg text-[#2C2C2C] px-8 md:px-12 py-5 md:py-6 uppercase tracking-[0.3em] text-[10px] md:text-xs font-bold haptic-press shadow-[0_0_30px_rgba(184,163,142,0.2)] haptic-target" data-vibrate="40">
+            <a href="https://wa.me/5549999999999?text=Ol%C3%A1%20Thiago,%20estou%20no%20Atelier%20da%20GL.ID%20e%20gostaria%20de%20solicitar%20uma%20an%C3%A1lise%20private." target="_blank" rel="noopener noreferrer" class="inline-block gold-gradient-bg text-[#2C2C2C] px-8 md:px-12 py-5 md:py-6 uppercase tracking-[0.3em] text-[9px] md:text-xs font-bold haptic-press shadow-[0_0_30px_rgba(184,163,142,0.2)] haptic-target" data-vibrate="40">
                 Agendar Análise Private com Thiago Grabski
             </a>
         </section>
 
-        <!-- 7. RODAPÉ INSTITUCIONAL -->
-        <footer class="bg-[#0A0A0A] text-[#F5F5F3] py-20 px-6 md:px-12 w-full text-xs font-light tracking-wide border-t border-[#222] relative z-10">
-            <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-16 mb-16">
-                <div>
+        <!-- RODAPÉ INSTITUCIONAL PROFISSIONAL -->
+        <footer class="bg-[#050505] text-[#F5F5F3] py-16 md:py-24 px-6 md:px-12 w-full text-xs font-light tracking-wide relative z-10">
+            <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-12 md:gap-8 mb-16">
+                <!-- Branding -->
+                <div class="md:col-span-2">
                     <div class="font-serif text-2xl tracking-[0.3em] uppercase font-bold mb-6 gold-gradient-text">GLID</div>
-                    <p class="opacity-50 leading-loose">Hand-coded.<br>Performance Radical.<br>Luxo Silencioso.</p>
+                    <p class="opacity-50 leading-relaxed max-w-sm mb-6">
+                        Alfaiataria Digital Hand-coded para marcas High-Ticket.<br> Onde a performance radical encontra o luxo silencioso.
+                    </p>
                 </div>
-                <div class="flex flex-col gap-4 opacity-50 uppercase tracking-widest">
-                    <span class="text-[#B8A38E] mb-2 text-[10px]">Legal</span>
+                
+                <!-- Legal & Compliance -->
+                <div class="flex flex-col gap-4 opacity-70 uppercase tracking-widest text-[9px] md:text-[10px]">
+                    <span class="text-[#B8A38E] mb-2 font-bold opacity-100">Compliance & Legal</span>
                     <a href="#" class="hover:text-[#E8D5C4] transition-colors">Política de Privacidade</a>
-                    <a href="#" class="hover:text-[#E8D5C4] transition-colors">Termos de Uso</a>
-                    <a href="#" class="hover:text-[#E8D5C4] transition-colors">Compliance LGPD</a>
+                    <a href="#" class="hover:text-[#E8D5C4] transition-colors">Termos & Condições de Uso</a>
+                    <a href="#" class="hover:text-[#E8D5C4] transition-colors">Governança LGPD</a>
+                    <a href="#" class="hover:text-[#E8D5C4] transition-colors">Política de Cookies</a>
                 </div>
-                <div class="opacity-50 uppercase tracking-widest leading-loose">
-                    <span class="text-[#B8A38E] mb-2 text-[10px] block">Sede</span>
+                
+                <!-- Sede & Contato -->
+                <div class="opacity-70 uppercase tracking-widest leading-loose text-[9px] md:text-[10px]">
+                    <span class="text-[#B8A38E] mb-2 font-bold opacity-100 block">Sede Operacional</span>
                     <p>GL.ID PRIVATE DIGITAL ATELIER</p>
                     <p>Chapecó, SC, Brasil</p>
-                    <p>CNPJ: 00.000.000/0000-00</p>
+                    <p class="mt-4">CNPJ: 00.000.000/0000-00</p>
+                    <p>atendimento@glid.com.br</p>
                 </div>
             </div>
-            <div class="max-w-7xl mx-auto border-t border-[#B8A38E]/20 pt-8 text-center text-[10px] opacity-30 uppercase tracking-[0.4em]">
-                &copy; 2026 GLID. Todos os direitos reservados.
+            
+            <div class="max-w-7xl mx-auto border-t border-[#333] mt-12 pt-8 text-[8px] md:text-[9px] text-center opacity-40 tracking-[0.5em] uppercase">
+                Este site está protegido por reCAPTCHA e aplica-se a <a href="https://policies.google.com/privacy" target="_blank" class="underline hover:text-[#B8A38E]">Política de Privacidade</a> e os <a href="https://policies.google.com/terms" target="_blank" class="underline hover:text-[#B8A38E]">Termos de Serviço</a> do Google.<br><br>
+                &copy; 2026 GLID ATELIER. TODOS OS DIREITOS RESERVADOS.
             </div>
         </footer>
 
@@ -718,7 +1080,7 @@
             const themeMeta = document.getElementById('theme-color-meta');
             const paperTexture = document.getElementById('paper-texture');
 
-            // --- LÓGICA DO PRELOADER (INTACTA) ---
+            // --- LÓGICA DO PRELOADER ---
             let attentionTimer = setTimeout(() => { visionToggle.classList.add('pulse-active'); }, 4000);
 
             let isObsidian = false;
@@ -758,11 +1120,18 @@
                 preloader.style.setProperty('--shadow-y', `${normY * 30}px`);
                 preloader.style.setProperty('--tilt-x', `${normX * 12}deg`);
                 preloader.style.setProperty('--tilt-y', `${-normY * 12}deg`);
+                
+                if (!document.documentElement.classList.contains('legacy-mode')) {
+                    requestAnimationFrame(autonomousLoop);
+                }
+            }
+            if (!document.documentElement.classList.contains('legacy-mode')) {
                 requestAnimationFrame(autonomousLoop);
             }
-            requestAnimationFrame(autonomousLoop);
 
             const handleMove = (e) => {
+                if (document.documentElement.classList.contains('legacy-mode')) return;
+                
                 const winW = window.innerWidth; const winH = window.innerHeight;
                 if (isAutonomous) {
                     isAutonomous = false;
@@ -814,18 +1183,40 @@
             window.addEventListener('mousemove', handleMove, { passive: true });
             window.addEventListener('touchstart', handleMove, { passive: true });
             window.addEventListener('touchmove', handleMove, { passive: true });
+            
+            document.addEventListener('mouseleave', () => {
+                if (cursor) cursor.style.opacity = '0';
+            });
+            document.addEventListener('mouseenter', () => {
+                if (cursor && window.innerWidth > 768 && !document.documentElement.classList.contains('legacy-mode')) {
+                    if (preloader.style.display === 'none') {
+                        cursor.classList.add('thimble-mode');
+                        cursor.style.opacity = '1';
+                    } else {
+                        cursor.classList.remove('thimble-mode');
+                        cursor.style.opacity = '1';
+                    }
+                }
+            });
 
             // --- TRANSIÇÃO PARA O FUNIL ---
             btn.addEventListener('click', () => {
                 try { if (navigator.vibrate) navigator.vibrate([20, 30, 20, 30, 60]); } catch (e) {}
 
-                preloader.classList.add('exit-ritual');
+                if (!document.documentElement.classList.contains('legacy-mode')) {
+                    preloader.classList.add('exit-ritual');
+                } else {
+                    preloader.style.opacity = '0';
+                }
+                
                 mainContent.classList.remove('opacity-0', 'pointer-events-none');
                 mainContent.classList.add('relative');
                 mainContent.classList.remove('absolute');
                 visionToggle.style.opacity = '0';
 
-                if (window.innerWidth > 768 && cursor) cursor.classList.add('thimble-mode');
+                if (window.innerWidth > 768 && cursor && !document.documentElement.classList.contains('legacy-mode')) {
+                    cursor.classList.add('thimble-mode');
+                }
 
                 setTimeout(() => {
                     preloader.style.display = 'none';
@@ -838,8 +1229,6 @@
             });
 
             // --- LÓGICA DO FUNIL (MAIN CONTENT) ---
-            
-            // Haptic Feedback Universal
             document.querySelectorAll('.haptic-target').forEach(el => {
                 const triggerHaptic = () => {
                     const val = el.getAttribute('data-vibrate') || 10;
@@ -849,54 +1238,121 @@
                 el.addEventListener('touchstart', triggerHaptic, {passive: true});
             });
 
-            // Intersection Observer (Scroll Reveal)
-            const initScrollReveal = () => {
-                const observerOptions = { root: null, rootMargin: '0px', threshold: 0.15 };
-                const observer = new IntersectionObserver((entries, observer) => {
-                    entries.forEach(entry => {
-                        if (entry.isIntersecting) {
-                            entry.target.classList.add('is-visible');
-                            observer.unobserve(entry.target);
+            // Lógica Avançada de Vídeo nos Cards do Acervo (Performance Otimizada)
+            const portfolioCards = document.querySelectorAll('.portfolio-card');
+            portfolioCards.forEach(card => {
+                const vid = card.querySelector('.portfolio-video');
+                if(!vid) return;
+
+                // Para Desktop (Hover via rato)
+                card.addEventListener('mouseenter', () => {
+                    if(!document.documentElement.classList.contains('legacy-mode')) {
+                        vid.play().catch(e => { /* Silencia erros de autoplay no browser */ });
+                    }
+                });
+                
+                card.addEventListener('mouseleave', () => {
+                    vid.pause();
+                });
+
+                // Para Mobile (Toque)
+                card.addEventListener('touchstart', () => {
+                    if(!document.documentElement.classList.contains('legacy-mode')) {
+                        if(vid.paused) {
+                            // Pausa os outros antes de iniciar este
+                            document.querySelectorAll('.portfolio-video').forEach(v => v.pause());
+                            vid.play().catch(e => {});
+                        }
+                    }
+                }, {passive: true});
+            });
+
+            // FAQ Accordion Logic
+            const faqItems = document.querySelectorAll('.faq-item');
+            faqItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    const answer = item.querySelector('.faq-answer');
+                    const icon = item.querySelector('.faq-icon');
+                    
+                    // Close others
+                    faqItems.forEach(otherItem => {
+                        if (otherItem !== item) {
+                            otherItem.querySelector('.faq-answer').classList.remove('open');
+                            otherItem.querySelector('.faq-icon').classList.remove('open');
                         }
                     });
-                }, observerOptions);
 
-                document.querySelectorAll('.reveal-on-scroll').forEach(section => {
-                    observer.observe(section);
-                });
-            };
-
-            // Horizontal Drag Scroll
-            const dragSliders = document.querySelectorAll('.drag-slider');
-            dragSliders.forEach(slider => {
-                let isDown = false;
-                let startX;
-                let scrollLeft;
-
-                slider.addEventListener('mousedown', (e) => {
-                    isDown = true;
-                    slider.classList.add('active');
-                    startX = e.pageX - slider.offsetLeft;
-                    scrollLeft = slider.scrollLeft;
-                });
-                slider.addEventListener('mouseleave', () => { isDown = false; });
-                slider.addEventListener('mouseup', () => { isDown = false; });
-                slider.addEventListener('mousemove', (e) => {
-                    if (!isDown) return;
-                    e.preventDefault();
-                    const x = e.pageX - slider.offsetLeft;
-                    const walk = (x - startX) * 2; 
-                    slider.scrollLeft = scrollLeft - walk;
+                    // Toggle current
+                    answer.classList.toggle('open');
+                    icon.classList.toggle('open');
                 });
             });
 
-            // Before/After Slider Interativo
+            const initScrollReveal = () => {
+                if (document.documentElement.classList.contains('legacy-mode')) return;
+                try {
+                    const observerOptions = { root: null, rootMargin: '0px', threshold: 0.15 };
+                    const observer = new IntersectionObserver((entries, observer) => {
+                        entries.forEach(entry => {
+                            if (entry.isIntersecting) {
+                                entry.target.classList.add('is-visible');
+                                observer.unobserve(entry.target);
+                            }
+                        });
+                    }, observerOptions);
+
+                    document.querySelectorAll('.reveal-on-scroll').forEach(section => {
+                        observer.observe(section);
+                    });
+                } catch(e) {
+                    document.querySelectorAll('.reveal-on-scroll').forEach(section => {
+                        section.classList.add('is-visible');
+                    });
+                }
+            };
+
+            const dragSliders = document.querySelectorAll('.drag-slider');
+            const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+            
+            if (!isTouchDevice) {
+                dragSliders.forEach(slider => {
+                    let isDown = false;
+                    let startX;
+                    let scrollLeft;
+
+                    slider.classList.add('mouse-drag');
+
+                    slider.addEventListener('mousedown', (e) => {
+                        isDown = true;
+                        slider.classList.add('active');
+                        slider.style.scrollSnapType = 'none';
+                        startX = e.pageX - slider.offsetLeft;
+                        scrollLeft = slider.scrollLeft;
+                    });
+                    slider.addEventListener('mouseleave', () => { 
+                        isDown = false; 
+                        slider.style.scrollSnapType = ''; 
+                    });
+                    slider.addEventListener('mouseup', () => { 
+                        isDown = false; 
+                        slider.style.scrollSnapType = ''; 
+                    });
+                    slider.addEventListener('mousemove', (e) => {
+                        if (!isDown) return;
+                        e.preventDefault();
+                        const x = e.pageX - slider.offsetLeft;
+                        const walk = (x - startX) * 2; 
+                        slider.scrollLeft = scrollLeft - walk;
+                    });
+                });
+            }
+
             const sliderContainer = document.getElementById('ba-container');
             const beforePanel = document.getElementById('ba-before');
             const handle = document.getElementById('ba-handle');
             let isDraggingSlider = false;
 
-            if (sliderContainer) {
+            if (sliderContainer && !document.documentElement.classList.contains('legacy-mode')) {
                 const updateSlider = (clientX) => {
                     const rect = sliderContainer.getBoundingClientRect();
                     let x = clientX - rect.left;
